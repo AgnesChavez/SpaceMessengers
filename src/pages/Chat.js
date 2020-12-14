@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Header from "../components/Header";
+
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import firebase from 'firebase/app';
@@ -21,6 +21,25 @@ function Message(props) {
     );
 }
 
+function setMessageArea() {
+    let headerHeight = document.querySelector("header").clientHeight;
+    let chatContHeight = (window.innerHeight - headerHeight);
+    document.querySelector(".spaceMessengersBg").style.height = chatContHeight + "px";
+    document.querySelector(".chat-container").style.height = chatContHeight + "px";
+    let messageInput = document.getElementById("messageInput");
+    let marginBottom = 20;
+    document.querySelector(".chat-area").style.height = (chatContHeight - messageInput.clientHeight - marginBottom) + "px";
+
+    let sendButton = document.getElementById("sendButton");
+
+    sendButton.style.height = (messageInput.clientHeight) + "px";
+
+
+
+}
+
+window.addEventListener('resize', setMessageArea);
+
 
 export default class Chat extends Component {
     constructor(props) {
@@ -31,33 +50,48 @@ export default class Chat extends Component {
             content: '',
             readError: null,
             writeError: null,
-            loadingChats: false
+            loadingChats: false,
+            group: {id: "default"}
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.myRef = React.createRef();
     }
 
+    
+
     async componentDidMount() {
         this.setState({ readError: null, loadingChats: true });
         const chatArea = this.myRef.current;
         try {
-            // .orderBy('created', 'asc').limit(25)//where("", "==", "CA")
-            db.collection("chats").orderBy('created', 'asc').limit(5)
+            // chatArea.style.height = (clientHeight - 60) + "px";
+            setMessageArea();
+            this.unsubscribe && this.unsubscribe();
+            this.unsubscribe = db.collection("chats").where("group", "==", this.state.group.id).orderBy('created', 'desc').limit(15)
                 .onSnapshot(querySnapshot => {
-                let chats = [];
-                querySnapshot.forEach((snap) => {
-                    chats.push(snap.data());
+                    let chats = [];
+                    querySnapshot.forEach((snap) => {
+                        if(!snap.data().isComment)
+                            chats.push(snap.data());
+                    });
+                    chats.reverse();
+                    // chats.sort(function(a, b) { return a.timestamp - b.timestamp })
+                    this.setState({ chats });
+                    chatArea.scrollBy(0, chatArea.scrollHeight);
+                    this.setState({ loadingChats: false });
                 });
-                // chats.sort(function(a, b) { return a.timestamp - b.timestamp })
-                this.setState({ chats });
-                chatArea.scrollBy(0, chatArea.scrollHeight);
-                this.setState({ loadingChats: false });
-            });
         } catch (error) {
             this.setState({ readError: error.message, loadingChats: false });
         }
     }
+
+    componentWillUnmount()
+    {
+        if(this.unsubscribe){
+            this.unsubscribe();
+            console.log("this.unsubscribe();");
+        }  
+    } 
 
     handleChange(event) {
         this.setState({
@@ -67,7 +101,10 @@ export default class Chat extends Component {
 
     async handleSubmit(event) {
         event.preventDefault();
-        console.log("handleSubmit");
+
+        if(this.state.content === "" || this.state.content == null) return;
+
+        // console.log("handleSubmit");
         this.setState({ writeError: null });
 
         try {
@@ -78,7 +115,7 @@ export default class Chat extends Component {
                 created: firebase.firestore.FieldValue.serverTimestamp(),
                 uid: this.state.user.uid,
                 id: null,
-                // group: this.state.group.id,
+                group: this.state.group.id,
                 likedBy: [],
                 numLikes: 0,
                 isComment: false,
@@ -86,14 +123,14 @@ export default class Chat extends Component {
                 attachments: [],
                 pullRequests: []
             });
-            
-            
+
+
 
             await db.collection("chats").doc(docRef.id).update({
                 id: docRef.id
             });
 
-        
+
             this.setState({ content: '' });
             const chatArea = this.myRef.current;
             chatArea.scrollBy(0, chatArea.scrollHeight);
@@ -110,7 +147,7 @@ export default class Chat extends Component {
         return (
             <div className="spaceMessengersBg">
             <div className="container-md chat-container">
-        <Header />
+        
 
         <div className="chat-area" ref={this.myRef}>
           {/* loading indicator */}
@@ -122,14 +159,18 @@ export default class Chat extends Component {
             return (<Message key={chat.id} chat={chat} uid={this.state.user.uid} />);
           })}
         </div>
-        <form onSubmit={this.handleSubmit} className="mx-3">
-          <textarea className="form-control" name="content" onChange={this.handleChange} value={this.state.content}></textarea>
-          {this.state.error ? <p className="text-danger">{this.state.error}</p> : null}
-          <button type="submit" className="btn btn-submit px-5 mt-4">Send</button>
-        </form>
-        <div className="py-5 mx-3">
-          Logged in as: <strong className="text-info">{this.state.user.email}</strong>
+        
+        
+        <div id="messageInput" className="input-group mb-3">
+        <textarea id="messageTxtArea" className="form-control" aria-label="With textarea" aria-describedby="sendButton" name="content" onChange={this.handleChange} value={this.state.content}></textarea>
+        <button className="btn btn-primary btn-outline-primary" type="button" id="sendButton" onClick={this.handleSubmit} >Send</button> 
         </div>
+        
+
+
+
+
+
       </div>
       </div>
         );
