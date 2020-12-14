@@ -100,7 +100,6 @@ render() {
         <form
           className="mt-5 py-5 px-5"
           autoComplete="off"
-          onSubmit={this.handleSubmit}
         >
           <p className="lead">
             Please write your email address to finish your registration.
@@ -118,7 +117,7 @@ render() {
             />
           </div>
           <div className="form-group">
-            <button className="btn btn-primary px-5" type="submit">Send</button>
+            <button className="btn btn-primary px-5" type="button" onClick={this.handleSubmit}>Send</button>
           </div>
         </form>
         : ""}
