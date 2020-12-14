@@ -82,7 +82,7 @@ class App extends Component {
           <Header />
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route exact path="/completeRegistration" component={CompleteRegistration} />
+            <Route path="/completeRegistration" component={CompleteRegistration} />
             <PrivateRoute
               path="/chat"
               authenticated={this.state.authenticated}
@@ -103,11 +103,7 @@ class App extends Component {
               authenticated={this.state.authenticated}
               component={Login}
             />
-            {/* <PublicRoute */}
-            {/*   path="/completeRegistration" */}
-            {/*   authenticated={this.state.authenticated} */}
-            {/*   component={CompleteRegistration} */}
-            {/* /> */}
+            
           </Switch>
         </Router>
       );
