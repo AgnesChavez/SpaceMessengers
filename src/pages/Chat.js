@@ -24,21 +24,25 @@ function Message(props) {
 function setMessageArea() {
     let headerHeight = document.querySelector("header").clientHeight;
     let chatContHeight = (window.innerHeight - headerHeight);
-    document.querySelector(".spaceMessengersBg").style.height = chatContHeight + "px";
-    document.querySelector(".chat-container").style.height = chatContHeight + "px";
-    let messageInput = document.getElementById("messageInput");
+    // let spaceMessengersBg = document.querySelector(".spaceMessengersBg");
+    let chatcontainer = document.querySelector(".chat-container");
+
+    // if(spaceMessengersBg) spaceMessengersBg.style.height = chatContHeight + "px";
+    if(chatcontainer) chatcontainer.style.height = chatContHeight + "px";
     let marginBottom = 20;
-    document.querySelector(".chat-area").style.height = (chatContHeight - messageInput.clientHeight - marginBottom) + "px";
+    let messageInput = document.getElementById("messageInput");
+    let chatArea = document.querySelector(".chat-area");
 
-    let sendButton = document.getElementById("sendButton");
+    if(messageInput && chatArea){
+        chatArea.style.height = (chatContHeight - messageInput.clientHeight - marginBottom) + "px";
 
-    sendButton.style.height = (messageInput.clientHeight) + "px";
+        let sendButton = document.getElementById("sendButton");
 
-
+        if(sendButton) sendButton.style.height = (messageInput.clientHeight) + "px";
+    }
 
 }
 
-window.addEventListener('resize', setMessageArea);
 
 
 export default class Chat extends Component {
@@ -63,9 +67,12 @@ export default class Chat extends Component {
     async componentDidMount() {
         this.setState({ readError: null, loadingChats: true });
         const chatArea = this.myRef.current;
+        setMessageArea();
+        window.addEventListener("resize", setMessageArea);
+
         try {
             // chatArea.style.height = (clientHeight - 60) + "px";
-            setMessageArea();
+            
             this.unsubscribe && this.unsubscribe();
             this.unsubscribe = db.collection("chats").where("group", "==", this.state.group.id).orderBy('created', 'desc').limit(15)
                 .onSnapshot(querySnapshot => {
@@ -87,9 +94,10 @@ export default class Chat extends Component {
 
     componentWillUnmount()
     {
+        window.removeEventListener("resize", setMessageArea);
         if(this.unsubscribe){
             this.unsubscribe();
-            console.log("this.unsubscribe();");
+            // console.log("this.unsubscribe();");
         }  
     } 
 
@@ -145,7 +153,6 @@ export default class Chat extends Component {
 
     render() {
         return (
-            <div className="spaceMessengersBg">
             <div className="container-md chat-container">
         
 
@@ -171,7 +178,6 @@ export default class Chat extends Component {
 
 
 
-      </div>
       </div>
         );
     }
