@@ -6,118 +6,128 @@ import { storageRef } from "../services/firebase";
 // import { getUserFromDb } from "../helpers/auth";
 import { userTypes, createNewUser } from "../helpers/userMananagement";
 
-
-class AdminProfile  extends Component {
-
-
-}
-
-
-function checkForm(formId)
+import EmailField  from "../components/EmailField";
+import {Toast}  from "../components/Toast";
+// class AdminProfile  extends Component {
+// 
+// 
+// }
+// 
+// 
+// function checkForm(formId)
+// {
+//     console.log("Check form");
+//     let form = document.getElementById(formId);
+//     if(form){
+//         if(form.classList.contains("needs-validation")){
+//             if (form.checkValidity()) {
+//                 form.classList.add('was-validated')
+//                 return true;
+//             }
+//         }
+//     }
+//     return false;
+// }
+// 
+// function clearForm(name)
+// {
+//     let form = document.getElementById(name);
+//     if(form){
+//         form.reset();
+//         if(form.classList.contains("was-validated")){
+//             form.classList.remove("was-validated");
+//         }
+//     }
+// }
+// 
+// 
+// class InstructorProfile extends Component {
+// 
+//     constructor(props) {
+//         super(props);    
+//         this.handleAddStudentChange = this.handleAddStudentChange.bind(this);
+//         this.handleAddStudent = this.handleAddStudent.bind(this);
+//         
+//         this.state = {
+//             
+//             addStudent: "",
+//             changed : {
+//                 addStudent: false
+//             }
+//         }
+//     }
+// 
+// 
+// 
+//     handleAddStudentChange(event)
+//     {
+//         let changed = this.state.changed;
+//         let name = event.target.name;
+//         changed[name] = true;
+//         this.setState({
+//             [name]: event.target.value,
+//             changed: changed
+//         });
+// 
+//         if(event.target.value === ""){
+//             clearForm("addStudentForm");
+//         } else 
+//         if(checkForm("addStudentForm")){
+//             if(event.target.classList.contains("is-invalid")){
+//                 event.target.classList.remove("is-invalid");
+//             }
+//         }
+//     }
+// 
+//     handleAddStudent(event)
+//     {
+//         
+//         // console.log(event);
+//         if(checkForm("addStudentForm"))
+//         {
+//             createNewUser(this.state.addStudent);
+//             clearForm("addStudentForm");
+//             // console.log("addStudent: ", this.state.addStudent);        
+//         }
+//         
+//         // if(validEmail(this.state.addStudent)){
+//             
+//         // }
+//         
+//     }
+// 
+//     render(){ 
+//         let name="addStudent";
+//         return (
+//             <form id="addStudentForm" className="needs-validation">
+//             <div className="input-group mb-3 has-validation">
+//             <span className="input-group-text " id={name+"_label"}>Add student</span>
+//             <input  id={name+"_input"}
+//                     type="email"
+//                     className="form-control"
+//                     placeholder="type student email"
+//                     aria-label="type student email"
+//                     aria-describedby="addStudentValidationFeedback"
+//                     onChange={this.handleAddStudentChange}
+//                     name={name}
+//                     required
+//                     />
+//             <button className="btn btn-primary" type="button"  onClick={this.handleAddStudent} >Add</button>
+//             <div id="addStudentValidationFeedback" className="invalid-feedback">Invalid email</div>
+//             </div>
+//             </form>
+//         );
+//     }
+// }
+// 
+// 
+function createToast(msg)
 {
-    console.log("Check form");
-    let form = document.getElementById(formId);
-    if(form){
-        if(form.classList.contains("needs-validation")){
-            if (form.checkValidity()) {
-                form.classList.add('was-validated')
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-function clearForm(name)
-{
-    let form = document.getElementById(name);
-    if(form){
-        form.reset();
-        if(form.classList.contains("was-validated")){
-            form.classList.remove("was-validated");
-        }
-    }
-}
-
-
-class InstructorProfile extends Component {
-
-    constructor(props) {
-        super(props);    
-        this.handleAddStudentChange = this.handleAddStudentChange.bind(this);
-        this.handleAddStudent = this.handleAddStudent.bind(this);
-        
-        this.state = {
-            
-            addStudent: "",
-            changed : {
-                addStudent: false
-            }
-        }
-    }
-
-
-
-    handleAddStudentChange(event)
-    {
-        let changed = this.state.changed;
-        let name = event.target.name;
-        changed[name] = true;
-        this.setState({
-            [name]: event.target.value,
-            changed: changed
-        });
-
-        if(event.target.value === ""){
-            clearForm("addStudentForm");
-        } else 
-        if(checkForm("addStudentForm")){
-            if(event.target.classList.contains("is-invalid")){
-                event.target.classList.remove("is-invalid");
-            }
-        }
-    }
-
-    handleAddStudent(event)
-    {
-        
-        // console.log(event);
-        if(checkForm("addStudentForm"))
-        {
-            createNewUser(this.state.addStudent);
-            clearForm("addStudentForm");
-            // console.log("addStudent: ", this.state.addStudent);        
-        }
-        
-        // if(validEmail(this.state.addStudent)){
-            
-        // }
-        
-    }
-
-    render(){ 
-        let name="addStudent";
-        return (
-            <form id="addStudentForm" className="needs-validation">
-            <div className="input-group mb-3 has-validation">
-            <span className="input-group-text " id={name+"_label"}>Add student</span>
-            <input  id={name+"_input"}
-                    type="email"
-                    className="form-control"
-                    placeholder="type student email"
-                    aria-label="type student email"
-                    aria-describedby="addStudentValidationFeedback"
-                    onChange={this.handleAddStudentChange}
-                    name={name}
-                    required
-                    />
-            <button className="btn btn-primary" type="button"  onClick={this.handleAddStudent} >Add</button>
-            <div id="addStudentValidationFeedback" className="invalid-feedback">Invalid email</div>
-            </div>
-            </form>
+    return (
+        <Toast message={msg} />
         );
-    }
 }
+
 
 export default class UserProfile extends Component {
 
@@ -318,7 +328,10 @@ export default class UserProfile extends Component {
 
     addInstructorProfile(){
         if(this.state.dbUser !== null && this.state.dbUser.type !== userTypes.student) {
-            return (<InstructorProfile ></InstructorProfile>)
+            return (<EmailField 
+            onClick={ email => createToast("Probando Toast: " + email)}
+          />);
+
         }
     }
 
