@@ -57,10 +57,7 @@ export default class Login extends Component {
           onSubmit={this.handleSubmit}
         >
           <h1>
-            Login to
-            <Link className="title ml-2" to="/">
-              Chatty
-            </Link>
+            Login to Space Messengers
           </h1>
           <p className="lead">
             Fill in the form below to login to your account.
@@ -75,16 +72,16 @@ export default class Login extends Component {
               value={this.state.email}
             />
           </div>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Password"
-              name="password"
-              onChange={this.handleChange}
-              value={this.state.password}
-              type="password"
-            />
-          </div>
+          {/* <div className="form-group"> */}
+          {/*   <input */}
+          {/*     className="form-control" */}
+          {/*     placeholder="Password" */}
+          {/*     name="password" */}
+          {/*     onChange={this.handleChange} */}
+          {/*     value={this.state.password} */}
+          {/*     type="password" */}
+          {/*   /> */}
+          {/* </div> */}
           <div className="form-group">
             {this.state.error ? (
               <p className="text-danger">{this.state.error}</p>
@@ -95,13 +92,13 @@ export default class Login extends Component {
           <button className="btn btn-danger mr-2" type="button" onClick={this.googleSignIn}>
             Sign in with Google
           </button>
-          <button className="btn btn-secondary" type="button" onClick={this.githubSignIn}>
-            Sign in with GitHub
-          </button>
-          <hr />
-          <p>
-            Don't have an account? <Link to="/signup">Sign up</Link>
-          </p>
+          {/* <button className="btn btn-secondary" type="button" onClick={this.githubSignIn}> */}
+          {/*   Sign in with GitHub */}
+          {/* </button> */}
+          {/* <hr /> */}
+          {/* <p> */}
+          {/*   Don't have an account? <Link to="/signup">Sign up</Link> */}
+          {/* </p> */}
         </form>
 
       </div>
