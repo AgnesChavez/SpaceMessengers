@@ -6,6 +6,13 @@ body {
   color:#ffffff;
 }
 
+html, body, #root {
+  height: 100%;
+}
+header
+{
+  height: 64px;
+}
 .header-nav
 {
   background-color: rgba(50,50,50,0.5);
@@ -16,13 +23,10 @@ body {
   color: white;
 }
 
-.chat-area, .home {
-  margin-top: 60px;
-}
 
 .chat-area {
   padding: 20px;
-  height: 400px;
+  /*height: 100%;*/
   overflow-y: scroll;
 }
 
@@ -53,7 +57,9 @@ body {
   box-shadow: none;
 }
 
-.btn {
+
+
+/*.btn {
   margin-top: 10px;
 }
 
@@ -61,7 +67,29 @@ body {
   background-color: #2e7d32;
   color: white;
 }
+*/
+#messageInput
+{
+  padding-right: 15px;
+}
+
+#sendButton{
+  color: rgb(200,200,200);
+  /*background-color: red; */
+  /*display: inline-block;*/
+  /*position: relative;*/
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/*#messageTxtAreaWrapper{
+  display: inline-block;
+  padding: 10px;
+}
+*/
+
 .spaceMessengersBg {
+  height: 100%;
   background-image: url("imgs/steaminSpace_2000x1000.jpg");
   background-attachment: fixed;
   background-clip: border-box;
@@ -74,7 +102,141 @@ body {
   background-size: cover
 }
 .chat-container{
+
+  /*height: 100%;*/
   background-color: rgba(0, 0, 0, 0.64);
+}
+
+
+.profileButton
+{
+  text-align: right;
+
+  display: block;
+}
+.emp-profile{
+    padding: 3%;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+.profile-img{
+    text-align: center;
+}
+.profile-img img{
+    width: 70%;
+    height: 100%;
+}
+.profile-img .file {
+    position: relative;
+    overflow: hidden;
+    margin-top: -20%;
+    width: 70%;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    background: #212529b8;
+    cursor: pointer;
+}
+.profile-img .file input[type=button] {
+    width: 100%;
+    position: absolute;
+    opacity: 1;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+}
+.profile-img input[type="file"] {
+    display: none;
+}
+.profile-img .custom-file-upload {
+
+  position: relative;
+    overflow: hidden;
+  
+    width: 70%;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    background: #212529b8;
+    cursor: pointer;
+
+    height:30px;
+    bottom:30px;
+    
+    display: inline-block;
+    
+    cursor: pointer;
+}
+
+
+.profile-head h5{
+    color: #333;
+}
+.profile-head h6{
+    color: #0062cc;
+}
+.profile-edit-btn{
+    border: none;
+    border-radius: 1.5rem;
+    width: 70%;
+    padding: 2%;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+}
+.proile-rating{
+    font-size: 12px;
+    color: #818182;
+    margin-top: 5%;
+}
+.proile-rating span{
+    color: #495057;
+    font-size: 15px;
+    font-weight: 600;
+}
+.profile-head .nav-tabs{
+    margin-bottom:5%;
+}
+.profile-head .nav-tabs .nav-link{
+    font-weight:600;
+    border: none;
+}
+.profile-head .nav-tabs .nav-link.active{
+    border: none;
+    border-bottom:2px solid #0062cc;
+}
+.profile-work{
+    padding: 14%;
+    margin-top: -15%;
+}
+.profile-work p{
+    font-size: 12px;
+    color: #818182;
+    font-weight: 600;
+    margin-top: 10%;
+}
+.profile-work a{
+    text-decoration: none;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+}
+.profile-work ul{
+    list-style: none;
+}
+.profile-tab label{
+    font-weight: 600;
+}
+.profile-tab p{
+    font-weight: 600;
+    color: #0062cc;
+}
+
+.profile-label, .profile-value
+{
+  
 }
 
 

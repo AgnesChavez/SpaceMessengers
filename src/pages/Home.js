@@ -7,7 +7,6 @@ export default class HomePage extends Component {
   render() {
     return (
       <div className="home">
-        <Header></Header>
         <section>
           <div className="jumbotron jumbotron-fluid py-5 spaceMessengersBg" >
             <div className="container text-center py-5">
