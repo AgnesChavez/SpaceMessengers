@@ -58,11 +58,3 @@ export  function getTeamForUserWorkshop(userId, workshopId) {
     return getQueryData(db.collection("teams").where("workshop", "==", workshopId).where("members", "array-contains",  userId));
 }
  
-export function createDummyUsers() {
-
-    createUserInDb(uid, userTypes().student);
-
-
-}
-
-
