@@ -10,9 +10,11 @@ import Chat from "./pages/Chat";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import UserProfile from "./pages/User";
+import Settings from "./pages/Settings";
 import CompleteRegistration from "./pages/CompleteRegistration";
 import { auth } from "./services/firebase";
 import Header from "./components/Header";
+import Board from "./pages/Board";
 import './styles.css';
 
 function PrivateRoute({ component: Component, authenticated, ...rest }) {
@@ -89,6 +91,11 @@ class App extends Component {
               component={Chat}
             />
             <PrivateRoute
+              path="/board"
+              authenticated={this.state.authenticated}
+              component={Board}
+            />
+            <PrivateRoute
               path="/profile"
               authenticated={this.state.authenticated}
               component={UserProfile}
@@ -102,6 +109,11 @@ class App extends Component {
               path="/login"
               authenticated={this.state.authenticated}
               component={Login}
+            />
+            <PrivateRoute
+              path="/settings"
+              authenticated={this.state.authenticated}
+              component={Settings}
             />
             
           </Switch>

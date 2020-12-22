@@ -1,13 +1,9 @@
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
+import { User, userTypes } from "./Types"
 
-export const userTypes = {
-    student :"student",
-    instructor: "instructor",
-    admin: "admin"
-}
-
+import { getQueryData, setDataInDb } from "./db"
 
 export async function createNewUser(_email) {
 
@@ -32,41 +28,41 @@ export async function createNewUser(_email) {
             console.log("Failed adding user: error: ", error );
             // Some error occurred, you can inspect the code: error.code
         });
-
 }
 
 
 
-export function createUserInDb(uid) {
+export function createUserInDb(uid, type = null) {
 
-    db.collection("users").doc(uid).set({
-        id : uid,
-        type : userTypes.student,
-        location : "",
-        bio : "",
-        workshops : [],
-        groups : [],
-        photoURL: null
-    })
-    .then(function() {
-        console.log("User successfully written!");
-    })
-    .catch(function(error) {
-        console.error("Error creating user: ", error);
-    });
+    let _type = type;
+    if(type === null) _type = userTypes().student;
+    setDataInDb("users", uid, User(uid, _type));
+    // db.collection("users").doc(uid).set(User(uid, _type))
+    // .then(function() {
+    //     console.log("User successfully written!");
+    // })
+    // .catch(function(error) {
+    //     console.error("Error creating user: ", error);
+    // });
 }
 
-export async function getUserFromDb(uid) {
-    try{
 
-    let user = await db.collection("users").doc(uid).get();
-    if(user.exists)
-        return user.data();
-    }
-    catch(error) {
-        console.error("Error retrieving user: ", uid, "  error: ", error);
-        return null;
-    }
-    return null;
+
+
+
+export function getUserFromDb(uid) {
+    return getQueryData(db.collection("users").doc(uid));
+
 } 
+export  function getTeamForUserWorkshop(userId, workshopId) {
+    return getQueryData(db.collection("teams").where("workshop", "==", workshopId).where("members", "array-contains",  userId));
+}
+ 
+export function createDummyUsers() {
+
+    createUserInDb(uid, userTypes().student);
+
+
+}
+
 

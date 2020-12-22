@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { auth } from "../services/firebase";
-import { createUserInDb } from "../helpers/userMananagement";
+import { createUserInDb } from "../helpers/userManagement";
 import { Link } from 'react-router-dom';
 
 export default class CompleteRegistration extends Component {
