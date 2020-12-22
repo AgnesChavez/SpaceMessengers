@@ -1,0 +1,13 @@
+#board{
+  height: 600px;
+  padding: 15px;
+  position: relative;
+} 
+
+.messageCard{
+  max-width:400px;
+}
+.boardMessageTime{
+  text-align: end;  
+  margin: 0px;
+}

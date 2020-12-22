@@ -10,13 +10,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
 
-
-function formatTime(timestamp) {
-    const d = timestamp.toDate();
-    const time = `${d.getDate()}/${(d.getMonth()+1)}/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
-    return time;
-}
-
+import { formatTime } from '../helpers/Formatting' 
 
 
 export default function Chat() {
@@ -56,6 +50,7 @@ export default function Chat() {
     setFormValue('');
     dummy.current.scrollIntoView({ behavior: 'smooth' });
   }
+
 
   return (<>
     <main>
