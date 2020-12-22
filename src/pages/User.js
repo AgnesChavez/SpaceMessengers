@@ -4,123 +4,16 @@ import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import { storageRef } from "../services/firebase";
 // import { getUserFromDb } from "../helpers/auth";
-import { userTypes, createNewUser } from "../helpers/userMananagement";
-
+// import { createNewUser } from "../helpers/userManagement";
+import { userTypes } from "../helpers/Types";
 import EmailField  from "../components/EmailField";
 import {Toast}  from "../components/Toast";
-// class AdminProfile  extends Component {
-// 
-// 
-// }
-// 
-// 
-// function checkForm(formId)
-// {
-//     console.log("Check form");
-//     let form = document.getElementById(formId);
-//     if(form){
-//         if(form.classList.contains("needs-validation")){
-//             if (form.checkValidity()) {
-//                 form.classList.add('was-validated')
-//                 return true;
-//             }
-//         }
-//     }
-//     return false;
-// }
-// 
-// function clearForm(name)
-// {
-//     let form = document.getElementById(name);
-//     if(form){
-//         form.reset();
-//         if(form.classList.contains("was-validated")){
-//             form.classList.remove("was-validated");
-//         }
-//     }
-// }
-// 
-// 
-// class InstructorProfile extends Component {
-// 
-//     constructor(props) {
-//         super(props);    
-//         this.handleAddStudentChange = this.handleAddStudentChange.bind(this);
-//         this.handleAddStudent = this.handleAddStudent.bind(this);
-//         
-//         this.state = {
-//             
-//             addStudent: "",
-//             changed : {
-//                 addStudent: false
-//             }
-//         }
-//     }
-// 
-// 
-// 
-//     handleAddStudentChange(event)
-//     {
-//         let changed = this.state.changed;
-//         let name = event.target.name;
-//         changed[name] = true;
-//         this.setState({
-//             [name]: event.target.value,
-//             changed: changed
-//         });
-// 
-//         if(event.target.value === ""){
-//             clearForm("addStudentForm");
-//         } else 
-//         if(checkForm("addStudentForm")){
-//             if(event.target.classList.contains("is-invalid")){
-//                 event.target.classList.remove("is-invalid");
-//             }
-//         }
-//     }
-// 
-//     handleAddStudent(event)
-//     {
-//         
-//         // console.log(event);
-//         if(checkForm("addStudentForm"))
-//         {
-//             createNewUser(this.state.addStudent);
-//             clearForm("addStudentForm");
-//             // console.log("addStudent: ", this.state.addStudent);        
-//         }
-//         
-//         // if(validEmail(this.state.addStudent)){
-//             
-//         // }
-//         
-//     }
-// 
-//     render(){ 
-//         let name="addStudent";
-//         return (
-//             <form id="addStudentForm" className="needs-validation">
-//             <div className="input-group mb-3 has-validation">
-//             <span className="input-group-text " id={name+"_label"}>Add student</span>
-//             <input  id={name+"_input"}
-//                     type="email"
-//                     className="form-control"
-//                     placeholder="type student email"
-//                     aria-label="type student email"
-//                     aria-describedby="addStudentValidationFeedback"
-//                     onChange={this.handleAddStudentChange}
-//                     name={name}
-//                     required
-//                     />
-//             <button className="btn btn-primary" type="button"  onClick={this.handleAddStudent} >Add</button>
-//             <div id="addStudentValidationFeedback" className="invalid-feedback">Invalid email</div>
-//             </div>
-//             </form>
-//         );
-//     }
-// }
-// 
-// 
+
+import { Workshop } from "../helpers/Workshops";
+
+
+import { Button, Icon } from 'react-materialize';
+
 function createToast(msg)
 {
     return (
@@ -187,21 +80,25 @@ export default class UserProfile extends Component {
         }
 
         return (
-            <div className="input-group mb-3">
-            <span className="input-group-text " id={id+"_label"}>{label}</span>
+
+            <div className="row">    
+            <div className="col s12 grey-text text-darken-4">
+            <span style={{marginRight: 10 + 'px'}} className="" id={id+"_label"}>{label}</span>
             {(value != null && isEditable && this.state.isEditing) ?
+            <div className="input-field inline">
             <input  id={id+"_input"}
                     type="text"
-                    className="form-control"
                     placeholder={value[id]}
                     aria-label={label}
                     onChange={handler}
                     defaultValue={value[id]}
                     name={id}
                     />
+            </div>
             :
             <span className="input-group-text " >{valueStr}</span>
             }
+            </div>
             </div>
         );
     }
@@ -331,17 +228,15 @@ export default class UserProfile extends Component {
             return (<EmailField 
             onClick={ email => createToast("Probando Toast: " + email)}
           />);
-
         }
     }
-
 
 
     render() {
         return (
             <div className="container emp-profile">
                 <div className="row">
-                    <div className="col-md-4">
+                    <div className="col s12 m4">
                         <div className="profile-img">
                             <img src={this.getPhotoUrl()} alt=""/>
                             <label htmlFor="photo-upload" className="custom-file-upload">Change Photo</label>
@@ -350,7 +245,7 @@ export default class UserProfile extends Component {
 
                         </div>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col s12 m6">
                         <div className="profile-head">
                                 <h5>
                                     {this.state.user.displayName}
@@ -370,18 +265,31 @@ export default class UserProfile extends Component {
                         { this.userProp("User Id", this.state.user, "uid", false, null)}
 
                     </div>
-                    <div className="col-md-2">
+                    <div className="col s12 m2">
                         {!this.state.isEditing ?
-                        <button className="profile-edit-btn"  onClick={this.editProfile} >Edit Profile</button>
+                            <Button
+                              className="grey"
+                              floating
+                              icon={<Icon>edit</Icon>}
+                              node="button"
+                              waves="light"
+                              tooltip="Edit Profile"
+                               onClick={this.editProfile}
+                            />
                         :<>
-                        <button className="btn btn-primary"  onClick={this.saveProfile} >Save Profile</button>
-                        <button className="btn "  onClick={this.editProfile} >Cancel</button>
+                        <div className="row">
+                        <Button node="button" waves="light" onClick={this.saveProfile} >Save Profile</Button>
+                        </div>
+                        <div className="row">
+                        <Button node="button" waves="light" className="white black-text"  onClick={this.editProfile} >Cancel</Button>
+                        </div>
                         </>
                         }
                     </div>
                 </div>
                 <div className="row">
-                    {this.addInstructorProfile()}
+                    <Workshop></Workshop>
+                    {/* {this.addInstructorProfile()} */}
                 </div>
             </div>
         )
