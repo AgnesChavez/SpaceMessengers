@@ -1,0 +1,38 @@
+.chatForm
+{
+
+}
+.chatInput
+{
+	width:70%  !important;
+	border-top-left-radius: 23px !important;
+	border-bottom-left-radius: 23px !important;
+	background-color: rgb(255,255,255, 0.3) !important;
+	height:2em !important;
+	margin:0px !important;
+
+}
+.chatSend
+{
+	border-top-right-radius: 23px;
+	border-bottom-right-radius: 23px;
+}
+
+.comment-current-user{
+	text-align: right;
+	background-color: rgb(0,0,0,0.1)
+}
+.comments-container{
+	margin-top: 5px;
+	max-height: 150px;
+	overflow-y: scroll;
+}
+.comment{
+
+}
+
+.comments-container p{
+	padding-left:8px;
+	padding-right:8px;
+	margin:0px;
+}

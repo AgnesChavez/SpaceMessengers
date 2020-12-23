@@ -6,7 +6,7 @@ import {
   Redirect
 } from "react-router-dom";
 import Home from "./pages/Home";
-import Chat from "./pages/Chat";
+import {ChatFullpage} from "./pages/Chat";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import UserProfile from "./pages/User";
@@ -85,11 +85,11 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
-            {/* <PrivateRoute */}
-            {/*   path="/chat" */}
-            {/*   authenticated={this.state.authenticated} */}
-            {/*   component={<Chat {...{collection:"chats", group:"default"}}/>} */}
-            {/* /> */}
+            <PrivateRoute
+              path="/chat"
+              authenticated={this.state.authenticated}
+              component={ChatFullpage}
+            />
             <PrivateRoute
               path="/board"
               authenticated={this.state.authenticated}

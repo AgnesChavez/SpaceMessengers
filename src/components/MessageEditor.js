@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect} from "react";
 
-import {Textarea, Icon, Button, Row, Col,} from 'react-materialize';
+// import { Icon, Button, Row, Col,} from 'react-materialize';
 
 
 import '../css/board.css';
