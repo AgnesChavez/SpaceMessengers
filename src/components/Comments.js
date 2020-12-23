@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect} from "react";
 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Button } from 'react-materialize';
+import { Icon, Button, CollapsibleItem, Collapsible } from 'react-materialize';
 
 import { db } from "../services/firebase";
 
@@ -30,18 +30,41 @@ export function Comments(props)
 
     return ( 
     <>
+
     
-<a className="waves-effect waves-light btn-small"
-    style={{width:100+'%'}}
-     onClick={showComments} 
-    >
-<Icon tiny left>comments</Icon>
-    comments
-</a>
-    <div ref={myRef} className="scale-transition">
+{/* <a className="waves-effect waves-light btn-small" */}
+{/*     style={{width:100+'%'}} */}
+{/*      onClick={showComments}  */}
+{/*     > */}
+{/* <Icon tiny left>comments</Icon> */}
+{/*     comments */}
+{/* </a> */}
+    {/* <div ref={myRef} className="scale-transition"> */}
+
+
+    {/* <ul class="collapsible z-depth-0"> */}
+    {/*     <li> */}
+    {/*         <div class="collapsible-header"><Icon tiny>comments</Icon>comments</div> */}
+    {/*         <div class="collapsible-body"> */}
+    {/*             <Chat collection="comments" group={props.messageId} containerClass="comments-container" isComment={true}></Chat> */}
+    {/*         </div> */}
+    {/*     </li> */}
+    {/* </ul> */}
+
+<Collapsible accordion className="z-depth-0">
+  <CollapsibleItem
+
+    expanded={false}
+    header="comments"
+    icon={<Icon tiny>comments</Icon>}
+    node="div"
+  >
     <Chat collection="comments" group={props.messageId} containerClass="comments-container" isComment={true}></Chat>
+  </CollapsibleItem>
+</Collapsible>
     
-    </div>
+    
+    {/* </div> */}
         {/* small */}
         {/* waves="light" */}
         {/* onClick={showComments} */}

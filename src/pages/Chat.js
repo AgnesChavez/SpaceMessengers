@@ -62,7 +62,7 @@ export default function Chat(props) {
 
     {/* <form className="valign-wrapper chatForm" onSubmit={sendMessage}> */}
 
-    <div className="valign-wrapper">
+    <div className="valign-wrapper chatInputContainer">
       <input  className="chatInput" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
       <button className="chatSend" type="submit" onClick={sendMessage} disabled={!formValue}><Icon>send</Icon></button>
     </div>
