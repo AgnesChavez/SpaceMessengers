@@ -1,13 +1,34 @@
 #board{
   height: 600px;
+  width: 1000px;
+  margin-left:-500px;
+  
+  left: 50%;
+  
   padding: 15px;
   position: relative;
 } 
 
 .messageCard{
   max-width:400px;
+  position:absolute;
 }
 .boardMessageTime{
   text-align: end;  
   margin: 0px;
+}
+
+.messageCard-content{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.messageCard-header{
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.messageCard-handle:hover
+{
+  cursor: grab;
 }

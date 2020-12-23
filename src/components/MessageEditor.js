@@ -1,37 +1,17 @@
 import React, { useState, useRef, useEffect} from "react";
 
-import Draggable from 'react-draggable';
-
-import {Textarea, Icon, Button, Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
-
-import { formatTime } from '../helpers/Formatting'
+import {Textarea, Icon, Button, Row, Col,} from 'react-materialize';
 
 
 import '../css/board.css';
 
 
-function booToString(b, name){
-  return name + ": " + (b?"true":"false")
-}
-
-export function BoardMessage(props) 
+export function MessageEditor(props) 
 {
     const { content, id, uid, timestamp } = props.message;
 
-    const myRef = useRef(null);
     const msgRef = useRef(null);
-    const onStop = (e, position) => {
-        props.onStopHandler(id, position);
-        e.preventDefault();
-        e.stopPropagation();
-    };
-    function isActive(){
-        if(props.selected === null || myRef.current === null)return false;
-        if(props.selected === myRef.current) return true;
-        if(myRef.current.contains(props.selected))return true;
-        return false;
-    }
-
+        
     function textAreaCss()
     {
         let a = isActive();
