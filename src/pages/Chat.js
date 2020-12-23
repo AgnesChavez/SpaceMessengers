@@ -8,18 +8,18 @@ import 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
+import { Icon, Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
 
 import { formatTime } from '../helpers/Formatting' 
 
 
-export default function Chat() {
+export default function Chat(props) {
   const dummy = useRef();
-  const messagesRef = db.collection("chats");
+  const messagesRef = db.collection(props.collection);
   
-  const [group, setGroup] = useState('default');
+  // const {group, setGroup] = useState(props.group);
 
-  const query = messagesRef.where("group", "==", group).orderBy('created', 'desc').limit(15);
+  const query = messagesRef.where("group", "==", props.group).orderBy('created', 'desc').limit(15);
 
   const [messages] = useCollectionData(query);
 
@@ -31,17 +31,16 @@ export default function Chat() {
     e.preventDefault();
 
     const { uid, photoURL } = auth().currentUser;
-    console.log("sendMessage: " , photoURL);
+    // console.log("sendMessage: " , photoURL);
     let docRef = await messagesRef.add({
         content: formValue,
         timestamp: firebase.firestore.Timestamp.now(),
         created: firebase.firestore.FieldValue.serverTimestamp(),
         uid,
         id: null,
-        group,
+        group: props.group,
         photoURL
     });
-
 
     await messagesRef.doc(docRef.id).update({
         id: docRef.id
@@ -63,9 +62,9 @@ export default function Chat() {
 
     <form onSubmit={sendMessage}>
 
-      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
+      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} />
 
-      <button type="submit" disabled={!formValue}>🕊️</button>
+      <button type="submit" disabled={!formValue}><Icon>send</Icon></button>
 
     </form>
   </>)
