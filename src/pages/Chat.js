@@ -11,6 +11,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { Icon, Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
 
 import { formatTime } from '../helpers/Formatting' 
+import '../css/chat.css';
 
 
 export default function Chat(props) {
@@ -52,31 +53,34 @@ export default function Chat(props) {
 
 
   return (<>
-    <main>
-        <div className="container">
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+    <div className={props.containerClass}>
+      {messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} isComment={props.isComment} />)}
 
       <span ref={dummy}></span>
     </div>
-    </main>
+    
 
-    <form onSubmit={sendMessage}>
+    {/* <form className="valign-wrapper chatForm" onSubmit={sendMessage}> */}
 
-      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} />
-
-      <button type="submit" disabled={!formValue}><Icon>send</Icon></button>
-
-    </form>
+    <div className="valign-wrapper">
+      <input  className="chatInput" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
+      <button className="chatSend" type="submit" onClick={sendMessage} disabled={!formValue}><Icon>send</Icon></button>
+    </div>
+    {/* </form> */}
   </>)
 }
 
+function RenderComment(props)
+{
+  let classType = ((props.uid === auth().currentUser.uid)?"comment-current-user":"");
+  return (<p  className={classType} >{props.content}</p>);
+}
 
-function ChatMessage(props) {
-  const { content, uid, photoURL, timestamp } = props.message;
-
+function RenderMessage( props){
+  const { content, uid, photoURL, timestamp } = props;
   const messageClass = uid === auth().currentUser.uid ? 'current-user' :'';
-
-  return (<>
+  
+return (<>
     <Row>
         <Col m={6} s={12}>
             <Card
@@ -89,5 +93,17 @@ function ChatMessage(props) {
             </Card>
         </Col>
     </Row>
-  </>)
+  </>);
+}
+
+function ChatMessage(props) {
+  // const { content, uid, photoURL, timestamp } = props.message;
+
+  return (props.isComment?<RenderComment {...props.message} />:
+                          <RenderMessage {...props.message} />);
+}
+
+
+export function ChatFullpage(props) {
+  return <Chat collection="chats" group="default" isComment={false} containerClass="container" ></Chat>
 }

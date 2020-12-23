@@ -10,7 +10,7 @@ import { MessageEditor } from './MessageEditor'
 
 import { Comments } from './Comments'
 
-import '../css/board.css';
+
 
 
 function booToString(b, name){
