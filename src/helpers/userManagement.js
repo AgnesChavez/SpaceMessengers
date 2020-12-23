@@ -1,7 +1,7 @@
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
-import { User, userTypes } from "./Types"
+import { UserData, userTypes } from "./Types"
 
 import { getQueryData, setDataInDb } from "./db"
 
@@ -36,7 +36,7 @@ export function createUserInDb(uid, type = null) {
 
     let _type = type;
     if(type === null) _type = userTypes().student;
-    setDataInDb("users", uid, User(uid, _type));
+    setDataInDb("users", uid, UserData(uid, _type));
     // db.collection("users").doc(uid).set(User(uid, _type))
     // .then(function() {
     //     console.log("User successfully written!");

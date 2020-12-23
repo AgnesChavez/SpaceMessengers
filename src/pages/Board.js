@@ -18,7 +18,38 @@ import { BoardMessage } from '../components/BoardMessage'
 
 import '../css/board.css';
 
-
+// 
+// async function getBoardUsers(boardId)
+// {
+// 
+//     try{
+//         
+//         let board = await db.collection("boards").doc(boardId).get();    
+//         if(board){
+//             let team =  await db.collection("teams").doc(board.teamId).get();    
+//             if(team)
+//             {
+//                 let members = {};
+//                 for(let i = 0; i< team.members.length; i++)
+//                 {
+//                     let user = await db.collection("users").doc(team.members[i]).get();
+//                     if(user){
+//                         members[team.members[i]] = {
+//                             name : user.displayName,
+//                             photoURL:user.photoURL
+//                         }
+//                     }
+//                 }
+//                 return members;
+//             }
+//         }    
+//     }
+//     catch(error){
+//         console.log("getBoardUsers error:", error);
+//         return null
+//     }
+//     return null
+// }
 
 
 export default function Board() {
@@ -28,9 +59,13 @@ export default function Board() {
 
     const messagesRef = db.collection("boardMessages");
 
-    const [messages, msgReady, msgError] = useCollectionData(messagesRef.where("boardId", "==", boardId));
+    const [users, usrLoading, usrError] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
+
+    const [messages, msgLoading, msgError] = useCollectionData(messagesRef.where("boardId", "==", boardId));
 
     const [selected, setSelected ] = useState(null);
+
+    const [usersMap, setUsersMap] = useState(null);
 
     const addMessage = async (e) => {
         e.preventDefault();
@@ -65,12 +100,38 @@ export default function Board() {
         }
     }
 
+    const onMessageChange = (msgId, msg) => {
+        messagesRef.doc(msgId).update({ content: msg });
+    }
+
+    
+    const getUser = (uid) =>{
+        if(users && !usrLoading)
+        {
+            if(usersMap === null ){
+                console.log("getUser: " + users.length);
+                let newUsersMap = {};
+                for(let i = 0; i < users.length; i++){
+                    newUsersMap[users[i].id] = {name: users[i].displayName, photoURL:users[i].photoURL };
+                }
+                setUsersMap(newUsersMap);
+            }
+            if( usersMap !=null && usersMap.hasOwnProperty(uid))
+            {
+                return usersMap[uid];  
+            }
+        }
+        return ({name: "users[i].displayName", photoURL:"" });
+    }
+
     return ( <>
         <Row>
+                
             <div ref={myRef} id="board" 
-                className="col s12 z-depth-2 grey darken-4  "
+                className="col s12 z-depth-2 grey darken-4 "
                 onClick={onClick}
                 >
+                
                 <Button
                     className="red right"
                     floating
@@ -81,11 +142,13 @@ export default function Board() {
                     tooltip="Click to add a new message"
                 />  
 
-                { messages && messages.map(msg => <BoardMessage
+                { users && messages && messages.map(msg => <BoardMessage
                                                     key={msg.id}  
                                                     message={msg} 
                                                     onStopHandler={onStopHandler} 
                                                     selected={selected}
+                                                    user={getUser(msg.uid)}
+                                                    onMessageChange={onMessageChange}
                                                      />)}
       
             </div>

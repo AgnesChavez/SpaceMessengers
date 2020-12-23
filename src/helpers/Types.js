@@ -8,7 +8,7 @@ export function userTypes() {
   }
 }
 
-export function Workshop() {
+export function WorkshopData() {
   return {
     id: "",
     instructors: [],
@@ -20,11 +20,11 @@ export function Workshop() {
   }
 }
 
-export function Pair(uid1, uid2) {
+export function PairData(uid1, uid2) {
   return [uid1, uid2];
 }
 
-export function Team(pair1, pair2, ws) {
+export function TeamData(pair1, pair2, ws) {
   return {
     id: "",
     workshop: ws,
@@ -34,7 +34,7 @@ export function Team(pair1, pair2, ws) {
 }
 
 
-export function User(uid, type) {
+export function UserData(uid, type) {
   return {
     id: uid,
     type: type,
@@ -45,10 +45,12 @@ export function User(uid, type) {
     institutionId: "",
     teamsMap: null,
     photoURL: null,
-    displayName: ""
+    displayName: "",
+    boards: []
+
   };
 }
-export function Board(teamId) {
+export function BoardData(teamId) {
   return {
     id: "",
     messages: [],
@@ -56,7 +58,7 @@ export function Board(teamId) {
   }
 }
 
-export function Institution(name) {
+export function InstitutionData(name) {
   return {
     name,
     members: []
@@ -74,6 +76,7 @@ export function BoardMessageData(uid, boardId) {
     position: {
       x: 0,
       y: 0
-    }
+    },
+    comments:{}
   };
 }
