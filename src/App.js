@@ -85,11 +85,11 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
-            <PrivateRoute
-              path="/chat"
-              authenticated={this.state.authenticated}
-              component={Chat}
-            />
+            {/* <PrivateRoute */}
+            {/*   path="/chat" */}
+            {/*   authenticated={this.state.authenticated} */}
+            {/*   component={<Chat {...{collection:"chats", group:"default"}}/>} */}
+            {/* /> */}
             <PrivateRoute
               path="/board"
               authenticated={this.state.authenticated}

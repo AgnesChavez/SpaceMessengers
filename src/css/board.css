@@ -32,3 +32,13 @@
 {
   cursor: grab;
 }
+
+.messageCard-footer{
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.textEditor{
+border-radius: 7px;
+}
