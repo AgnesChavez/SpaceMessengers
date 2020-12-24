@@ -1,16 +1,5 @@
-import React, { Component, useState } from 'react';
-// import { Link } from 'react-router-dom';
-import { auth } from "../services/firebase";
-import { db } from "../services/firebase";
-import { storageRef } from "../services/firebase";
-// import { getUserFromDb } from "../helpers/auth";
-// import { userTypes, createNewUser } from "../helpers/userManagement";
+import React from 'react';
 
-// import EmailField  from "../components/EmailField";
-// import {Toast}  from "../components/Toast";
-// import Toast from 'react-bootstrap/Toast';
-
-// import '../dashboard.css'
 
 function SidebarItem(props)
 {

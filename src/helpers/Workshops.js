@@ -1,17 +1,6 @@
 import React, { Component } from 'react';
-// import { Link } from 'react-router-dom';
-// import { auth } from "../services/firebase";
-// import { db } from "../services/firebase";
-// import { storageRef } from "../services/firebase";
-// import { getUserFromDb } from "../helpers/auth";
-// import { createNewUser } from "../helpers/userManagement";
-// import { userTypes } from "../helpers/Types";
-// import EmailField  from "../components/EmailField";
-// import {Toast}  from "../components/Toast";
 
-// import { addDataToDb } from "../helpers/db";
-
-import {Icon, CollapsibleItem, Collapsible, Button, Row, Col, TextInput } from 'react-materialize';
+import { CollapsibleItem, Collapsible, Button, Row, Col, TextInput } from 'react-materialize';
 
 
 function EmptyUserEmail(){return ({name: "", email:""})}

@@ -1,55 +1,18 @@
-import React, { Component, useRef, useState} from "react";
+import React, {  useRef, useState} from "react";
 
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
-import firebase from 'firebase/app';
 import 'firebase/firestore';
 
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-// import { useAuthState } from 'react-firebase-hooks/auth';
-import { useDocumentData, useCollectionData } from 'react-firebase-hooks/firestore';
-
-import { Icon, Button, Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
-
-import { formatTime } from '../helpers/Formatting'
+import { Icon, Button, Row } from 'react-materialize';
 
 import { BoardMessageData } from '../helpers/Types'
+
 import { BoardMessage } from '../components/BoardMessage'
 
 import '../css/board.css';
-
-// 
-// async function getBoardUsers(boardId)
-// {
-// 
-//     try{
-//         
-//         let board = await db.collection("boards").doc(boardId).get();    
-//         if(board){
-//             let team =  await db.collection("teams").doc(board.teamId).get();    
-//             if(team)
-//             {
-//                 let members = {};
-//                 for(let i = 0; i< team.members.length; i++)
-//                 {
-//                     let user = await db.collection("users").doc(team.members[i]).get();
-//                     if(user){
-//                         members[team.members[i]] = {
-//                             name : user.displayName,
-//                             photoURL:user.photoURL
-//                         }
-//                     }
-//                 }
-//                 return members;
-//             }
-//         }    
-//     }
-//     catch(error){
-//         console.log("getBoardUsers error:", error);
-//         return null
-//     }
-//     return null
-// }
 
 
 export default function Board() {
@@ -59,13 +22,14 @@ export default function Board() {
 
     const messagesRef = db.collection("boardMessages");
 
-    const [users, usrLoading, usrError] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
+    const [users, usrLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
 
-    const [messages, msgLoading, msgError] = useCollectionData(messagesRef.where("boardId", "==", boardId));
+    const [messages] = useCollectionData(messagesRef.where("boardId", "==", boardId));
 
     const [selected, setSelected ] = useState(null);
 
-    const [usersMap, setUsersMap] = useState(null);
+    // const [usersMap, setUsersMap] = useState(null);
+    const usersMap = useRef(null);
 
     const addMessage = async (e) => {
         e.preventDefault();
@@ -108,17 +72,17 @@ export default function Board() {
     const getUser = (uid) =>{
         if(users && !usrLoading)
         {
-            if(usersMap === null ){
+            if(usersMap.current === null ){
                 console.log("getUser: " + users.length);
-                let newUsersMap = {};
+                usersMap.current = {};
                 for(let i = 0; i < users.length; i++){
-                    newUsersMap[users[i].id] = {name: users[i].displayName, photoURL:users[i].photoURL };
+                    usersMap.current[users[i].id] = {name: users[i].displayName, photoURL:users[i].photoURL };
                 }
-                setUsersMap(newUsersMap);
+                // setUsersMap(newUsersMap);
             }
-            if( usersMap !=null && usersMap.hasOwnProperty(uid))
+            if( usersMap.current !=null && usersMap.current.hasOwnProperty(uid))
             {
-                return usersMap[uid];  
+                return usersMap.current[uid];  
             }
         }
         return ({name: "users[i].displayName", photoURL:"" });

@@ -7,17 +7,20 @@ import { storageRef } from "../services/firebase";
 // import { createNewUser } from "../helpers/userManagement";
 import { userTypes } from "../helpers/Types";
 import EmailField  from "../components/EmailField";
-import {Toast}  from "../components/Toast";
 
 import { Workshop } from "../helpers/Workshops";
 
-
-import { Button, Icon } from 'react-materialize';
+import { Button, Icon, Toast } from 'react-materialize';
 
 function createToast(msg)
 {
     return (
-        <Toast message={msg} />
+        <Toast
+            options={{
+                html: msg,
+                displayLength: 2000
+            }} 
+            />
         );
 }
 

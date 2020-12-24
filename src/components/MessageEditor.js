@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect} from "react";
+import React, { useRef, useEffect} from "react";
 
 // import { Icon, Button, Row, Col,} from 'react-materialize';
 
@@ -8,7 +8,7 @@ import '../css/board.css';
 
 export function MessageEditor(props) 
 {
-    const { content, id, uid } = props.message;
+    const { content, id } = props.message;
 
     const msgRef = useRef(null);
         

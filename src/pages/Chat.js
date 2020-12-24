@@ -1,14 +1,14 @@
-import React, { Component, useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
-import { useAuthState } from 'react-firebase-hooks/auth';
+
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Row, Col, Card, CardTitle, CardPanel } from 'react-materialize';
+import { Icon, Row, Col, Card, CardTitle } from 'react-materialize';
 
 import { formatTime } from '../helpers/Formatting' 
 import '../css/chat.css';
@@ -26,7 +26,12 @@ export default function Chat(props) {
 
   const [formValue, setFormValue] = useState('');
   
-  
+  useEffect (
+  () => {
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+  },
+  [messages],
+  );
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -86,7 +91,7 @@ return (<>
             <Card
               header={<CardTitle image={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'} />}
               horizontal
-              className="teal"
+              className={"teal "+ messageClass}
             >
                 <p>{content}</p>
                 <p className="chat-time right">{formatTime(timestamp)}</p>

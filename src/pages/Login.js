@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+
 import { signin, signInWithGoogle, signInWithGitHub } from "../helpers/auth";
 
 export default class Login extends Component {
@@ -72,16 +72,6 @@ export default class Login extends Component {
               value={this.state.email}
             />
           </div>
-          {/* <div className="form-group"> */}
-          {/*   <input */}
-          {/*     className="form-control" */}
-          {/*     placeholder="Password" */}
-          {/*     name="password" */}
-          {/*     onChange={this.handleChange} */}
-          {/*     value={this.state.password} */}
-          {/*     type="password" */}
-          {/*   /> */}
-          {/* </div> */}
           <div className="form-group">
             {this.state.error ? (
               <p className="text-danger">{this.state.error}</p>
@@ -92,13 +82,6 @@ export default class Login extends Component {
           <button className="btn btn-danger mr-2" type="button" onClick={this.googleSignIn}>
             Sign in with Google
           </button>
-          {/* <button className="btn btn-secondary" type="button" onClick={this.githubSignIn}> */}
-          {/*   Sign in with GitHub */}
-          {/* </button> */}
-          {/* <hr /> */}
-          {/* <p> */}
-          {/*   Don't have an account? <Link to="/signup">Sign up</Link> */}
-          {/* </p> */}
         </form>
 
       </div>
