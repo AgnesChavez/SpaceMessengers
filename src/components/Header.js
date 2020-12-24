@@ -23,7 +23,7 @@ function Header() {
     <header>
 <Navbar
   alignLinks="right"
-  brand={<a className="brand-logo" href="#">Space Messengers</a>}
+  brand={<a className="brand-logo" href="/">Space Messengers</a>}
   id="mobile-nav"
   menuIcon={<Icon>menu</Icon>}
   options={{

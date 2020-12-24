@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import { auth } from "../services/firebase";
-import { db } from "../services/firebase";
-
-
 
 function checkForm(formId)
 {
@@ -49,7 +45,6 @@ export default  class EmailField extends Component {
     handleChange(event)
     {
         
-        let name = event.target.name;
         
         this.setState({
             email: event.target.value,

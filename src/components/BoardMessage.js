@@ -1,8 +1,6 @@
-import React, { useState, useRef, useEffect} from "react";
+import React, { useRef } from "react";
 
 import Draggable from 'react-draggable';
-
-import { Collapsible, CollapsibleItem, Icon } from 'react-materialize';
 
 import { formatTime } from '../helpers/Formatting'
 
@@ -11,11 +9,6 @@ import { MessageEditor } from './MessageEditor'
 import { Comments } from './Comments'
 
 
-
-
-function booToString(b, name){
-  return name + ": " + (b?"true":"false")
-}
 
 export function BoardMessage(props) 
 {
@@ -35,29 +28,12 @@ export function BoardMessage(props)
         if(myRef.current.contains(props.selected))return true;
         return false;
     }
-// 
-//     function textAreaCss()
-//     {
-//         let a = isActive();
-//       return ({
-//         borderBottomWidth: (a? 1:0 )+'px',
-//         })
-//     }
-//   
-    // useEffect(() => {
-    //         window.M.textareaAutoResize(msgRef.current);
-    //     },
-    //     [props.message.content],
-    // );
-
     
 
     return ( 
     <>
         <Draggable
-            // cancel="textarea"
             handle=".messageCard-header"
-            // disabled={!isActive()}
             defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
@@ -69,12 +45,6 @@ export function BoardMessage(props)
                 <div ref={headerRef} className="messageCard-header messageCard-handle">{props.user.name}</div>
                 <div className="messageCard-content white-text">
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/>
-
-                    {/* <textarea ref={msgRef} id={"textarea-"+id} defaultValue={content} */}
-                    {/*     className={"materialize-textarea"} */}
-                    {/*     style={textAreaCss()} */}
-                    {/*     onChange={(e)=>props.onMessageChange(id, e.target.value)} */}
-                    {/* ></textarea> */}
                     {isActive()?
                     <p className="boardMessageTime ">{formatTime(timestamp)}</p>:""
                     }
@@ -83,18 +53,6 @@ export function BoardMessage(props)
                     <Comments 
                         messageId={id}
                         ></Comments>
-                    {/* <Icon tiny>comments</Icon>comments */}
-
-                    {/* <Collapsible accordion> */}
-                    {/*     <CollapsibleItem */}
-                    {/*       expanded={false} */}
-                    {/*       header="comments" */}
-                    {/*       icon={<Icon small>comments</Icon>} */}
-                    {/*       node="div" */}
-                    {/*     > */}
-                    {/*      */}
-                    {/*     </CollapsibleItem> */}
-                    {/* </Collapsible> */}
                 </div>                    
             </div>
         </Draggable> 

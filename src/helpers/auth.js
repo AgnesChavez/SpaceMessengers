@@ -1,5 +1,5 @@
 import { auth } from "../services/firebase";
-import { db } from "../services/firebase";
+
 
 
 export function signup(email, password) {

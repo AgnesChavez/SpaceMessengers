@@ -83,7 +83,7 @@ class App extends Component {
         <Router>
           <Header />
           <Switch>
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" component={this.state.authenticated?Board:Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
             <PrivateRoute
               path="/chat"
