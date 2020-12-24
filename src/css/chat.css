@@ -8,14 +8,18 @@
 	border-top-left-radius: 23px !important;
 	border-bottom-left-radius: 23px !important;
 	background-color: rgb(255,255,255, 0.3) !important;
-	height:2em !important;
+	height:32px !important;
 	margin:0px !important;
-
+	flex-grow: 1;
+	border-width:0px !important;
 }
+
 .chatSend
 {
 	border-top-right-radius: 23px;
 	border-bottom-right-radius: 23px;
+	height:32px;
+	border-width:0px;
 }
 
 .comment-current-user{
@@ -39,4 +43,5 @@
 .chatInputContainer
 {
 	margin-top:12px;
+	display: flex;
 }
