@@ -3,9 +3,10 @@ import { db } from "../services/firebase";
 
 import { UserData, userTypes } from "./Types"
 
-import { getQueryData, setDataInDb } from "./db"
+import { getQueryData, setDataInDb, addDataToDb } from "./db"
 
-export async function createNewUser(_email) {
+// export function createNewUser(_email, _name, _type=userTypes().student) {
+export async function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
 
     var actionCodeSettings = {
         // URL you want to redirect back to. The domain (www.example.com) for this
@@ -15,6 +16,8 @@ export async function createNewUser(_email) {
         handleCodeInApp: true,
     };
 
+    
+    setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
 
     auth().sendSignInLinkToEmail(_email, actionCodeSettings)
         .then(function() {
@@ -28,15 +31,27 @@ export async function createNewUser(_email) {
             console.log("Failed adding user: error: ", error );
             // Some error occurred, you can inspect the code: error.code
         });
+
+
+
 }
 
 
 
-export function createUserInDb(uid, type = null) {
+export async function createUserInDb(uid, name, type, institutionId, workshopId) {
 
     let _type = type;
     if(type === null) _type = userTypes().student;
-    setDataInDb("users", uid, UserData(uid, _type));
+
+    if(uid){
+        await setDataInDb("users", uid, UserData(uid, name, _type, institutionId, workshopId));
+        return uid;
+    }else{
+        let user= await addDataToDb("users", UserData("", name, _type, institutionId, workshopId), true, 'id');
+        if(user) return user.id;
+    }
+    return null;
+
     // db.collection("users").doc(uid).set(User(uid, _type))
     // .then(function() {
     //     console.log("User successfully written!");

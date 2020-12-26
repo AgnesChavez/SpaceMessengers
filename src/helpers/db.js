@@ -1,31 +1,13 @@
 import { db } from "../services/firebase";
 
-// export function readChats() {
-//   let abc = [];
-//   db.ref("chats").on("value", snapshot => {
-//     snapshot.forEach(snap => {
-//       abc.push(snap.val())
-//     });
-//     return abc;
-//   });
-// }
-// 
-// export function writeChats(message) {
-//   return db.ref("chats").push({
-//     content: message.content,
-//     timestamp: message.timestamp,
-//     uid: message.uid
-//   });
-// }
-
-
-export async function addDataToDb(dataBaseName,data, autoAddId = true) {
+export async function addDataToDb(dataBaseName,data, autoAddId = true, idFieldName="docId") {
+    // console.log("addDataToDb", dataBaseName, data, autoAddId, idFieldName);
 	try{
 		let docRef = await db.collection(dataBaseName).add(data);	
 
 		if(autoAddId)
 		{
-			docRef.update({docId: docRef.id});
+			await docRef.update({[idFieldName]: docRef.id});
 		}
 
 		return docRef;
@@ -37,11 +19,13 @@ export async function addDataToDb(dataBaseName,data, autoAddId = true) {
 	return null;
 }
 
-export function setDataInDb(dataBaseName, docName, data) {
+export function setDataInDb(dataBaseName, docName, data, _merge = false) {
 
-    db.collection(dataBaseName).doc(docName).set(data)
+    // console.log("setDataInDb: ",  dataBaseName, docName, data);
+// 
+    db.collection(dataBaseName).doc(docName).set(data, { merge: _merge })
     .then(function() {
-        console.log(docName +  " successfully written to " + dataBaseName);
+        // console.log(docName +  " successfully written to " + dataBaseName);
     })
     .catch(function(error) {
         console.error("Error creating document " + docName +  " in " + dataBaseName + " error: ", error);
@@ -61,4 +45,3 @@ export async function getQueryData(query) {
     }
     return null;
 } 
-

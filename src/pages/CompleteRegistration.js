@@ -3,6 +3,12 @@ import { auth } from "../services/firebase";
 import { createUserInDb } from "../helpers/userManagement";
 import { Link } from 'react-router-dom';
 
+import { getQueryData } from "../helpers/db"
+import { db } from "../services/firebase";
+
+
+import firebase from "firebase";
+
 export default class CompleteRegistration extends Component {
 
     constructor(props) {
@@ -11,7 +17,8 @@ export default class CompleteRegistration extends Component {
             error: null,
             email: window.localStorage.getItem('emailForSignIn'),
             completingRegistration: false,
-            requestingEmail: false
+            requestingEmail: false,
+            userName:""
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,11 +51,35 @@ export default class CompleteRegistration extends Component {
                 if (result) {
                     // Clear email from storage.
                     window.localStorage.removeItem('emailForSignIn');
-                    this.setState({ completingRegistration: false });
+                    
 
                     if (result.additionalUserInfo.isNewUser) {
-                        await createUserInDb(result.user.uid);
+                        
+                        let query = db.collection('unauthenticatedUsers').doc(this.state.email);
+                        let user = await getQueryData(query);
+                        if(user !== null){
+                            await createUserInDb(result.user.uid, user.name, user.type, user.institution, user.workshopId);  
+                            
+                            // await setDataInDb( {members: membersIds}, true);
+
+
+
+                            await db.collection("institution").doc(user.institution).update({
+                                members: firebase.firestore.FieldValue.arrayUnion(result.user.uid)
+                            });
+
+
+
+                            await query.delete();
+                        }else{
+                            await createUserInDb(result.user.uid, "", null, "", "");  
+                        }
+                        
+
                     }
+                    
+
+                    this.setState({ completingRegistration: false });
                     // You can access the new user via result.user
                     // Additional user info profile not available via:
                     // result.additionalUserInfo.profile == null

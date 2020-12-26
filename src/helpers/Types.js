@@ -8,15 +8,16 @@ export function userTypes() {
   }
 }
 
-export function WorkshopData() {
+export function WorkshopData(name) {
   return {
     id: "",
     instructors: [],
     members: [],
     teams: [],
     institutions: [],
-    name: "",
-    date: null,
+    name: name,
+    date: firebase.firestore.Timestamp.now(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
@@ -29,39 +30,45 @@ export function TeamData(pair1, pair2, ws) {
     id: "",
     workshop: ws,
     members: [pair1[0], pair1[1], pair2[0], pair2[1]],
-    boards: []
+    boards: [],
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 
-export function UserData(uid, type) {
+export function UserData(uid, name, type, institutionId, workshopId) {
+  // console.log("UserData: ", uid, name, type, institutionId);
   return {
     id: uid,
     type: type,
     location: "",
     bio: "",
-    workshops: [],
+    workshops: [workshopId],
     teams: [],
-    institutionId: "",
+    institutionId: institutionId,
     teamsMap: null,
     photoURL: null,
-    displayName: "",
-    boards: []
-
+    displayName: name,
+    boards: [],
+    partnerId:"",
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }
 export function BoardData(teamId) {
   return {
     id: "",
     messages: [],
-    teamId
+    teamId,
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 export function InstitutionData(name) {
   return {
     name,
-    members: []
+    created: firebase.firestore.FieldValue.serverTimestamp(),
+    members: [], 
+    workshops: [],
   };
 }
 
