@@ -15,7 +15,7 @@ import CompleteRegistration from "./pages/CompleteRegistration";
 import { auth } from "./services/firebase";
 import Header from "./components/Header";
 import Board from "./pages/Board";
-import './styles.css';
+import './css/styles.css';
 
 function PrivateRoute({ component: Component, authenticated, ...rest }) {
   return (
@@ -108,7 +108,7 @@ class App extends Component {
             <PublicRoute
               path="/login"
               authenticated={this.state.authenticated}
-              component={Login}
+              component={this.state.authenticated?Board:Login}
             />
             <PrivateRoute
               path="/settings"

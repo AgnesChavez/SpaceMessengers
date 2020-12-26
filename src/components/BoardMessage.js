@@ -8,6 +8,7 @@ import { MessageEditor } from './MessageEditor'
 
 import { Comments } from './Comments'
 
+import '../css/board.css';
 
 
 export function BoardMessage(props) 
@@ -42,7 +43,10 @@ export function BoardMessage(props)
                 id={"msg-"+id}
                 className="card messageCard teal"
             >
-                <div ref={headerRef} className="messageCard-header messageCard-handle">{props.user.name}</div>
+                <div ref={headerRef} className="messageCard-header messageCard-handle valign-wrapper">
+                    <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
+                    {props.user.name}
+                </div>
                 <div className="messageCard-content white-text">
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/>
                     {isActive()?

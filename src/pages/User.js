@@ -6,11 +6,15 @@ import { storageRef } from "../services/firebase";
 // import { getUserFromDb } from "../helpers/auth";
 // import { createNewUser } from "../helpers/userManagement";
 import { userTypes } from "../helpers/Types";
-import EmailField  from "../components/EmailField";
+import { WorkshopData } from "../helpers/Types";
 
-import { Workshop } from "../helpers/Workshops";
+
+import { Workshop } from "../helpers/WorkshopsWithHooks";
 
 import { Button, Icon, Toast } from 'react-materialize';
+import { addDataToDb } from '../helpers/db'
+
+
 
 function createToast(msg)
 {
@@ -226,15 +230,6 @@ export default class UserProfile extends Component {
         } 
     }
 
-    addInstructorProfile(){
-        if(this.state.dbUser !== null && this.state.dbUser.type !== userTypes.student) {
-            return (<EmailField 
-            onClick={ email => createToast("Probando Toast: " + email)}
-          />);
-        }
-    }
-
-
     render() {
         return (
             <div className="container emp-profile">
@@ -268,6 +263,20 @@ export default class UserProfile extends Component {
                         { this.userProp("User Id", this.state.user, "uid", false, null)}
 
                     </div>
+
+                        <Button
+                              className="grey"
+                              floating
+                              icon={<Icon>add_circle_outline</Icon>}
+                              node="button"
+                              waves="light"
+                              tooltip="Edit Profile"
+                              onClick={()=>addDataToDb("workshops",WorkshopData(), true, "id")}
+
+
+                        />
+                    
+
                     <div className="col s12 m2">
                         {!this.state.isEditing ?
                             <Button
@@ -292,7 +301,6 @@ export default class UserProfile extends Component {
                 </div>
                 <div className="row">
                     <Workshop></Workshop>
-                    {/* {this.addInstructorProfile()} */}
                 </div>
             </div>
         )

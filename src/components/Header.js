@@ -26,6 +26,7 @@ function Header() {
   brand={<a className="brand-logo" href="/">Space Messengers</a>}
   id="mobile-nav"
   menuIcon={<Icon>menu</Icon>}
+  className="black"
   options={{
     draggable: false,
     edge: 'left',

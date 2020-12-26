@@ -6,7 +6,7 @@
 	* [ ] Nicer design
 	* [ ] Event (Real time messages)
 * [ ] Confirmation
-	* 	[ ] Use a random password and prompt the user to change it on first login?
+	* [ ] Use a random password and prompt the user to change it on first login?
 * [ ] Profile
 	* Instructors
 	* [ ] Manage students
