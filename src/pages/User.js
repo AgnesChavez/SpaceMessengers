@@ -264,17 +264,17 @@ export default class UserProfile extends Component {
 
                     </div>
 
-                        <Button
-                              className="grey"
-                              floating
-                              icon={<Icon>add_circle_outline</Icon>}
-                              node="button"
-                              waves="light"
-                              tooltip="Edit Profile"
-                              onClick={()=>addDataToDb("workshops",WorkshopData(), true, "id")}
-
-
-                        />
+{/*                         <Button */}
+{/*                               className="grey" */}
+{/*                               floating */}
+{/*                               icon={<Icon>add_circle_outline</Icon>} */}
+{/*                               node="button" */}
+{/*                               waves="light" */}
+{/*                               tooltip="Edit Profile" */}
+{/*                               onClick={()=>addDataToDb("workshops",WorkshopData(), true, "id")} */}
+{/*  */}
+{/*  */}
+{/*                         /> */}
                     
 
                     <div className="col s12 m2">

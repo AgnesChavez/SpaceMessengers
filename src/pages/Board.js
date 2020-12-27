@@ -6,11 +6,17 @@ import 'firebase/firestore';
 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Button, Row } from 'react-materialize';
+import { Icon, Button, Row, Col } from 'react-materialize';
 
 import { BoardMessageData } from '../helpers/Types'
 
 import { BoardMessage } from '../components/BoardMessage'
+
+// import { SidebarNav } from '../components/SidebarNav'
+
+import { Sidebar } from '../components/Sidebar'
+
+import Chat from "./Chat";
 
 import '../css/board.css';
 
@@ -90,9 +96,12 @@ export default function Board() {
 
     return ( <>
         <Row>
-                
+           <Col s={2} className="SidebarNavLeft">  
+             <Sidebar   ></Sidebar>
+         </Col>
+         <Col s={12} className="boardContainer">  
             <div ref={myRef} id="board" 
-                className="col s12 z-depth-2 grey darken-4 "
+                className="col s12 z-depth-2 "
                 onClick={onClick}
                 >
                 
@@ -116,6 +125,11 @@ export default function Board() {
                                                      />)}
       
             </div>
+            </Col>
+            {/* <Col s={2} className="grey darken-4 rightSideChat">   */}
+            {/*     <h5>Chat</h5> */}
+            {/*     <Chat collection="chats" group="default" containerClass="" isComment={true}></Chat> */}
+            {/* </Col> */}
         </Row> 
     </>)
 }

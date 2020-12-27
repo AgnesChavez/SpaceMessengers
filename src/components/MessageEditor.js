@@ -21,6 +21,8 @@ export function MessageEditor(props)
                 ret["backgroundColor"] = "rgba(255, 255, 255, 0.46)";
                 
         }
+        ret["color"]="rgb(255,255,255)";
+        ret["font-size"]=14+'px';
         return ret;
     }
   
