@@ -9,8 +9,12 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { Collapsible, CollapsibleItem } from 'react-materialize';
-import { getQueryData, getUserFromDb, getTeamForUserWorkshop } from "../helpers/userManagement";
+import { getUserFromDb, getTeamForUserWorkshop } from "../helpers/userManagement";
+import { getQueryData } from "../helpers/db";
 
+import { Link } from 'react-router-dom';
+
+import { Collection, CollectionItem, Button, Row, Col } from 'react-materialize';
 
 function SidebarUser(props)
 {
@@ -61,7 +65,7 @@ async function SidebarWorkshop(props){
 
    <CollapsibleItem
     expanded={false}
-    header="Instructors",
+    header="Instructors"
     node="div"
   >
   <Collection>
@@ -71,7 +75,7 @@ async function SidebarWorkshop(props){
 
   <CollapsibleItem
     expanded={false}
-    header="Your Team",
+    header="Your Team"
     node="div"
   >
 
@@ -82,7 +86,7 @@ async function SidebarWorkshop(props){
 
   <CollapsibleItem
     expanded={true}
-    header="Boards",
+    header="Boards"
     node="div"
   >
 
@@ -100,12 +104,13 @@ async function SidebarWorkshop(props){
 }
 
 
-export default function Sidebar() {
+export  function Sidebar() {
 
   let usr = getUserFromDb(auth().currentUser.uid);
+  if(!usr) return "";
 
   return (<>
-<Collapsible accordion>
+  <Collapsible accordion>
   <CollapsibleItem
     expanded={true}
     header="Workshops"

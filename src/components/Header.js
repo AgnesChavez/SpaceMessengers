@@ -40,14 +40,8 @@ function Header() {
   }}
 >
 {auth().currentUser
-            ? <><div>
+            ? 
             <Link className="profileButton" to="/profile">Profile</Link>
-            <div className="loggedInAs">
-              Logged in as: <strong className="text-info">{auth().currentUser.email}</strong>
-            </div>
-            </div>
-              <NavItem  onClick={() => auth().signOut()}>Logout</NavItem>
-              </>
             :<NavItem href="/login">Log In</NavItem> 
             }
 </Navbar>

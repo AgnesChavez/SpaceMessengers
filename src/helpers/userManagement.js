@@ -1,6 +1,8 @@
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
+import firebase from "firebase";
+
 import { UserData, userTypes } from "./Types"
 
 import { getQueryData, setDataInDb, addDataToDb } from "./db"
@@ -31,9 +33,6 @@ export async function createNewUser(_email, _name, _type, _institutionId, _works
             console.log("Failed adding user: error: ", error );
             // Some error occurred, you can inspect the code: error.code
         });
-
-
-
 }
 
 
@@ -43,22 +42,20 @@ export async function createUserInDb(uid, name, type, institutionId, workshopId)
     let _type = type;
     if(type === null) _type = userTypes().student;
 
+    let retVal = null;
     if(uid){
         await setDataInDb("users", uid, UserData(uid, name, _type, institutionId, workshopId));
-        return uid;
+        retVal = uid;
     }else{
         let user= await addDataToDb("users", UserData("", name, _type, institutionId, workshopId), true, 'id');
-        if(user) return user.id;
+        if(user) retVal = user.id;
     }
-    return null;
-
-    // db.collection("users").doc(uid).set(User(uid, _type))
-    // .then(function() {
-    //     console.log("User successfully written!");
-    // })
-    // .catch(function(error) {
-    //     console.error("Error creating user: ", error);
-    // });
+    if(institutionId !== null && institutionId !== ""){
+        await db.collection("institution").doc(institutionId).update({
+            members: firebase.firestore.FieldValue.arrayUnion(uid)
+        });
+    }
+    return retVal;
 }
 
 

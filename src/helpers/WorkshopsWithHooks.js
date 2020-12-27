@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Row, Col, TextInput } from 'react-materialize';
+import { Button, Row, Col, TextInput, Preloader } from 'react-materialize';
 
 import { createNewUser, createUserInDb } from "../helpers/userManagement";
 
@@ -50,7 +50,7 @@ function AddMembers(props){
 	</>)
 }
 
-const MAKE_DUMMY_USERS = false;
+const MAKE_DUMMY_USERS = true;
 
 async  function createUser( email, name, type, institutionId, workshopId, userIds)
 	{
@@ -70,9 +70,23 @@ async  function createUser( email, name, type, institutionId, workshopId, userId
 
 
 
-async function create(name, institution, instructors, students){
 
 
+
+export function Workshop (props){
+
+    		
+    	const [name, setName ] = useState("");
+    	const [institution, setInstitution ] = useState( "" );
+        const [instructors, setInstructors ] = useState( []);
+        const [students, setStudents ] = useState( []);
+        const [sending, setSending] = useState(false);
+
+
+async function create(){
+
+
+	setSending(true);
 	let wsRef = await addDataToDb("workshops", WorkshopData(name), true, 'id');
 
 	if(wsRef === null)
@@ -98,8 +112,6 @@ async function create(name, institution, instructors, students){
 		}
 	}
 
-	// console.log("Institution ID: ", instId);
-
 	var membersIds = [];
 	for(let i = 0; i < instructors.length; i++){
 		await createUser(instructors[i].email, instructors[i].name, userTypes().instructor , instId, wsId, membersIds );
@@ -115,78 +127,39 @@ async function create(name, institution, instructors, students){
 		await setDataInDb("institution", instId, {members: membersIds}, true);
 
 	}
-// 	console.log("Members: " , membersIds );
-// 
-// 	console.log("membersIds.length  " , membersIds.length);
-// 
-// 
-// 	console.log("Members: " , membersIds );
-// 
-// 
-// 	console.log("Members: " , JSON.stringify(membersIds) );
-// 
+	setSending(false);
 
-	// membersIds.map( i => console.log(i));
+	window.M.toast({html: 'Successfully created workshop!'})
 
-
-	// let docRef = db.collection("institution").doc(instId);
-
-
-
-	// membersIds.map( i => docRef.update({ members: firebase.firestore.FieldValue.arrayUnion(i)}) ) ;
-		
-	
-
-	// for(let i = 0; i < membersIds.length; i++)
-	// {
-	// 	console.log(membersIds[i]);
-	// 	await docRef.update({
-	// 		members: firebase.firestore.FieldValue.arrayUnion(membersIds[i])
-	// 	});
-	// 	
-	// }
-
-	// db.collection("institution").doc(instId).update({members: membersIds});
-
-	
-
-
-
-
-
-	// db.collection("institution")
-	// Atomically add a new region to the "regions" array field.
-// 	let instData = await getQueryData( db.collection("institution").doc(instId));
-// 
-// 	instData.members = membersIds;
-// 
-// 	console.log("instData: ", instData);
-
-
-	// setDataInDb("institution", instId, instData, false) ;
-		// members: firebase.firestore.FieldValue.arrayUnion(membersIds)
-	// });
-
-
-
+	setName("");
+	setInstitution("" );
+	setInstructors([]);
+	setStudents([]);
+	setSending(false);
 }
 
 
 
+	if(sending){
+		return (<>
+	<Col s={12}>
+    	<Row className="z-depth-2 black-text" style={{padding: 12+'px'}}>	
+				<Col s={12}>
+		<h5>Creating new workshop</h5>
+		</Col>
+  		<Col s={2} offset="s5">
+    	<Preloader
+      		active
+      		color="blue"
+      		flashing={false}
+      		size="big"
+    		/>
+  		</Col>
 
-
-
-export function Workshop (props){
-
-    		
-    	const [name, setName ] = useState("");
-    	const [institution, setInstitution ] = useState( "" );
-        const [instructors, setInstructors ] = useState( []);
-        const [students, setStudents ] = useState( []);
-
-
-
-	
+		</Row>
+		</Col>
+		</>)
+	}else{
 
 	return (<>
   	<Col s={12}>
@@ -200,11 +173,12 @@ export function Workshop (props){
 			<AddMembers name="Instructors" data={instructors} setData={setInstructors} buttonLabel="Add Instructor"/>
 			<AddMembers name="Students" data={students} setData={setStudents} buttonLabel="Add Student"/>
 
-			<Button className="right" node="button" waves="light"  onClick={()=>create(name, institution, instructors, students)}>Create</Button> 
+			<Button className="right" node="button" waves="light"  onClick={()=>create()}>Create</Button> 
 			<Button className="white black-text right" node="button" waves="light" onClick={()=>console.log("cancel clicked")} >Cancel</Button> 
 			</Col>
 		</Row>
 	</Col>
 </>)
+	}
 }
 

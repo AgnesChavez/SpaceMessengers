@@ -41,7 +41,7 @@ export function BoardMessage(props)
         >
             <div ref={myRef}
                 id={"msg-"+id}
-                className="card messageCard teal"
+                className="card messageCard transparent"
             >
                 <div ref={headerRef} className="messageCard-header messageCard-handle valign-wrapper">
                     <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
@@ -54,9 +54,9 @@ export function BoardMessage(props)
                     }
                 </div>
                 <div className="messageCard-footer">
-                    <Comments 
-                        messageId={id}
-                        ></Comments>
+                    {/* <Comments  */}
+                    {/*     messageId={id} */}
+                    {/*     ></Comments> */}
                 </div>                    
             </div>
         </Draggable> 

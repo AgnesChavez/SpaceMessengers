@@ -59,23 +59,10 @@ export default class CompleteRegistration extends Component {
                         let user = await getQueryData(query);
                         if(user !== null){
                             await createUserInDb(result.user.uid, user.name, user.type, user.institution, user.workshopId);  
-                            
-                            // await setDataInDb( {members: membersIds}, true);
-
-
-
-                            await db.collection("institution").doc(user.institution).update({
-                                members: firebase.firestore.FieldValue.arrayUnion(result.user.uid)
-                            });
-
-
-
                             await query.delete();
                         }else{
                             await createUserInDb(result.user.uid, "", null, "", "");  
                         }
-                        
-
                     }
                     
 
