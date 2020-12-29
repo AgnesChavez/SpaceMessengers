@@ -63,7 +63,22 @@ export async function createUserInDb(uid, name, type, institutionId, workshopId)
 
 
 export function getUserFromDb(uid) {
-    return getQueryData(db.collection("users").doc(uid));
+    let usr = getQueryData(db.collection("users").doc(uid));
+    if(!usr) return null;
+    
+    let currentUser = auth().currentUser;
+    if(currentUser.uid === uid)
+    {
+        if(!usr.photoURL){
+            usr.photoURL = currentUser.photoURL;
+        }
+        if(!usr.displayName){
+            usr.displayName = currentUser.displayName;
+        }
+    }
+
+    return usr;
+
 
 } 
 export  function getTeamForUserWorkshop(userId, workshopId) {

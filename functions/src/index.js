@@ -9,9 +9,21 @@ const app = express();
 // const cors = require('cors')({origin: true});
 // var request = require('request');
 // var fs = require('fs');
+// 
+// import { AvatarGenerator } from 'random-avatar-generator';
+//  
+// const generator = new AvatarGenerator();
+//  
+// Simply get a random avatar
+// generator.generateRandomAvatar();
+ 
+// Optionally specify a seed for the avatar. e.g. for always getting the same avatar for a user id.
+// With seed 'avatar', always returns https://avataaars.io/?accessoriesType=Kurt&avatarStyle=Circle&clotheColor=Blue01&clotheType=Hoodie&eyeType=EyeRoll&eyebrowType=RaisedExcitedNatural&facialHairColor=Blonde&facialHairType=BeardMagestic&hairColor=Black&hatColor=White&mouthType=Sad&skinColor=Yellow&topType=ShortHairShortWaved
+// generator.generateRandomAvatar('avatar'); 
+
+const Types = require('./Types.js');
 
 
-const Types = require('./Types.js')
 
 // Express middleware that validates a token passed in the Authorization HTTP header.
 // The token needs to be passed as a Bearer token in the Authorization HTTP header like this:
@@ -40,20 +52,28 @@ var serviceAccount = require("./serviceAccountKey.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     storageBucket: "space-messengers.appspot.com"
+
 });
 
+
+if (process.env.NODE_ENV === 'development') {
+  firebase.functions().useFunctionsEmulator('http://localhost:5001');
+}
 
 const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
 
 
-async function addDataToDb(dataBaseName,data, autoAddId = true, idFieldName="docId") {
-    functions.logger.log("addDataToDb");
-    functions.logger.log(dataBaseName);
-    functions.logger.log(data);
-    functions.logger.log(autoAddId);
-    functions.logger.log(idFieldName);
+
+
+
+async function addDataToDb(dataBaseName, data, autoAddId = true, idFieldName="docId") {
+    // functions.logger.log("addDataToDb");
+    // functions.logger.log(dataBaseName);
+    // functions.logger.log(data);
+    // functions.logger.log(autoAddId);
+    // functions.logger.log(idFieldName);
     try{
         let docRef = await db.collection(dataBaseName).add(data);   
 
@@ -73,19 +93,26 @@ async function addDataToDb(dataBaseName,data, autoAddId = true, idFieldName="doc
 
 function setDataInDb(dataBaseName, docName, data, _merge = false) {
 
-    functions.logger.log("setDataInDb: ");
-    functions.logger.log("dataBaseName ", dataBaseName);
-    functions.logger.log("docName ", docName);
-    functions.logger.log("data ", data);
-// 
-    db.collection(dataBaseName).doc(docName).set(data, { merge: _merge })
-    .then(()=> {
-        functions.logger.log(docName +  " successfully written to " + dataBaseName);
-        return null; 
-    })
-    .catch((error) => {
-        console.error("Error creating document " + docName +  " in " + dataBaseName + " error: ", error);
-    });
+    // functions.logger.log("setDataInDb: ");
+    // functions.logger.log("dataBaseName ", dataBaseName);
+    // functions.logger.log("docName ", docName);
+    // functions.logger.log("data ", data);
+
+    let docRef = db.collection(dataBaseName).doc(docName);
+
+    if(Array.isArray(data)){
+
+
+    }else{
+        docRef.set(data, { merge: _merge })
+        .then(()=> {
+            functions.logger.log(docName +  " successfully written to " + dataBaseName);
+            return null; 
+        })
+        .catch((error) => {
+            console.error("Error creating document " + docName +  " in " + dataBaseName + " error: ", error);
+        });
+    }
 }
 
 async function getQueryData(query) {
@@ -142,14 +169,24 @@ function setDefault(param, defaultVal){
     return (param?param:defaultVal);
 }
 
-async function createUserInDb(uid, name, type, institutionId, workshopId) {
 
-    functions.logger.log("createUserInDb");
-    functions.logger.log('uid ' + uid);
-    functions.logger.log('name ' + name);
-    functions.logger.log('type ' + type);
-    functions.logger.log('institutionId ' + institutionId);
-    functions.logger.log('workshopId ' + workshopId);
+
+async function addToArray(collectionId, docId, arrayId, data)
+{
+    await db.collection(collectionId).doc(docId).update({
+        [arrayId] : FieldValue.arrayUnion(data)
+    });
+}
+
+
+async function createUserInDb(uid, name, type, institutionId) {
+
+    // functions.logger.log("createUserInDb");
+    // functions.logger.log('uid ' + uid);
+    // functions.logger.log('name ' + name);
+    // functions.logger.log('type ' + type);
+    // functions.logger.log('institutionId ' + institutionId);
+    // functions.logger.log('workshopId ' + workshopId);
 
 
     let _type = type;
@@ -157,35 +194,48 @@ async function createUserInDb(uid, name, type, institutionId, workshopId) {
 
     let userId = null;
     if(uid){
-        await setDataInDb("users", uid, Types.UserData(uid, name, _type, institutionId, workshopId));
+        await setDataInDb("users", uid, Types.UserData(uid, name, _type, institutionId));
         userId = uid;
     }else{
-        let user= await addDataToDb("users", Types.UserData("", name, _type, institutionId, workshopId), true, 'id');
+        let user= await addDataToDb("users", Types.UserData("", name, _type, institutionId), true, 'id');
         if(user) userId = user.id;
     }
-    if(userId !== null && institutionId !== null && institutionId !== ""){
-        await db.collection("institution").doc(institutionId).update({
-            members: firebase.firestore.FieldValue.arrayUnion(userId)
-        });
-    }
+    // if(userId !== null && institutionId !== null && institutionId !== ""){
+    //     await db.collection("institution").doc(institutionId).update({
+    //         members: firebase.firestore.FieldValue.arrayUnion(userId)
+    //     });
+        // await addToArray("institution", institutionId, "members", userId);
+
+
+    // }
+    // addUserToWorkshop(userId, workshopId, type);    
+
     return userId;
 }
 
-// module.exports.createUserInDb = createUserInDb;
-
-app.get('/api/roy', async (req, res) => {
-
-    // db.collection('users').doc('e5ohIfDKFsMuuSVGi2Xa3bpkHH53').;
-
-    await db.collection('cities').add({
-        name: 'Tokyo',
-        country: 'Japan'
-    });
 
 
-    let uid = await createUserInDb("e5ohIfDKFsMuuSVGi2Xa3bpkHH53", "Roy Macdonald", Types.admin, "", "");
-    return res.status(200).json({uid});
+
+app.get('/api/test', async (req, res) => {
+
+    // const r = await db.collection('cities').add({
+    //     name: 'Tokyo',
+    //     country: 'Japan'
+    // });
+    // return res.status(200).json({id: r.id});
+
+    generateDummyUsers();
+//     let t = null;
+//     let s = '';
+//     let c = 'zxcvb';
+// 
+//     functions.logger.log("isNull " + ((!t)?"true":"false"));
+//     functions.logger.log("isEmpty " + ((!s)?"true":"false"));
+//     functions.logger.log("isEmpty " + ((!c)?"true":"false"));
+    return res.status(200).json({ok:true});
 });
+
+
  
 app.post('/api/createUserInDb', async (req, res) => {
 
@@ -225,6 +275,99 @@ app.post('/api/createNewUser', async (req, res) => {
 
 });
 
+
+async function generateDummyUsers(){
+    let workshopId = await createWorkshop("Dummy Workshop");
+
+    
+    let institution_1 = await createInstitution("A", workshopId);
+
+    
+    let institution_2 = await createInstitution("B", workshopId);
+
+    functions.logger.log("students_1", institution_1.students);
+    functions.logger.log("students_2", institution_2.students);
+
+    for(let i = 0; i < 10; i+=2){
+        let members = [];
+        members.push(institution_1.students[i]);
+        members.push(institution_1.students[i+1]);
+        members.push(institution_2.students[i]);
+        members.push(institution_2.students[i+1]);
+        let doc = await addDataToDb("teams", Types.TeamData(workshopId, members) , true, "id");
+        if(doc) {
+            addDataToDb("boards", Types.BoardData(doc.id, "Board!"), true, "id");
+        }    
+    }
+
+}
+
+
+
+async function createWorkshop(name){
+    let doc = await addDataToDb("workshops", Types.WorkshopData(name) , true, "id");
+    if(doc) return doc.id;
+    return null;
+}
+
+
+async function generateUsers(type, institutionId, num)
+{
+
+    let users = [];
+    for(let i =0; i < num; i++){
+        users.push( await createUserInDb(null, "Student 1", type, institutionId));
+    }
+    return users;
+
+}
+
+async function createInstitution(name, workshopId){
+
+
+
+    let doc = await addDataToDb("institutions", Types.InstitutionData(name) , true, "id");
+    if(!doc) return null;
+
+    let students = await generateUsers(Types.student, doc.id, 10);
+    let instructors = await generateUsers(Types.instructor, doc.id, 2);
+
+    students.map(u => addUserToWorkshop(u, workshopId,Types.student));
+    instructors.map(u => addUserToWorkshop(u, workshopId,Types.instructor));
+
+    return ({
+        id: doc.id,
+        name, 
+        students
+    });
+
+     // return doc.id;
+    
+}
+
+
+function addUserToWorkshop(userId, workshopId, userType){
+    if(!userId || !workshopId) return;
+
+
+    if(userType === Types.instructor){
+        addToArray("workshops", workshopId, "instructors", userId);    
+    }
+
+    if(userType === Types.student){
+        addToArray("workshops", workshopId, "students", userId);    
+    }
+}
+
+
+
+
+function addUserToTeam(userId, teamId){
+    if(!userId || !teamId) return;
+
+    addToArray("teams",  teamId, "members", userId );
+
+}
 
 
 
@@ -630,8 +773,6 @@ async function checkPostUserId(req, res, type) {
 // 
 // 
 // }
-
-
 
 
 

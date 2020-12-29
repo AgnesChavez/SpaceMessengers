@@ -1,5 +1,8 @@
 import firebase from 'firebase/app';
 
+import { getRandomInt } from './utils.js';
+
+
 export function userTypes() {
   return {
     student: "student",
@@ -8,75 +11,82 @@ export function userTypes() {
   }
 }
 
+
+export function Color(r=255, g=255, b=255, a=1){
+  return {r, g, b, a};
+}
+
+
+export function randomColor()
+{
+  return Color(getRandomInt(0,255), getRandomInt(0,255), getRandomInt(0,255), 1);
+}
+
+
+
 export function WorkshopData(name) {
   return {
     id: "",
     instructors: [],
-    members: [],
-    teams: [],
     institutions: [],
+    students: [],
     name: name,
-    date: firebase.firestore.Timestamp.now(),
-    created: firebase.firestore.FieldValue.serverTimestamp(),
+    date: admin.firestore.FieldValue.serverTimestamp(),
+    created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
-export function PairData(uid1, uid2) {
-  return [uid1, uid2];
-}
 
-export function TeamData(pair1, pair2, ws) {
+export function TeamData(workshopId, membersArray) {
   return {
     id: "",
-    workshop: ws,
-    members: [pair1[0], pair1[1], pair2[0], pair2[1]],
-    boards: [],
-    created: firebase.firestore.FieldValue.serverTimestamp(),
+    name:"",
+    workshopId,
+    members: Array.isArray(membersArray)?membersArray:[],
+    created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 
-export function UserData(uid, name, type, institutionId, workshopId) {
+export function UserData(uid, name, type, institutionId) {
   // console.log("UserData: ", uid, name, type, institutionId);
   return {
     id: uid,
     type: type,
     location: "",
     bio: "",
-    workshops: [workshopId],
-    teams: [],
     institutionId: institutionId,
     teamsMap: null,
     photoURL: null,
     displayName: name,
-    boards: [],
+    color: randomColor(),
     partnerId:"",
-    created: firebase.firestore.FieldValue.serverTimestamp(),
+    created: admin.firestore.FieldValue.serverTimestamp(),
   };
 }
-export function BoardData(teamId) {
+export function BoardData(teamId, name) {
   return {
     id: "",
     messages: [],
     teamId,
-    created: firebase.firestore.FieldValue.serverTimestamp(),
+    name,
+    created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 export function InstitutionData(name) {
   return {
     name,
-    created: firebase.firestore.FieldValue.serverTimestamp(),
-    members: [], 
-    workshops: [],
+    color: randomColor(),
+    created: admin.firestore.FieldValue.serverTimestamp(),
   };
 }
 
 export function BoardMessageData(uid, boardId) {
   return {
     content: "",
-    created: firebase.firestore.FieldValue.serverTimestamp(),
-    timestamp: firebase.firestore.Timestamp.now(),
+    created: admin.firestore.FieldValue.serverTimestamp(),
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
     uid,
     id: null,
     boardId,

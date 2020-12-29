@@ -8,77 +8,78 @@ exports.student = typeStudent;
 exports.instructor = typeInstructor;
 exports.admin = typeAdmin;
 
+const { getRandomInt } = require('./utils.js');
 
 
-// export function userTypes() {
-//   return {
-//     student: "student",
-//     instructor: "instructor",
-//     admin: "admin"
-//   }
-// }
+
+function Color(r=255, g=255, b=255, a=1){
+  return {r, g, b, a};
+}
+
+
+function randomColor()
+{
+  return Color(getRandomInt(0,255), getRandomInt(0,255), getRandomInt(0,255), 1);
+}
+
+
 
 function WorkshopData(name) {
   return {
     id: "",
     instructors: [],
-    members: [],
-    teams: [],
     institutions: [],
+    students: [],
     name: name,
     date: admin.firestore.FieldValue.serverTimestamp(),
     created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
-function PairData(uid1, uid2) {
-  return [uid1, uid2];
-}
 
-function TeamData(pair1, pair2, ws) {
+function TeamData(workshopId, membersArray) {
   return {
     id: "",
-    workshop: ws,
-    members: [pair1[0], pair1[1], pair2[0], pair2[1]],
-    boards: [],
+    name:"",
+    workshopId,
+    members: Array.isArray(membersArray)?membersArray:[],
     created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 
-function UserData(uid, name, type, institutionId, workshopId) {
+function UserData(uid, name, type, institutionId) {
   // console.log("UserData: ", uid, name, type, institutionId);
   return {
     id: uid,
     type: type,
     location: "",
     bio: "",
-    workshops: [workshopId],
-    teams: [],
     institutionId: institutionId,
     teamsMap: null,
     photoURL: null,
     displayName: name,
-    boards: [],
+    color: randomColor(),
     partnerId:"",
     created: admin.firestore.FieldValue.serverTimestamp(),
   };
 }
-function BoardData(teamId) {
+function BoardData(teamId, name) {
   return {
     id: "",
     messages: [],
     teamId,
+    name,
     created: admin.firestore.FieldValue.serverTimestamp(),
   }
 }
 
 function InstitutionData(name) {
   return {
+    id:"",
     name,
+    color: randomColor(),
     created: admin.firestore.FieldValue.serverTimestamp(),
-    members: [], 
-    workshops: [],
   };
 }
 
@@ -100,7 +101,6 @@ function BoardMessageData(uid, boardId) {
 
 
 exports.WorkshopData = WorkshopData;
-exports.PairData = PairData;
 exports.TeamData = TeamData;
 exports.UserData = UserData;
 exports.BoardData = BoardData;
