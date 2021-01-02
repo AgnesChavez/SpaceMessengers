@@ -9,8 +9,6 @@ import Home from "./pages/Home";
 import {ChatFullpage} from "./pages/Chat";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import UserProfile from "./pages/User";
-import Settings from "./pages/Settings";
 import CompleteRegistration from "./pages/CompleteRegistration";
 import { auth } from "./services/firebase";
 import Header from "./components/Header";
@@ -85,20 +83,11 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={this.state.authenticated?Board:Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
-            <PrivateRoute
-              path="/chat"
-              authenticated={this.state.authenticated}
-              component={ChatFullpage}
-            />
+            
             <PrivateRoute
               path="/board"
               authenticated={this.state.authenticated}
               component={Board}
-            />
-            <PrivateRoute
-              path="/profile"
-              authenticated={this.state.authenticated}
-              component={UserProfile}
             />
             <PublicRoute
               path="/signup"
@@ -109,11 +98,6 @@ class App extends Component {
               path="/login"
               authenticated={this.state.authenticated}
               component={this.state.authenticated?Board:Login}
-            />
-            <PrivateRoute
-              path="/settings"
-              authenticated={this.state.authenticated}
-              component={Settings}
             />
             
           </Switch>
