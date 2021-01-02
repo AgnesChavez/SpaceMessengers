@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect } from "react";
 
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
@@ -9,13 +9,13 @@ import 'firebase/firestore';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 
-import { getUserFromDb } from "../helpers/userManagement";
+// import { getUserFromDb } from "../helpers/userManagement";
 
 import { userTypes } from "../helpers/Types"
 
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 
-import { Icon, Collection, CollectionItem, Button, Row, Col, SideNav, Modal } from 'react-materialize';
+import { Button,  Modal } from 'react-materialize';
 
 import UserProfile from "./UserProfile";
 
@@ -29,12 +29,15 @@ function SidebarUser(props)
   // let usr = getUserFromDb(props.uid);
   if(usr && ! usrLoading){
 
-    if ('color' in usr){
-      return (<li key={usr.id} style={{color: usr.color}}>{usr.displayName}</li>);  
-    }else{
-      return (<li key={usr.id} >{usr.displayName } </li>);  
-    }
-    
+      return (
+        <>
+            <li key={usr.id} className="SidebarUser">
+                <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/>
+                <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
+                    {usr.displayName}
+                </span>
+            </li> 
+        </>);  
   }
   return null;
 }
@@ -59,7 +62,7 @@ function SidebarTeam(props){
             <div className="collapsible-body">
                 <ul className="collapsible SidebarTeam">
                     <RenderUsers name="Members" users={props.team.members} ></RenderUsers>
-                    <SidebarBoardsCollection user={props.user} teamId={props.team.id} />
+                    <SidebarBoardsCollection user={props.user} teamId={props.team.id} boardSelectHandle={props.boardSelectHandle}/>
                 </ul>
             </div>
         </li>
@@ -75,7 +78,7 @@ function SidebarWorkshop(props){
             <div className="collapsible-body">
                 <ul className="collapsible SidebarWorkshop">
                     <RenderUsers name="Instructors" users={props.workshop.instructors} ></RenderUsers>
-                    <SidebarTeamCollection user={props.user} workshopId={props.workshop.id} />
+                    <SidebarTeamCollection user={props.user} workshopId={props.workshop.id} boardSelectHandle={props.boardSelectHandle}/>
                 </ul>
             </div>
         </li>
@@ -92,7 +95,7 @@ function SidebarBoardsCollection(props){
                 <p className="collapsible-header">Boards</p>
                 <ul className="collapsible-body">
                     {!boardsLoading && boards && boards.map(board => 
-                        <li key={board.id}>
+                        <li className="SidebarBoard" key={board.id} style={{color: board.color}} onClick={()=> props.boardSelectHandle(board.id)}>
                             {board.name}</li>
                         )}
                 </ul>
@@ -110,7 +113,7 @@ function SidebarTeamCollection(props){
                 <p className="collapsible-header">Teams</p>
                 <div className="collapsible-body">
                     <ul className="collapsible SidebarTeamCollection">
-                        { !teamsLoading && teams && teams.map(team => <SidebarTeam key={team.id} team={team} user={props.user}/> )}
+                        { !teamsLoading && teams && teams.map(team => <SidebarTeam key={team.id} team={team} user={props.user} boardSelectHandle={props.boardSelectHandle}/> )}
                     </ul>
                 </div>
             </li>
@@ -127,11 +130,9 @@ function initCollapsibles(elementSelector)
 
 function SidebarWorkshopCollection(props){
     const [workshops] = useCollectionData(getWorkshopQueryForUser(props.user)); 
-    // useEffect(() => {
-    //     var elems = document.getElementById("SidebarLeft").querySelectorAll('.collapsible');
-    //     var instances = window.M.Collapsible.init(elems, null);
-    // });
+    
     useEffect(() => initCollapsibles(".SidebarWorkshopCollection"));
+
 
     if(!workshops)return null;
     return (
@@ -139,7 +140,7 @@ function SidebarWorkshopCollection(props){
             <div>
                 <p>Workshops</p>
                 <ul  className="collapsible SidebarWorkshopCollection">
-                    {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} /> )}
+                    {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} boardSelectHandle={props.boardSelectHandle} /> )}
                 </ul>
             </div>
         </>
@@ -172,7 +173,7 @@ function getWorkshopQueryForUser(usr)
 function SidebarCurrentUser(props){
 return (<>
     <div id="SidebarCurrentUser">
-        <img className="circle" src={props.user.image}/>
+        <img className="circle" alt={props.user.name} src={props.user.image}/>
         <div id="SidebarCurrentUserBlock">
         <p className="name"> {props.user.name} </p>
             
@@ -184,49 +185,26 @@ return (<>
     </>);
 }
 
-function openProfile()
-{
-
-}
-
-export  function Sidebar() {
-    // useEffect(() => {
-    //     var elems = document.getElementById("SidebarLeft").querySelectorAll('.collapsible');
-    //     var instances = window.M.Collapsible.init(elems, null);
-    // });
+export  function Sidebar(props) {
 
 
-    let [ usr, usrLoading] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
+
+    useEffect(() => (window.M.Sidenav.init(document.getElementById('SidebarLeft'), {  draggable: true  })));
 
 
-    let user = {};
-
-    if(usr && !usrLoading){
-        user.image=  (usr.photoURL  || auth().currentUser.photoURL);
-        user.name= (usr.displayName || auth().currentUser.displayName);
-    }
+    let user = {
+        image:  (props.usr.photoURL  || auth().currentUser.photoURL),
+        name: (props.usr.displayName || auth().currentUser.displayName)
+    };
     return (<>
-        <SideNav 
-            id="SidebarLeft"
-            className="black white-text" 
-            options={{  draggable: true  }} 
-            trigger={<Button
-                        className="red left"
-                        floating
-                        icon={<Icon>menu</Icon>}
-                        node="button"
-                        waves="light"
-                        tooltip="Menu"
-                    />}           
-        >
 
-            
+
+        <ul id="SidebarLeft" className="sidenav black white-text">
     
-            {usr && !usrLoading && <SidebarCurrentUser className="white-text"  user={user} /> }
-            {usr && !usrLoading && <SidebarWorkshopCollection user={usr} /> }
+        <SidebarCurrentUser className="white-text"  user={user} />
+        <SidebarWorkshopCollection user={props.usr} boardSelectHandle={props.boardSelectHandle}/>
             
-            
-        </SideNav>
+        </ul>
 
 
   
