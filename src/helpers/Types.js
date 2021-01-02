@@ -17,12 +17,13 @@ export function Color(r=255, g=255, b=255, a=1){
 }
 
 
-export function randomColor()
-{
-  return Color(getRandomInt(0,255), getRandomInt(0,255), getRandomInt(0,255), 1);
+// export function randomColor()
+// {
+//   return Color(getRandomInt(0,255), getRandomInt(200,255), getRandomInt(0,255), 1);
+// }
+export function randomColorHSL(){
+  return "hsl("+ getRandomInt(0,360) + ", " + getRandomInt(90,100) + "%, 50%)" 
 }
-
-
 
 export function WorkshopData(name) {
   return {
@@ -59,7 +60,7 @@ export function UserData(uid, name, type, institutionId) {
     teamsMap: null,
     photoURL: null,
     displayName: name,
-    color: randomColor(),
+    color: randomColorHSL(),
     partnerId:"",
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -77,7 +78,7 @@ export function BoardData(teamId, name) {
 export function InstitutionData(name) {
   return {
     name,
-    color: randomColor(),
+    color: randomColorHSL(),
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }
