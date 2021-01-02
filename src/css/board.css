@@ -13,6 +13,12 @@
   color:#FFFFFF !important;
 }
 
+.SidebarBoard:hover
+{
+  cursor: pointer;
+  color:#FFFFFF !important;
+}
+
 
 
 #SidebarLeft p{
@@ -52,6 +58,32 @@ padding: 0px  !important;
   display: inline-block;
 }
 
+.SidebarUser:hover{
+  cursor: pointer;
+}
+
+.SidebarUser .name:hover{
+  color:#FFFFFF !important; 
+}
+
+.SidebarUser{
+  display: flex;
+  align-items:center;
+}
+
+.SidebarUser img{
+  width: 24px;
+  height: 24px;
+}
+
+.SidebarUser .name{
+  padding-left:10px;
+  /*font-size: 20px;*/
+  word-wrap: break-word;
+  /*max-width: 200px;*/
+}
+
+
 
 
 #SidebarCurrentUser{
@@ -77,6 +109,19 @@ padding: 0px  !important;
 
 .SidebarNavLeft{
  padding: 0px !important; 
+}
+
+.boardButtonRight{
+  position: absolute;
+  top:0px;
+  right:0px;
+}
+
+
+.boardButtonLeft{
+  position: absolute;
+  top:0px;
+  left:0px;
 }
 
 /*.SidebarNav{
@@ -111,7 +156,7 @@ padding: 0px  !important;
 }
 
 .messageCard-header{
-  padding-top: 10px;
+  padding-top: 0px;
   padding-left: 10px;
   padding-right: 10px;
   color:magenta;
