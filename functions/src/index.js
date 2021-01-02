@@ -222,16 +222,27 @@ app.get('/api/test', async (req, res) => {
     //     name: 'Tokyo',
     //     country: 'Japan'
     // });
-    // return res.status(200).json({id: r.id});
+
 
 
     let users = await db.collection('users').get();
 
     users.forEach(doc => {
-        db.collection('users').doc(doc.id).set({color: "hsl("+ Utils.getRandomInt(0,360) + ", " + Utils.getRandomInt(0,100) + "%, 50%)" }, {merge:true});
+        db.collection('users').doc(doc.id).set({currentBoard: null}, {merge:true});
         
       // console.log(doc.id, '=>', doc.data());
     });
+
+    // return res.status(200).json({id: r.id});
+
+// 
+//     let users = await db.collection('boards').get();
+// 
+//     users.forEach(doc => {
+//         db.collection('boards').doc(doc.id).set({color: Types.randomColorHSL()}, {merge:true});
+//         
+//       // console.log(doc.id, '=>', doc.data());
+//     });
 
     // generateDummyUsers();
 //     let t = null;
