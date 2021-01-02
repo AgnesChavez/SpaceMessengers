@@ -31,8 +31,8 @@ export function WorkshopData(name) {
     institutions: [],
     students: [],
     name: name,
-    date: admin.firestore.FieldValue.serverTimestamp(),
-    created: admin.firestore.FieldValue.serverTimestamp(),
+    date: firebase.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
@@ -43,7 +43,7 @@ export function TeamData(workshopId, membersArray) {
     name:"",
     workshopId,
     members: Array.isArray(membersArray)?membersArray:[],
-    created: admin.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
@@ -61,7 +61,7 @@ export function UserData(uid, name, type, institutionId) {
     displayName: name,
     color: randomColor(),
     partnerId:"",
-    created: admin.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }
 export function BoardData(teamId, name) {
@@ -70,7 +70,7 @@ export function BoardData(teamId, name) {
     messages: [],
     teamId,
     name,
-    created: admin.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
 
@@ -78,15 +78,15 @@ export function InstitutionData(name) {
   return {
     name,
     color: randomColor(),
-    created: admin.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }
 
 export function BoardMessageData(uid, boardId) {
   return {
     content: "",
-    created: admin.firestore.FieldValue.serverTimestamp(),
-    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     uid,
     id: null,
     boardId,

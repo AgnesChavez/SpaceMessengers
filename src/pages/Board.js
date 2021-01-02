@@ -4,7 +4,7 @@ import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import 'firebase/firestore';
 
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { Icon, Button, Row, Col } from 'react-materialize';
 
@@ -15,6 +15,7 @@ import { BoardMessage } from '../components/BoardMessage'
 // import { SidebarNav } from '../components/SidebarNav'
 
 import { Sidebar } from '../components/Sidebar'
+// import { Sidebar } from '../components/SidebarNoReactMaterialize'
 
 import Chat from "./Chat";
 
@@ -23,7 +24,9 @@ import '../css/board.css';
 
 export default function Board() {
 
+
     const myRef = useRef();
+
     const boardId = "default";
 
     const messagesRef = db.collection("boardMessages");
@@ -39,7 +42,7 @@ export default function Board() {
 
     const addMessage = async (e) => {
         e.preventDefault();
-        console.log("addMessage");
+        // console.log("addMessage");
         const { uid } = auth().currentUser;
 
         let msgRef = await messagesRef.add(BoardMessageData(uid, boardId));
@@ -47,6 +50,11 @@ export default function Board() {
         await messagesRef.doc(msgRef.id).update({
             id: msgRef.id
         });
+        // let usr = await db.collection('users').doc(uid).get();
+        // console.log(usr);
+        // if(!usr.boards.includes(boardId)){
+        //     usr.boards.push(boardId);
+        // }
     }
 
 
@@ -79,7 +87,7 @@ export default function Board() {
         if(users && !usrLoading)
         {
             if(usersMap.current === null ){
-                console.log("getUser: " + users.length);
+                // console.log("getUser: " + users.length);
                 usersMap.current = {};
                 for(let i = 0; i < users.length; i++){
                     usersMap.current[users[i].id] = {name: users[i].displayName, photoURL:users[i].photoURL };
@@ -96,10 +104,8 @@ export default function Board() {
 
     return ( <>
         <Row>
-           <Col s={2} className="SidebarNavLeft">  
-             <Sidebar   ></Sidebar>
-         </Col>
-         <Col s={12} className="boardContainer">  
+        <Sidebar   ></Sidebar>
+        <Col s={12} className="boardContainer">  
             <div ref={myRef} id="board" 
                 className="col s12 z-depth-2 "
                 onClick={onClick}

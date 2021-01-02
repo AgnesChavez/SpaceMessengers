@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
@@ -12,6 +12,14 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 import { getUserFromDb } from "../helpers/userManagement";
 
 import { userTypes } from "../helpers/Types"
+
+import { Link } from 'react-router-dom';
+
+import { Icon, Collection, CollectionItem, Button, Row, Col, SideNav, Modal } from 'react-materialize';
+
+import UserProfile from "./UserProfile";
+
+import '../css/board.css';
 
 
 function SidebarUser(props)
@@ -33,86 +41,106 @@ function SidebarUser(props)
 function RenderUsers(props)     
 {
     return (<>
-      <div>
-      <p className="sidebarName"> {props.name}</p>
-    <ul style={{"paddingLeft": 20+'px'}}>
-            {props.users.map( i => <SidebarUser key={i} uid={i} />)}
-    </ul>
-  </div>
+        <li>
+            <div className="sidebarName collapsible-header"> {props.name}</div>
+            <div className="collapsible-body">
+            <ul>
+                {props.users.map( i => <SidebarUser key={i} uid={i} />)}
+            </ul>
+            </div>
+        </li>
+    </>);
+}
+function SidebarTeam(props){
+    useEffect(() => initCollapsibles(".SidebarTeam"));
+    return (<>
+        <li>
+            <p className="collapsible-header">{props.team.name}</p>
+            <div className="collapsible-body">
+                <ul className="collapsible SidebarTeam">
+                    <RenderUsers name="Members" users={props.team.members} ></RenderUsers>
+                    <SidebarBoardsCollection user={props.user} teamId={props.team.id} />
+                </ul>
+            </div>
+        </li>
     </>
     );
 }
-function SidebarTeam(props){
-  return (<>
-  
-  <p>{props.team.name}</p>
-
-    <RenderUsers name="Members" users={props.team.members} ></RenderUsers>
-    <SidebarBoardsCollection user={props.user} teamId={props.team.id} />  
-  </>
-  );
-}
-
-
 
 function SidebarWorkshop(props){
-  return (<>
-    <div style={{"paddingLeft": 20+'px'}}>
-    <p>{props.workshop.name}</p>
-    <RenderUsers name="Instructors" users={props.workshop.instructors} ></RenderUsers>
-
-    <SidebarTeamCollection user={props.user} workshopId={props.workshop.id} />
-    </div>
-  </>
-  );
+    useEffect(() => initCollapsibles(".SidebarWorkshop"));
+    return (<>
+        <li>
+            <p className="collapsible-header">{props.workshop.name}</p>
+            <div className="collapsible-body">
+                <ul className="collapsible SidebarWorkshop">
+                    <RenderUsers name="Instructors" users={props.workshop.instructors} ></RenderUsers>
+                    <SidebarTeamCollection user={props.user} workshopId={props.workshop.id} />
+                </ul>
+            </div>
+        </li>
+    </>);
 }
 
 
 function SidebarBoardsCollection(props){
-      const [boards, boardsLoading] = useCollectionData(
+    const [boards, boardsLoading] = useCollectionData(
         db.collection("boards").where("teamId", "==", props.teamId));
-      // if(!boards) return null;
     return (
         <>
-            <p>Boards</p>
-            <ul style={{"paddingLeft": 20+'px'}}>
-                {!boardsLoading && boards && boards.map(board => 
-                    <li key={board.id}>
-                        {board.name}</li>
-                    )}
-            </ul>
+            <li>
+                <p className="collapsible-header">Boards</p>
+                <ul className="collapsible-body">
+                    {!boardsLoading && boards && boards.map(board => 
+                        <li key={board.id}>
+                            {board.name}</li>
+                        )}
+                </ul>
+            </li>
         </>
     );
 }
 
 function SidebarTeamCollection(props){
-    
-
     const [teams, teamsLoading] = useCollectionData(getTeamsQueryForUser(props.user, props.workshopId)); 
+    useEffect(() => initCollapsibles(".SidebarTeamCollection"));
     return (
         <>
-            <div>
-            <p>Teams</p>
-            
-            <ul style={{"paddingLeft": 20+'px'}}>
-                { !teamsLoading && teams && teams.map(team => <SidebarTeam key={team.id} team={team} user={props.user}/> )}
-            </ul>
-            </div>
+            <li>
+                <p className="collapsible-header">Teams</p>
+                <div className="collapsible-body">
+                    <ul className="collapsible SidebarTeamCollection">
+                        { !teamsLoading && teams && teams.map(team => <SidebarTeam key={team.id} team={team} user={props.user}/> )}
+                    </ul>
+                </div>
+            </li>
         </>
     );
+}
+
+function initCollapsibles(elementSelector)
+{
+    var elems = document.querySelectorAll(elementSelector);
+    window.M.Collapsible.init(elems, null);
 }
 
 
 function SidebarWorkshopCollection(props){
     const [workshops] = useCollectionData(getWorkshopQueryForUser(props.user)); 
+    // useEffect(() => {
+    //     var elems = document.getElementById("SidebarLeft").querySelectorAll('.collapsible');
+    //     var instances = window.M.Collapsible.init(elems, null);
+    // });
+    useEffect(() => initCollapsibles(".SidebarWorkshopCollection"));
+
     if(!workshops)return null;
     return (
         <>
             <div>
-              <p>Workshops</p>
-              <ul style={{"paddingLeft": 20+'px'}}>
-                  {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} /> )}
-              </ul>
+                <p>Workshops</p>
+                <ul  className="collapsible SidebarWorkshopCollection">
+                    {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} /> )}
+                </ul>
             </div>
         </>
     );
@@ -141,16 +169,78 @@ function getWorkshopQueryForUser(usr)
   return ws;
 }
 
+function SidebarCurrentUser(props){
+return (<>
+    <div id="SidebarCurrentUser">
+        <img className="circle" src={props.user.image}/>
+        <div id="SidebarCurrentUserBlock">
+        <p className="name"> {props.user.name} </p>
+            
+            <Button flat className="modal-trigger" href="#profileModal" node="button">Profile</Button>
+            <Button flat onClick={() => auth().signOut()}>Logout</Button>
+        </div>
+
+    </div>
+    </>);
+}
+
+function openProfile()
+{
+
+}
 
 export  function Sidebar() {
+    // useEffect(() => {
+    //     var elems = document.getElementById("SidebarLeft").querySelectorAll('.collapsible');
+    //     var instances = window.M.Collapsible.init(elems, null);
+    // });
 
-  let usr = getUserFromDb(auth().currentUser.uid);
-  if(!usr) return "";
+
+    let [ usr, usrLoading] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
 
 
-return (<>
-  <SidebarWorkshopCollection user={usr} />
-  </>)
+    let user = {};
+
+    if(usr && !usrLoading){
+        user.image=  (usr.photoURL  || auth().currentUser.photoURL);
+        user.name= (usr.displayName || auth().currentUser.displayName);
+    }
+    return (<>
+        <SideNav 
+            id="SidebarLeft"
+            className="black white-text" 
+            options={{  draggable: true  }} 
+            trigger={<Button
+                        className="red left"
+                        floating
+                        icon={<Icon>menu</Icon>}
+                        node="button"
+                        waves="light"
+                        tooltip="Menu"
+                    />}           
+        >
+
+            
+    
+            {usr && !usrLoading && <SidebarCurrentUser className="white-text"  user={user} /> }
+            {usr && !usrLoading && <SidebarWorkshopCollection user={usr} /> }
+            
+            
+        </SideNav>
+
+
+  
+  <Modal
+    actions={[
+      <Button flat modal="close" node="button" waves="green">Close</Button>
+    ]}
+    header="User Profile"
+    id="profileModal"
+  >
+    <UserProfile  ></UserProfile>
+  </Modal>
+
+    </>)
 }
 
 

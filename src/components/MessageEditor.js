@@ -22,7 +22,7 @@ export function MessageEditor(props)
                 
         }
         ret["color"]="rgb(255,255,255)";
-        ret["font-size"]=14+'px';
+        ret["fontSize"]=14+'px';
         return ret;
     }
   

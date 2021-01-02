@@ -6,10 +6,73 @@
   
   padding: 15px;
   position: relative;
-} 
-.collapsible-body
+}
+
+#SidebarLeft{
+  max-width:300px;
+  color:#FFFFFF !important;
+}
+
+
+
+#SidebarLeft p{
+  color:white !important;
+  margin: 0px !important;
+}
+
+.boardsCollection li{
+  color:white !important;
+}
+
+
+.sidebarFooter{
+  color:white !important;
+}
+
+#SidebarLeft .collapsible-header
 {
-  padding: 0px !important;
+padding: 0px  !important;
+}
+
+#SidebarLeft .collapsible-body
+{
+
+  padding: 0px 0px 0px 16px !important;
+  
+  background-color: transparent !important;
+}
+
+#SidebarLeft li{
+  line-height: 20px;
+
+}
+
+#SidebarCurrentUserBlock{
+  padding: 0px 0px 0px 10px ;
+  display: inline-block;
+}
+
+
+
+#SidebarCurrentUser{
+  padding: 10px;
+}
+
+#SidebarCurrentUser img{
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  vertical-align: top;
+}
+
+#SidebarCurrentUser .name{
+  font-size: 20px;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+#SidebarCurrentUser .profileLink > a{
+  color: #FFF !important;
 }
 
 .SidebarNavLeft{

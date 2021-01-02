@@ -5,28 +5,28 @@ import { db } from "../services/firebase";
 import { storageRef } from "../services/firebase";
 // import { getUserFromDb } from "../helpers/auth";
 // import { createNewUser } from "../helpers/userManagement";
-import { userTypes } from "../helpers/Types";
-import { WorkshopData } from "../helpers/Types";
+// import { userTypes } from "../helpers/Types";
+// import { WorkshopData } from "../helpers/Types";
 
 
-import { Workshop } from "../helpers/WorkshopsWithHooks";
+// import { Workshop } from "../helpers/WorkshopsWithHooks";
 
 import { Button, Icon, Toast } from 'react-materialize';
-import { addDataToDb } from '../helpers/db'
+// import { addDataToDb } from '../helpers/db'
 
 
 
-function createToast(msg)
-{
-    return (
-        <Toast
-            options={{
-                html: msg,
-                displayLength: 2000
-            }} 
-            />
-        );
-}
+// function createToast(msg)
+// {
+//     return (
+//         <Toast
+//             options={{
+//                 html: msg,
+//                 displayLength: 2000
+//             }} 
+//             />
+//         );
+// }
 
 
 export default class UserProfile extends Component {
@@ -122,6 +122,7 @@ export default class UserProfile extends Component {
             // console.log(state);
         db.collection("users").doc(this.state.user.uid).set(state, { merge: true })
         .then(function() {
+
             console.log("successfully updated " + name);
         })
         .catch(function(error) {
@@ -232,7 +233,7 @@ export default class UserProfile extends Component {
 
     render() {
         return (
-            <div className="container emp-profile">
+            <div >
                 <div className="row">
                     <div className="col s12 m4">
                         <div className="profile-img">
@@ -299,9 +300,9 @@ export default class UserProfile extends Component {
                         }
                     </div>
                 </div>
-                <div className="row">
-                    <Workshop></Workshop>
-                </div>
+                {/* <div className="row"> */}
+                {/*     <Workshop></Workshop> */}
+                {/* </div> */}
             </div>
         )
     }
