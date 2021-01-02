@@ -16,17 +16,17 @@ import { Button, Icon, Toast } from 'react-materialize';
 
 
 
-// function createToast(msg)
-// {
-//     return (
-//         <Toast
-//             options={{
-//                 html: msg,
-//                 displayLength: 2000
-//             }} 
-//             />
-//         );
-// }
+function createToast(msg)
+{
+    return (
+        <Toast
+            options={{
+                html: msg,
+                displayLength: 2000
+            }} 
+            />
+        );
+}
 
 
 export default class UserProfile extends Component {
@@ -122,7 +122,7 @@ export default class UserProfile extends Component {
             // console.log(state);
         db.collection("users").doc(this.state.user.uid).set(state, { merge: true })
         .then(function() {
-
+            createToast("Succesfully updated your profile");
             console.log("successfully updated " + name);
         })
         .catch(function(error) {
@@ -144,6 +144,7 @@ export default class UserProfile extends Component {
             auth().currentUser.updateProfile({
                 displayName: this.state.user.displayName
             }).then(function() {
+                createToast("Succesfully updated your profile");
               // Update successful.
             }).catch(function(error) {
               // An error happened.
