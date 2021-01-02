@@ -6,7 +6,7 @@ import {
   Redirect
 } from "react-router-dom";
 import Home from "./pages/Home";
-import {ChatFullpage} from "./pages/Chat";
+// import {ChatFullpage} from "./pages/Chat";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import CompleteRegistration from "./pages/CompleteRegistration";
@@ -14,6 +14,9 @@ import { auth } from "./services/firebase";
 import Header from "./components/Header";
 import Board from "./pages/Board";
 import './css/styles.css';
+
+import { checkCurrentUserDbData } from "./helpers/userManagement"
+
 
 function PrivateRoute({ component: Component, authenticated, ...rest }) {
   return (
@@ -47,6 +50,7 @@ function PublicRoute({ component: Component, authenticated, ...rest }) {
   );
 }
 
+
 class App extends Component {
   constructor() {
     super();
@@ -57,12 +61,14 @@ class App extends Component {
   }
 
   componentDidMount() {
+    
     auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({
           authenticated: true,
           loading: false
         });
+        checkCurrentUserDbData();
       } else {
         this.setState({
           authenticated: false,

@@ -17,11 +17,13 @@ function Color(r=255, g=255, b=255, a=1){
 }
 
 
-function randomColor()
-{
-  return Color(getRandomInt(0,255), getRandomInt(0,255), getRandomInt(0,255), 1);
+// function randomColor()
+// {
+//   return Color(getRandomInt(0,255), getRandomInt(0,255), getRandomInt(0,255), 1);
+// }
+function randomColorHSL(){
+  return "hsl("+ getRandomInt(0,360) + ", " + getRandomInt(90,100) + "%, 50%)" 
 }
-
 
 
 function WorkshopData(name) {
@@ -59,7 +61,7 @@ function UserData(uid, name, type, institutionId) {
     teamsMap: null,
     photoURL: null,
     displayName: name,
-    color: randomColor(),
+    color: randomColorHSL(),
     partnerId:"",
     created: admin.firestore.FieldValue.serverTimestamp(),
   };
@@ -68,6 +70,7 @@ function BoardData(teamId, name) {
   return {
     id: "",
     messages: [],
+    color: randomColorHSL(),
     teamId,
     name,
     created: admin.firestore.FieldValue.serverTimestamp(),
@@ -78,7 +81,7 @@ function InstitutionData(name) {
   return {
     id:"",
     name,
-    color: randomColor(),
+    color: randomColorHSL(),
     created: admin.firestore.FieldValue.serverTimestamp(),
   };
 }
@@ -107,3 +110,4 @@ exports.BoardData = BoardData;
 exports.InstitutionData = InstitutionData;
 exports.BoardMessageData = BoardMessageData;
 
+exports.randomColorHSL = randomColorHSL;
