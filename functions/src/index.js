@@ -23,7 +23,7 @@ const app = express();
 
 const Types = require('./Types.js');
 
-
+const Utils = require('./utils.js');
 
 // Express middleware that validates a token passed in the Authorization HTTP header.
 // The token needs to be passed as a Bearer token in the Authorization HTTP header like this:
@@ -100,10 +100,10 @@ function setDataInDb(dataBaseName, docName, data, _merge = false) {
 
     let docRef = db.collection(dataBaseName).doc(docName);
 
-    if(Array.isArray(data)){
+    if(!Array.isArray(data)){
 
 
-    }else{
+    // }else{
         docRef.set(data, { merge: _merge })
         .then(()=> {
             functions.logger.log(docName +  " successfully written to " + dataBaseName);
@@ -224,7 +224,16 @@ app.get('/api/test', async (req, res) => {
     // });
     // return res.status(200).json({id: r.id});
 
-    generateDummyUsers();
+
+    let users = await db.collection('users').get();
+
+    users.forEach(doc => {
+        db.collection('users').doc(doc.id).set({color: "hsl("+ Utils.getRandomInt(0,360) + ", " + Utils.getRandomInt(0,100) + "%, 50%)" }, {merge:true});
+        
+      // console.log(doc.id, '=>', doc.data());
+    });
+
+    // generateDummyUsers();
 //     let t = null;
 //     let s = '';
 //     let c = 'zxcvb';
@@ -275,32 +284,32 @@ app.post('/api/createNewUser', async (req, res) => {
 
 });
 
-
-async function generateDummyUsers(){
-    let workshopId = await createWorkshop("Dummy Workshop");
-
-    
-    let institution_1 = await createInstitution("A", workshopId);
-
-    
-    let institution_2 = await createInstitution("B", workshopId);
-
-    functions.logger.log("students_1", institution_1.students);
-    functions.logger.log("students_2", institution_2.students);
-
-    for(let i = 0; i < 10; i+=2){
-        let members = [];
-        members.push(institution_1.students[i]);
-        members.push(institution_1.students[i+1]);
-        members.push(institution_2.students[i]);
-        members.push(institution_2.students[i+1]);
-        let doc = await addDataToDb("teams", Types.TeamData(workshopId, members) , true, "id");
-        if(doc) {
-            addDataToDb("boards", Types.BoardData(doc.id, "Board!"), true, "id");
-        }    
-    }
-
-}
+// 
+// async function generateDummyUsers(){
+//     let workshopId = await createWorkshop("Dummy Workshop");
+// 
+//     
+//     let institution_1 = await createInstitution("A", workshopId);
+// 
+//     
+//     let institution_2 = await createInstitution("B", workshopId);
+// 
+//     functions.logger.log("students_1", institution_1.students);
+//     functions.logger.log("students_2", institution_2.students);
+// 
+//     for(let i = 0; i < 10; i+=2){
+//         let members = [];
+//         members.push(institution_1.students[i]);
+//         members.push(institution_1.students[i+1]);
+//         members.push(institution_2.students[i]);
+//         members.push(institution_2.students[i+1]);
+//         let doc = await addDataToDb("teams", Types.TeamData(workshopId, members) , true, "id");
+//         if(doc) {
+//             addDataToDb("boards", Types.BoardData(doc.id, "Board!"), true, "id");
+//         }    
+//     }
+// 
+// }
 
 
 
@@ -314,11 +323,11 @@ async function createWorkshop(name){
 async function generateUsers(type, institutionId, num)
 {
 
-    let users = [];
-    for(let i =0; i < num; i++){
-        users.push( await createUserInDb(null, "Student 1", type, institutionId));
-    }
-    return users;
+    // let users = [];
+    // for(let i =0; i < num; i++){
+    //     users.push( await createUserInDb(null, "Student 1", type, institutionId));
+    // }
+    // return users;
 
 }
 

@@ -62,10 +62,10 @@ export async function createUserInDb(uid, name, type, institutionId, workshopId)
 
 
 
-export function getUserFromDb(uid) {
-    let usr = getQueryData(db.collection("users").doc(uid));
+export async function getUserFromDb(uid) {
+    let usr = await getQueryData(db.collection("users").doc(uid));
     if(!usr) return null;
-    
+    // console.log("User", usr);
     let currentUser = auth().currentUser;
     if(currentUser.uid === uid)
     {
