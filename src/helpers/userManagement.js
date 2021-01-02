@@ -85,3 +85,22 @@ export  function getTeamForUserWorkshop(userId, workshopId) {
     return getQueryData(db.collection("teams").where("workshop", "==", workshopId).where("members", "array-contains",  userId));
 }
  
+export async function checkCurrentUserDbData(){
+
+    let query = db.collection("users").doc(auth().currentUser.uid);
+    let usr = await getQueryData(query);
+    if(!usr) return ;
+
+    let dataToUpdate = {};
+    let needsUpdate = false;
+    if(!usr.displayName){needsUpdate = true; dataToUpdate.displayName = auth().currentUser.displayName; }
+    if(!usr.photoURL) {needsUpdate = true; dataToUpdate.photoURL = auth().currentUser.photoURL; }
+
+    if(needsUpdate){
+        query.update(dataToUpdate);
+    }
+
+
+
+}
+
