@@ -58,7 +58,6 @@ function UserData(uid, name, type, institutionId) {
     location: "",
     bio: "",
     institutionId: institutionId,
-    teamsMap: null,
     photoURL: null,
     displayName: name,
     color: randomColorHSL(),

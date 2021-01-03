@@ -6,6 +6,10 @@ import { formatTime } from '../helpers/Formatting'
 
 import { MessageEditor } from './MessageEditor'
 
+import { userTypes } from '../helpers/Types'
+
+import { Icon, Button } from 'react-materialize';
+
 import '../css/board.css';
 
 
@@ -21,6 +25,7 @@ export function BoardMessage(props)
         e.stopPropagation();
     };
     function isActive(){
+        if(props.currentUser.type === userTypes().student && props.message.uid !== props.currentUser.id)return false;
         if(props.selected === null || myRef.current === null)return false;
         if(props.selected === myRef.current) return true;
         if(props.selected === headerRef.current) return false;
@@ -28,6 +33,9 @@ export function BoardMessage(props)
         return false;
     }
     
+    function canDelete(){
+        return (isActive() && (props.currentUser.type !== userTypes().student || props.message.uid === props.currentUser.id));
+    }
 
     return ( 
     <>
@@ -51,6 +59,18 @@ export function BoardMessage(props)
                     {/* {isActive()? */}
                     {/* <p className="boardMessageTime ">{formatTime(timestamp)}</p>:"" */}
                     {/* } */}
+                    {canDelete()?
+                    <Button
+                        className="red halfway-fab"
+                        floating
+                        small
+                        icon={<Icon>delete</Icon>}
+                        onClick={(e)=>props.deleteMessage(id)}
+                        node="button"
+                        tooltip="Delete this message"
+                        waves="light"
+                    />:""}
+                     
                 </div>
                 <div className="messageCard-footer">
                     {/* <Comments  */}
