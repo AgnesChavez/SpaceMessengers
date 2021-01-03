@@ -6,8 +6,6 @@ import { formatTime } from '../helpers/Formatting'
 
 import { MessageEditor } from './MessageEditor'
 
-import { Comments } from './Comments'
-
 import '../css/board.css';
 
 
@@ -19,8 +17,8 @@ export function BoardMessage(props)
     const headerRef = useRef(null);
     const onStop = (e, position) => {
         props.onStopHandler(id, position);
-        e.preventDefault();
-        e.stopPropagation();
+        // e.preventDefault();
+        // e.stopPropagation();
     };
     function isActive(){
         if(props.selected === null || myRef.current === null)return false;
@@ -35,7 +33,8 @@ export function BoardMessage(props)
     <>
         <Draggable
             handle=".messageCard-header"
-            defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
+            // defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
+            position={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
         >
@@ -43,15 +42,18 @@ export function BoardMessage(props)
                 id={"msg-"+id}
                 className="card messageCard transparent"
             >
-                <div ref={headerRef} className="messageCard-header messageCard-handle valign-wrapper">
-                    <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
-                    {props.user.name}
-                </div>
+            
+            {/* <MessageUser ref={headerRef} usr={props.usr} ></MessageUser> */}
+            <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>
+                <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
+                <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
+            </div>
                 <div className="messageCard-content white-text">
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/>
-                    {isActive()?
-                    <p className="boardMessageTime ">{formatTime(timestamp)}</p>:""
-                    }
+                    {/* <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/> */}
+                    {/* {isActive()? */}
+                    {/* <p className="boardMessageTime ">{formatTime(timestamp)}</p>:"" */}
+                    {/* } */}
                 </div>
                 <div className="messageCard-footer">
                     {/* <Comments  */}
