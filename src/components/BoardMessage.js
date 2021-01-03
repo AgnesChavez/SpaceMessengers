@@ -17,8 +17,8 @@ export function BoardMessage(props)
     const headerRef = useRef(null);
     const onStop = (e, position) => {
         props.onStopHandler(id, position);
-        // e.preventDefault();
-        // e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
     };
     function isActive(){
         if(props.selected === null || myRef.current === null)return false;
@@ -33,8 +33,7 @@ export function BoardMessage(props)
     <>
         <Draggable
             handle=".messageCard-header"
-            // defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
-            position={{x: props.message.position.x, y: props.message.position.y }}
+            defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
         >
@@ -43,14 +42,12 @@ export function BoardMessage(props)
                 className="card messageCard transparent"
             >
             
-            {/* <MessageUser ref={headerRef} usr={props.usr} ></MessageUser> */}
             <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>
                 <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
                 <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/>
-                    {/* <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/> */}
                     {/* {isActive()? */}
                     {/* <p className="boardMessageTime ">{formatTime(timestamp)}</p>:"" */}
                     {/* } */}
