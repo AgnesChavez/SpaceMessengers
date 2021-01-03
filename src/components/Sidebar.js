@@ -138,9 +138,9 @@ function SidebarWorkshopCollection(props){
     return (
         <>
             <div>
-                <p>Workshops</p>
+                {(workshops.length > 1)?<p>Workshops</p>:""}
                 <ul  className="collapsible SidebarWorkshopCollection">
-                    {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} boardSelectHandle={props.boardSelectHandle} /> )}
+                    {workshops && workshops.map(doc => <SidebarWorkshop key={doc.id} workshop={doc} user={props.user} boardSelectHandle={props.boardSelectHandle} numWorkshops={workshops.length} /> )}
                 </ul>
             </div>
         </>

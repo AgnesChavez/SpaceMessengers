@@ -3,10 +3,11 @@ import React, {  useRef, useEffect, useState} from "react";
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import 'firebase/firestore';
+import firebase from "firebase";
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Button, Row, Col } from 'react-materialize';
+import { Icon, Button, Row, Col, Preloader } from 'react-materialize';
 
 import { BoardMessageData } from '../helpers/Types'
 
@@ -16,6 +17,8 @@ import { BoardMessage } from '../components/BoardMessage'
 
 import { Sidebar } from '../components/Sidebar'
 
+import { userTypes } from '../helpers/Types'
+
 // import Chat from "./Chat";
 
 import '../css/board.css';
@@ -23,21 +26,36 @@ import '../css/board.css';
 
 export default function Board() {
 
-    const myRef = useRef();
-    const boardId = "default";
+    const boardRef = useRef(null);
 
-    const messagesRef = db.collection("boardMessages");
-
-    const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
-
-    const [messages] = useCollectionData(messagesRef.where("boardId", "==", boardId));
-
-    const [selected, setSelected ] = useState(null);
-
-    useEffect(() => window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null));
     const usersMap = useRef(null);
 
+    // const [boardId, setBoardId ] = useState(null);
+
+    let boardId = "default";
+
+    function setBoardId(i) {}
+
+    // setBoardId("default");
+
+    const messagesRef = db.collection("boardMessages");
+    
+    const [selected, setSelected ] = useState(null);
+
+    // const [teams, teamsLoading] = useCollectionData(db.collection("teams").where("members", "array-contains", auth().currentUser.uid)); 
+    
+    const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
+
+    const [messages, messagesLoading] = useCollectionData(messagesRef.where("boardId", "==", boardId));
+
     const [currentUser, currentUserLoading] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
+
+
+
+    useEffect(() => window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null));
+    
+
+
     
 
     const addMessage = async (e) => {
@@ -52,6 +70,24 @@ export default function Board() {
         });
     }
 
+
+     const deleteMessage = (messageId) => {
+        if(!messageId) return;
+
+        messagesRef.doc(messageId).delete().then(function() {
+            console.log("Document successfully deleted!");
+        }).catch(function(error) {
+            console.error("Error removing document: ", error);
+        });
+
+        
+    }
+
+
+    const boardSelectHandle = (bid) =>{
+        console.log("boardSelectHandle " + boardId);
+        setBoardId(bid);
+    }
     
     const onStopHandler = (msgId, position) => {
         messagesRef.doc(msgId).update({
@@ -64,7 +100,7 @@ export default function Board() {
 
     const onClick = (evt) =>
     {
-        if( evt.target === myRef.current)
+        if( evt.target === boardRef.current)
         {
             setSelected(null);
         }else
@@ -73,7 +109,7 @@ export default function Board() {
         }
     }
 
-    const onMessageChange = (msgId, msg) => {
+    const onMessageChange = async (msgId, msg) => {
         messagesRef.doc(msgId).update({ content: msg });
     }
 
@@ -90,14 +126,42 @@ export default function Board() {
             {
                 if(usersMap.current.hasOwnProperty(uid)){
                     return usersMap.current[uid];      
+                }else{
+                    console.log("add board "+ boardId + " to user " +uid  );
+                     db.collection('users').doc(uid).update({
+                        boards: firebase.firestore.FieldValue.arrayUnion(boardId)
+                    });
                 }
             }
         }
         return ({name: "", photoURL:"" });
     }
 
-    function setBoardId(bid){
-        
+   
+    if(boardId === null)
+    {
+        if(currentUser && !currentUserLoading && currentUser.currentBoard !== null){
+            setBoardId(currentUser.currentBoard);
+        }
+    }
+    
+
+    if(!messages && messagesLoading){
+    // if(true){
+        return (<>
+            <Row>
+                <h6 className="center-align">Loading board data</h6>
+            </Row>
+            <Row style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <Col s={2} offset="s5" style={{width: "unset", margin: "auto"}}>
+                <Preloader 
+                    active
+                    color="blue"
+                    flashing
+                />
+            </Col>
+            </Row>
+        </>);
     }
 
     return ( <>
@@ -106,13 +170,13 @@ export default function Board() {
         <Col s={12} className="boardContainer">  
             
 
-            {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={(bid)=>setBoardId(bid)}  ></Sidebar> }
+            {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
 
-            <div ref={myRef} id="board" 
+            <div ref={boardRef} id="board" 
                 className="col s12 z-depth-2 "
                 onClick={onClick}
                 >
-                
+                {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
                 <Button
                     className="red right boardButtonRight"
                     floating
@@ -121,7 +185,7 @@ export default function Board() {
                     waves="light"
                     onClick={addMessage}
                     tooltip="Click to add a new message"
-                />  
+                />  :""}
 
                 <a className="red left btn-floating boardButtonLeft waves-effect waves-light btn sidenav-trigger tooltipped" 
                     href="!#" 
@@ -134,14 +198,18 @@ export default function Board() {
                 </a>
 
 
-                { users && messages && messages.map(msg => <BoardMessage
+                {(boardId === null)?
+                (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
+                :( users && messages && messages.map(msg => <BoardMessage
                                                     key={msg.id} 
                                                     message={msg}
                                                     onStopHandler={onStopHandler}
                                                     selected={selected}
                                                     user={getUser(msg.uid)}
                                                     onMessageChange={onMessageChange}
-                                                     />)}
+                                                    currentUser={currentUser} 
+                                                    deleteMessage={deleteMessage}
+                                                    />))}
 
             </div>
             </Col>
