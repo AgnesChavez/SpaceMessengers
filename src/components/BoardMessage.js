@@ -40,14 +40,17 @@ export function BoardMessage(props)
     return ( 
     <>
         <Draggable
+            className=""
             handle=".messageCard-header"
             defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
+            onMouseDown={(e)=>props.onMessageClick(e, props.message)}
         >
             <div ref={myRef}
                 id={"msg-"+id}
-                className="card messageCard transparent"
+                className={ "card messageCard " + ((!isActive())?"transparent":"") }
+                style={{backgroundColor: props.message.color}}
             >
             
             <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>

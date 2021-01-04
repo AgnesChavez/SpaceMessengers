@@ -224,14 +224,14 @@ app.get('/api/test', async (req, res) => {
     // });
 
 
-
-    let users = await db.collection('users').get();
-
-    users.forEach(doc => {
-        db.collection('users').doc(doc.id).set({currentBoard: null}, {merge:true});
-        
-      // console.log(doc.id, '=>', doc.data());
-    });
+// 
+//     let users = await db.collection('users').get();
+// 
+//     users.forEach(doc => {
+//         db.collection('users').doc(doc.id).set({currentBoard: null}, {merge:true});
+//         
+//       // console.log(doc.id, '=>', doc.data());
+//     });
 
     // return res.status(200).json({id: r.id});
 
@@ -243,6 +243,13 @@ app.get('/api/test', async (req, res) => {
 //         
 //       // console.log(doc.id, '=>', doc.data());
 //     });
+
+    let collectionId = 'boardMessages';
+    const messages = await db.collection(collectionId).get();
+
+    messages.forEach(doc => {
+        db.collection(collectionId).doc(doc.id).set({color: Types.randomColorHSL()}, {merge:true});
+    });
 
     // generateDummyUsers();
 //     let t = null;
