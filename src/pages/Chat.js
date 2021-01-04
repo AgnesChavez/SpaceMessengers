@@ -58,20 +58,19 @@ export default function Chat(props) {
 
 
   return (<>
+    <div className="chatContainer"
+      style={props.isComment?({backgroundColor: props.bgColor}):{}}
+      >
     <div className={props.containerClass}>
       {messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} isComment={props.isComment} />)}
 
       <span ref={dummy}></span>
     </div>
-    
-
-    {/* <form className="valign-wrapper chatForm" onSubmit={sendMessage}> */}
-
     <div className="valign-wrapper chatInputContainer">
       <input  className="chatInput" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
       <button className="chatSend" type="submit" onClick={sendMessage} disabled={!formValue}><Icon>send</Icon></button>
     </div>
-    {/* </form> */}
+    </div>
   </>)
 }
 
@@ -86,7 +85,7 @@ function RenderMessage( props){
   const messageClass = uid === auth().currentUser.uid ? 'current-user' :'';
   
 return (<>
-    <Row>
+    {/* <Row> */}
         <Col m={6} s={12}>
             <Card
               header={<CardTitle image={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'} />}
@@ -97,7 +96,7 @@ return (<>
                 <p className="chat-time right">{formatTime(timestamp)}</p>
             </Card>
         </Col>
-    </Row>
+    {/* </Row> */}
   </>);
 }
 
@@ -109,6 +108,6 @@ function ChatMessage(props) {
 }
 
 
-export function ChatFullpage(props) {
-  return <Chat collection="chats" group="default" isComment={false} containerClass="container" ></Chat>
-}
+// export function ChatFullpage(props) {
+//   return <Chat collection="chats" group="default" isComment={false} containerClass="container" ></Chat>
+// }

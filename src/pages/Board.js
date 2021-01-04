@@ -19,10 +19,13 @@ import { Sidebar } from '../components/Sidebar'
 
 import { userTypes } from '../helpers/Types'
 
-// import Chat from "./Chat";
+import { InfoSidebar } from '../components/InfoSidebar'
 
 import '../css/board.css';
 
+function getInfoSidebar(){
+    return window.M.Sidenav.getInstance(document.getElementById("InfoSidebar"));
+}
 
 export default function Board() {
 
@@ -41,6 +44,8 @@ export default function Board() {
     const messagesRef = db.collection("boardMessages");
     
     const [selected, setSelected ] = useState(null);
+
+    const [selectedMessage, setSelectedMessage] = useState(null);
 
     // const [teams, teamsLoading] = useCollectionData(db.collection("teams").where("members", "array-contains", auth().currentUser.uid)); 
     
@@ -85,7 +90,7 @@ export default function Board() {
 
 
     const boardSelectHandle = (bid) =>{
-        console.log("boardSelectHandle " + boardId);
+        // console.log("boardSelectHandle " + boardId);
         setBoardId(bid);
     }
     
@@ -98,15 +103,46 @@ export default function Board() {
         });
     }
 
+
+    function onMessageClick(evt, message)
+    {
+        setSelected(evt.target);
+        setSelectedMessage(message);
+        let sidebar = getInfoSidebar();
+        if(!sidebar.isOpen)sidebar.open();
+        // evt.stopPropagation();
+        // console.log("onMessageClick " + messageId );
+    }
+
     const onClick = (evt) =>
     {
+            
         if( evt.target === boardRef.current)
         {
-            setSelected(null);
-        }else
-        {
-            setSelected(evt.target);
+            console.log("onClick ", evt);
+            evt.stopPropagation();
+            evt.preventDefault();
+            let sidebar = getInfoSidebar();
+            if(sidebar.isOpen){
+                sidebar.close();
+                
+
+                setSelected(null);
+                setSelectedMessage(null);
+        
+
+            }
+            
+        // }else
+        // {
+        //     setSelected(evt.target);
         }
+    }
+    function onCloseEnd(){
+        console.log("onCloseEnd");
+
+        setSelected(null);
+        setSelectedMessage(null);
     }
 
     const onMessageChange = async (msgId, msg) => {
@@ -165,9 +201,9 @@ export default function Board() {
     }
 
     return ( <>
-        <Row>
+        <Row id="boardContainerRow">
         
-        <Col s={12} className="boardContainer">  
+        <Col id="boardContainerCol" s={12} className="boardContainer">  
             
 
             {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
@@ -187,6 +223,7 @@ export default function Board() {
                     tooltip="Click to add a new message"
                 />  :""}
 
+                
                 <a className="red left btn-floating boardButtonLeft waves-effect waves-light btn sidenav-trigger tooltipped" 
                     href="!#" 
                     data-target="SidebarLeft"
@@ -205,6 +242,7 @@ export default function Board() {
                                                     message={msg}
                                                     onStopHandler={onStopHandler}
                                                     selected={selected}
+                                                    onMessageClick={onMessageClick}
                                                     user={getUser(msg.uid)}
                                                     onMessageChange={onMessageChange}
                                                     currentUser={currentUser} 
@@ -212,11 +250,8 @@ export default function Board() {
                                                     />))}
 
             </div>
+            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage} onCloseEnd={onCloseEnd}/>
             </Col>
-            {/* <Col s={2} className="grey darken-4 rightSideChat">   */}
-            {/*     <h5>Chat</h5> */}
-            {/*     <Chat collection="chats" group="default" containerClass="" isComment={true}></Chat> */}
-            {/* </Col> */}
         </Row> 
     </>)
 }

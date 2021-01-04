@@ -1,7 +1,4 @@
-.chatForm
-{
 
-}
 .chatInput
 {
 	width:70%  !important;
@@ -31,6 +28,22 @@
 	max-height: 150px;
 	overflow-y: scroll;
 }
+
+.sidebar-chat{
+	flex:2;
+	
+	min-height: 100px;
+	overflow-y: scroll;
+	background-color: black;
+}
+
+.chatContainer{
+	display: flex;
+	flex-flow: column;	
+	padding: 10px;
+	height:100%;
+}
+
 .comment{
 
 }
@@ -40,8 +53,11 @@
 	padding-right:8px;
 	margin:0px;
 }
+
+
 .chatInputContainer
 {
+	min-height:32px;
 	margin-top:12px;
 	display: flex;
 }
