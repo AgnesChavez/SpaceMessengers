@@ -104,14 +104,14 @@ export default function Board() {
     }
 
 
-    function onMessageClick(evt, message)
+    function onMessageClick(evt, element, message)
     {
-        setSelected(evt.target);
+        setSelected(element);
         setSelectedMessage(message);
         let sidebar = getInfoSidebar();
         if(!sidebar.isOpen)sidebar.open();
         // evt.stopPropagation();
-        // console.log("onMessageClick " + messageId );
+        // console.log("onMessageClick " + message, evt );
     }
 
     const onClick = (evt) =>
@@ -119,14 +119,15 @@ export default function Board() {
             
         if( evt.target === boardRef.current)
         {
-            console.log("onClick ", evt);
+            
             evt.stopPropagation();
             evt.preventDefault();
             let sidebar = getInfoSidebar();
+         
             if(sidebar.isOpen){
                 sidebar.close();
-                
-
+                sidebar.isOpen = false;
+                // console.log("onClick. sidebar.isOpen: ", sidebar.isOpen);
                 setSelected(null);
                 setSelectedMessage(null);
         
