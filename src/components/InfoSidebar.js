@@ -10,34 +10,32 @@ import '../css/board.css';
 export function InfoSidebar(props){
 
     const tabsRef = useRef(null);
+    const sidenavRef = useRef(null);
 
     useEffect(()=>{
         if(!tabsRef.current){
             tabsRef.current = window.M.Tabs.init(document.querySelectorAll(".tabs"), null);
         }
+        if(!sidenavRef.current){
+            sidenavRef.current = window.M.Sidenav.init(document.getElementById('InfoSidebar'), {  draggable: true, edge: "right"  });    
+        }
+        
     });
     if(!props.boardId) return "";
     return (<>
-        <SideNav
-            className="black black-text"
-            id="InfoSidebar"
-            options={{
-                edge: "right",
-                draggable: true,
-                
-                // onOpenStart: ()=> console.log("onOpenStart"),
-                // onOpenEnd: ()=> console.log("onOpenEnd"),
-                // onCloseStart: props.onCloseEnd, 
-                // onCloseStart: ()=> console.log("onCloseStart"),
-                // onCloseEnd: ()=> console.log("onCloseEnd"),
+{/*         <SideNav */}
+{/*             className="black black-text" */}
+{/*             id="InfoSidebar" */}
+{/*             options={{ */}
+{/*                 edge: "right", */}
+{/*                 draggable: true */}
+{/*             }} */}
+{/* fixed={false} */}
+{/*         > */}
+
+    <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text">
 
 
-
-
-
-            }}
-
-        >
 
     <div id="TabsContainer" className="fullheight">
 
@@ -64,6 +62,7 @@ export function InfoSidebar(props){
         }      
     </div>
     </div>
+    </ul>
 {/*  */}
 {/*             <Tabs className="z-depth-1 tabs-fixed-width black white-text"> */}
 {/*                 <Tab */}
@@ -93,6 +92,6 @@ export function InfoSidebar(props){
 {/*                     } */}
 {/*                 </Tab> */}
 {/*             </Tabs> */}
-        </SideNav>
+        {/* </SideNav> */}
     </>);
 }
