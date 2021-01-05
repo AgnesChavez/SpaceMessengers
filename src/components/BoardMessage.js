@@ -25,15 +25,15 @@ export function BoardMessage(props)
         e.stopPropagation();
     };
     function isActive(){
-        if(props.currentUser.type === userTypes().student && props.message.uid !== props.currentUser.id)return false;
+        // if(props.currentUser.type === userTypes().student && props.message.uid !== props.currentUser.id)return false;
         if(props.selected === null || myRef.current === null)return false;
         if(props.selected === myRef.current) return true;
-        if(props.selected === headerRef.current) return false;
+        if(props.selected === headerRef.current) return true;
         if(myRef.current.contains(props.selected))return true;
         return false;
     }
     
-    function canDelete(){
+    function canEdit(){
         return (isActive() && (props.currentUser.type !== userTypes().student || props.message.uid === props.currentUser.id));
     }
 
@@ -45,11 +45,11 @@ export function BoardMessage(props)
             defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
-            onMouseDown={(e)=>props.onMessageClick(e, props.message)}
+            onMouseDown={(e)=>props.onMessageClick(e, myRef.current, props.message)}
         >
             <div ref={myRef}
                 id={"msg-"+id}
-                className={ "card messageCard " + ((!isActive())?"transparent":"") }
+                className={ "card messageCard z-depth-0 " + ((!isActive())?"transparent":"") }
                 style={{backgroundColor: props.message.color}}
             >
             
@@ -58,11 +58,11 @@ export function BoardMessage(props)
                 <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
-                    <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={isActive()}/>
+                    <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={canEdit()}/>
                     {/* {isActive()? */}
                     {/* <p className="boardMessageTime ">{formatTime(timestamp)}</p>:"" */}
                     {/* } */}
-                    {canDelete()?
+                    {canEdit()?
                     <Button
                         className="red halfway-fab"
                         floating
