@@ -12,20 +12,19 @@ export function MessageEditor(props)
 
     const msgRef = useRef(null);
         
-    function textAreaCss()
-    {
-        let ret = {borderBottomWidth: (props.active? 1:0 )+'px',
-                    padding: 5+'px'
-                    };
-        if(props.active){
-                ret["backgroundColor"] = "rgba(255, 255, 255, 0.46)";
-                
-        }
-        ret["color"]="rgb(255,255,255)";
-        ret["fontSize"]=14+'px';
-        return ret;
-    }
-  
+  //   function textAreaCss()
+  //   {
+  //       let ret = {borderBottomWidth: (props.active? 1:0 )+'px',
+  //                   padding: 5+'px'
+  //                   };
+  //       if(props.active){
+  //               ret["backgroundColor"] = "rgba(0,0,0, 0.3)";
+  //       }
+  //       ret["color"]="rgb(255,255,255)";
+  //       ret["fontSize"]=14+'px';
+  //       return ret;
+  //   }
+  // 
     useEffect(() => {
             window.M.textareaAutoResize(msgRef.current);
         },
@@ -38,8 +37,7 @@ export function MessageEditor(props)
     <>
         <div className="textEditor">
         <textarea ref={msgRef} id={"textarea-"+id} defaultValue={content}
-            className={"materialize-textarea "}
-            style={textAreaCss()}
+            className={"materialize-textarea " + (props.active?"activeTextArea":"inactiveTextArea")}
             onChange={(e)=>props.onMessageChange(id, e.target.value)}
         ></textarea>
         </div>
