@@ -139,12 +139,6 @@ export default function Board() {
         //     setSelected(evt.target);
         }
     }
-    function onCloseEnd(){
-        console.log("onCloseEnd");
-
-        setSelected(null);
-        setSelectedMessage(null);
-    }
 
     const onMessageChange = async (msgId, msg) => {
         messagesRef.doc(msgId).update({ content: msg });
@@ -251,7 +245,7 @@ export default function Board() {
                                                     />))}
 
             </div>
-            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage} onCloseEnd={onCloseEnd}/>
+            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage}  getUser={getUser}/>
             </Col>
         </Row> 
     </>)
