@@ -15,63 +15,74 @@ import '../css/chat.css';
 
 
 export default function Chat(props) {
-  const dummy = useRef();
-  const messagesRef = db.collection(props.collection);
-  
-  // const {group, setGroup] = useState(props.group);
+    const dummy = useRef();
+    const messagesRef = db.collection(props.collection);
+    
+    // const {group, setGroup] = useState(props.group);
 
-  const query = messagesRef.where("group", "==", props.group).orderBy('created', 'desc').limit(15);
+    const query = messagesRef.where("group", "==", props.group).orderBy('created', 'desc').limit(15);
 
-  const [messages] = useCollectionData(query);
+    const [messages] = useCollectionData(query);
 
-  const [formValue, setFormValue] = useState('');
-  
-  useEffect (
-  () => {
-    dummy.current.scrollIntoView({ behavior: 'smooth' });
-  },
-  [messages],
-  );
+    const [formValue, setFormValue] = useState('');
+    
+    useEffect (() => {
+        dummy.current.scrollIntoView({ behavior: 'smooth' });
+    },[messages],);
 
-  const sendMessage = async (e) => {
-    e.preventDefault();
+    const sendMessage = async (e) => {
+        
+        e.preventDefault();
+        const { uid } = auth().currentUser;
+        
+        let docRef = await messagesRef.add({
+            content: formValue,
+            timestamp: firebase.firestore.Timestamp.now(),
+            created: firebase.firestore.FieldValue.serverTimestamp(),
+            uid,
+            id: null,
+            group: props.group
+        });
 
-    const { uid, photoURL } = auth().currentUser;
-    // console.log("sendMessage: " , photoURL);
-    let docRef = await messagesRef.add({
-        content: formValue,
-        timestamp: firebase.firestore.Timestamp.now(),
-        created: firebase.firestore.FieldValue.serverTimestamp(),
-        uid,
-        id: null,
-        group: props.group,
-        photoURL
-    });
+        await messagesRef.doc(docRef.id).update({
+                id: docRef.id
+        });
 
-    await messagesRef.doc(docRef.id).update({
-        id: docRef.id
-    });
-
-    setFormValue('');
-    dummy.current.scrollIntoView({ behavior: 'smooth' });
-  }
+        setFormValue('');
+        dummy.current.scrollIntoView({ behavior: 'smooth' });
+    }
 
 
-  return (<>
-    <div className="chatContainer"
-      style={props.isComment?({backgroundColor: props.bgColor}):{}}
-      >
-    <div className={props.containerClass}>
-      {messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} isComment={props.isComment} />)}
+    const getUser = (uid) =>{
+        console.log("getUser " + uid, props.getUser);
+        return props.getUser(uid);
+    }
 
-      <span ref={dummy}></span>
-    </div>
-    <div className="valign-wrapper chatInputContainer">
-      <input  className="chatInput" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
-      <button className="chatSend" type="submit" onClick={sendMessage} disabled={!formValue}><Icon>send</Icon></button>
-    </div>
-    </div>
-  </>)
+    return (<>
+        <div className="chatContainer"
+            style={props.isComment?({backgroundColor: props.bgColor}):{}}
+        >
+        <div className={props.containerClass}>
+        <ul>
+            {props.getUser && messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} user={getUser(msg.uid)} isComment={props.isComment} />)}
+        </ul>
+        <span ref={dummy}></span>
+        </div>
+            <form className="valign-wrapper chatInputContainer" >
+                <input  className="chatInput"
+                    value={formValue}
+                    onChange={(e) => setFormValue(e.target.value)} 
+                    // onKeyDown={(e) => {if(e.keyCode === 13)sendMessage(e);}}
+                />
+                <button className="chatSend"
+                    type="submit"
+                    onClick={(e) => sendMessage(e)}
+                    disabled={!formValue}>
+                    <Icon>send</Icon>
+                </button>
+            </form>
+        </div>
+    </>)
 }
 
 function RenderComment(props)
@@ -81,33 +92,33 @@ function RenderComment(props)
 }
 
 function RenderMessage( props){
-  const { content, uid, photoURL, timestamp } = props;
-  const messageClass = uid === auth().currentUser.uid ? 'current-user' :'';
+    const { content, uid, timestamp } = props;
+    let style = {};
+    if(uid === auth().currentUser.uid) style.float = "right";
   
+    if(props.user) style.backgroundColor = (('color' in props.user)?props.user.color:"grey");
+
+
 return (<>
-    {/* <Row> */}
-        <Col m={6} s={12}>
-            <Card
-              header={<CardTitle image={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'} />}
-              horizontal
-              className={"teal "+ messageClass}
+
+    <li id={"chatmessage-"+props.id}
+                className= "chatMessage card  z-depth-0  "
+                style={style}
             >
-                <p>{content}</p>
-                <p className="chat-time right">{formatTime(timestamp)}</p>
-            </Card>
-        </Col>
-    {/* </Row> */}
+            
+            <div className="messageCard-header valign-wrapper" 
+                >
+                <img src={props.user?props.user.photoURL:""} alt="" className="circle messageHeaderImg "/> 
+                <span className="black-text">{props.user?props.user.displayName:""}</span> 
+            </div>
+            <div className="messageCard-content white-text">
+                {content}
+            </div>
+    </li>    
   </>);
 }
 
 function ChatMessage(props) {
-  // const { content, uid, photoURL, timestamp } = props.message;
-
-  return (props.isComment?<RenderComment {...props.message} />:
-                          <RenderMessage {...props.message} />);
+    return (props.isComment?<RenderComment user={props.user} {...props.message} />:
+                            <RenderMessage user={props.user} {...props.message} />);
 }
-
-
-// export function ChatFullpage(props) {
-//   return <Chat collection="chats" group="default" isComment={false} containerClass="container" ></Chat>
-// }

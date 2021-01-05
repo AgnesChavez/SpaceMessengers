@@ -23,19 +23,8 @@ export function InfoSidebar(props){
     });
     if(!props.boardId) return "";
     return (<>
-{/*         <SideNav */}
-{/*             className="black black-text" */}
-{/*             id="InfoSidebar" */}
-{/*             options={{ */}
-{/*                 edge: "right", */}
-{/*                 draggable: true */}
-{/*             }} */}
-{/* fixed={false} */}
-{/*         > */}
 
     <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text">
-
-
 
     <div id="TabsContainer" className="fullheight">
 
@@ -48,6 +37,7 @@ export function InfoSidebar(props){
             group={props.boardId} 
             containerClass="sidebar-chat"
             isComment={false}
+            getUser={props.getUser}
         />
     </div>
     <div id="commentsTab" className="col s12">
