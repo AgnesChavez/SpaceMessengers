@@ -148,16 +148,16 @@ padding: 0px  !important;
 }
 
 .boardButtonRight{
-  position: absolute;
-  top:0px;
-  right:0px;
+  position: fixed;
+  top: 86px;
+  right: 16px;
 }
 
 
 .boardButtonLeft{
-  position: absolute;
-  top:0px;
-  left:0px;
+  position: fixed;
+  top: 86px;
+  left: 16px;
 }
 
 /*.SidebarNav{
@@ -201,9 +201,10 @@ padding: 0px  !important;
 
 */
 .messageCard-header{
-  padding-top: 0px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-top: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 4px;
   color:magenta;
   border-bottom: 1px solid #ddd;
 }
@@ -220,6 +221,20 @@ padding: 0px  !important;
 
 .textEditor{
   border-radius: 7px;
+}
+.textEditor textarea {
+  padding: 5px;
+  color : rgb(255,255,255);
+  font-size : 14px;
+}
+
+.textEditor .activeTextArea{
+    border-bottom-width: 1px;
+    background-color : rgba(0,0,0, 0.3);
+}
+.textEditor .inactiveTextArea{
+  border-bottom-width: 0px;
+  background-color: unset; 
 }
 
 .messageCard-footer .collapsible-body{
