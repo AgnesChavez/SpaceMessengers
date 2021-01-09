@@ -3,8 +3,19 @@
 	margin: .5rem 0 0.5rem 0 !important;
 	max-width: 80%;
 	word-break: break-word !important;
+	background-color: grey;
 }
+.messageComment{
+	line-height: unset !important;
+	margin: .5rem 0 0.5rem 0 !important;
+	word-break: break-word !important;
+	background-color: grey;	
+}
+.ownChatMessage{
+right: -20%;
 
+position: relative;
+}
 
 #chatTab{
 	height:100%;
