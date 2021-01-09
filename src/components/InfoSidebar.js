@@ -13,18 +13,24 @@ export function InfoSidebar(props){
     const sidenavRef = useRef(null);
 
     useEffect(()=>{
-        if(!tabsRef.current){
-            tabsRef.current = window.M.Tabs.init(document.querySelectorAll(".tabs"), null);
+        let el = document.getElementById('InfoSidebar');
+        if(el){
+            if(!tabsRef.current){
+                tabsRef.current = window.M.Tabs.init(el.querySelectorAll(".tabs"), null);
+            }
+
+
+            if(!sidenavRef.current){
+                sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "right"  });   
+                // console.log("init InfoSidebar");
+                sidenavRef.current.open();
+                sidenavRef.current.isOpen = true;
+            }
+            
         }
-        if(!sidenavRef.current){
-            sidenavRef.current = window.M.Sidenav.init(document.getElementById('InfoSidebar'), {  draggable: true, edge: "right"  });    
-        }
-        
     });
 
-    console.log('InfoSidebar ' , props.selectedMessage);
-
-    if(!props.boardId) return "";
+    if(!props.boardId  ) return "";
 
     return (<>
 
@@ -32,9 +38,9 @@ export function InfoSidebar(props){
 
     <div id="TabsContainer" className="fullheight">
 
-    <ul className="tabs tabs-fixed-width z-depth-1 black white-text">
+    <ul id="InfoSidebarTabs" className="tabs tabs-fixed-width z-depth-1 black white-text">
         <li className="tab"><a href="#chatTab">Chat</a></li>
-        <li className="tab"><a className="active" href="#commentsTab">Comments</a></li>
+        <li className="tab"><a href="#commentsTab">Comments</a></li>
     </ul>
     <div id="chatTab" className="col s12">
         <Chat collection="chats"
@@ -44,49 +50,19 @@ export function InfoSidebar(props){
             getUser={props.getUser}
         />
     </div>
-    <div id="commentsTab" className="col s12">
-        {props.selectedMessage?
-            <Chat collection="comments"
-                group={props.selectedMessage.id}
-                containerClass="sidebar-chat"
-                isComment={true}
-                bgColor={props.selectedMessage.color}
-                getUser={props.getUser}
-            />
-            :""
-        }      
-    </div>
+        <div id="commentsTab" className="col s12">
+            {props.selectedMessage?
+                <Chat collection="comments"
+                    group={props.selectedMessage.id}
+                    containerClass="sidebar-chat"
+                    isComment={true}
+                    bgColor={props.selectedMessage.color}
+                    getUser={props.getUser}
+                />
+            :<h6>Select a message on the board and you will see its comments here</h6>
+            }      
+        </div>
     </div>
     </ul>
-{/*  */}
-{/*             <Tabs className="z-depth-1 tabs-fixed-width black white-text"> */}
-{/*                 <Tab */}
-{/*                     className="fullheight" */}
-{/*                     options={{swipeable: false}} */}
-{/*                     title="Chat" */}
-{/*                 > */}
-{/*                     <Chat collection="chats" */}
-{/*                         group={props.boardId}  */}
-{/*                         containerClass="sidebar-chat" */}
-{/*                         isComment={false} */}
-{/*                     /> */}
-{/*                 </Tab> */}
-{/*                 <Tab */}
-{/*                     active */}
-{/*                     options={{swipeable: false}} */}
-{/*                     title="Comments" */}
-{/*                 > */}
-{/*                     {props.selectedMessage? */}
-{/*                         <Chat collection="comments" */}
-{/*                             group={props.selectedMessage.id} */}
-{/*                             containerClass="sidebar-chat" */}
-{/*                             isComment={true} */}
-{/*                             bgColor={props.selectedMessage.color} */}
-{/*                         /> */}
-{/*                         :"" */}
-{/*                     } */}
-{/*                 </Tab> */}
-{/*             </Tabs> */}
-        {/* </SideNav> */}
     </>);
 }

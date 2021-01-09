@@ -24,7 +24,14 @@ import { InfoSidebar } from '../components/InfoSidebar'
 import '../css/board.css';
 
 function getInfoSidebar(){
-    return window.M.Sidenav.getInstance(document.getElementById("InfoSidebar"));
+    let element = document.getElementById("InfoSidebar");
+    if(!element)return null;
+    return window.M.Sidenav.getInstance(element);
+}
+function getInfoSidebarTabs(){
+    let element = document.getElementById("InfoSidebarTabs");
+    if(!element)return null;
+    return window.M.Tabs.getInstance(element);
 }
 
 export default function Board() {
@@ -54,7 +61,19 @@ export default function Board() {
 
 
 
-    useEffect(() => window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null));
+    useEffect(() => {
+        window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null);
+        
+        // if(!selectedMessage){
+        //     console.log("selectedMessage is  null");
+        //     let sidebar = getInfoSidebar();
+        //     if(sidebar){
+        // //         console.log("sidebar");
+        //         sidebar.open();
+        //         sidebar.isOpen = true;
+        //     }
+        // }
+    });
     
 
 
@@ -106,12 +125,17 @@ export default function Board() {
         setSelectedMessage(message);
         
         let sidebar = getInfoSidebar();
-        if(!sidebar.isOpen)sidebar.open();
+        if(sidebar && !sidebar.isOpen)sidebar.open();
+
+        let tabs = getInfoSidebarTabs();
+        if(tabs){
+            tabs.select('commentsTab');  
+        }
+
     }
 
     const onClick = (evt) =>
     {
-            
         if( evt.target === boardRef.current)
         {
             
@@ -119,7 +143,7 @@ export default function Board() {
             evt.preventDefault();
             let sidebar = getInfoSidebar();
          
-            if(sidebar.isOpen){
+            if(sidebar && sidebar.isOpen){
                 sidebar.close();
                 sidebar.isOpen = false;
                 setSelected(null);
