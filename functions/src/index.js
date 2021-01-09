@@ -25,6 +25,8 @@ const Types = require('./Types.js');
 
 const Utils = require('./utils.js');
 
+
+
 // Express middleware that validates a token passed in the Authorization HTTP header.
 // The token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Token>`.
@@ -69,11 +71,7 @@ const FieldValue = admin.firestore.FieldValue;
 
 
 async function addDataToDb(dataBaseName, data, autoAddId = true, idFieldName="docId") {
-    // functions.logger.log("addDataToDb");
-    // functions.logger.log(dataBaseName);
-    // functions.logger.log(data);
-    // functions.logger.log(autoAddId);
-    // functions.logger.log(idFieldName);
+    
     try{
         let docRef = await db.collection(dataBaseName).add(data);   
 
@@ -92,11 +90,6 @@ async function addDataToDb(dataBaseName, data, autoAddId = true, idFieldName="do
 }
 
 function setDataInDb(dataBaseName, docName, data, _merge = false) {
-
-    // functions.logger.log("setDataInDb: ");
-    // functions.logger.log("dataBaseName ", dataBaseName);
-    // functions.logger.log("docName ", docName);
-    // functions.logger.log("data ", data);
 
     let docRef = db.collection(dataBaseName).doc(docName);
 
@@ -146,7 +139,7 @@ function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
     
     setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
 
-    auth().sendSignInLinkToEmail(_email, actionCodeSettings)
+    admin.auth().sendSignInLinkToEmail(_email, actionCodeSettings)
         .then(()=> {
             // The link was successfully sent. Inform the user.
             // Save the email locally so you don't need to ask the user for it again
@@ -181,12 +174,6 @@ async function addToArray(collectionId, docId, arrayId, data)
 
 async function createUserInDb(uid, name, type, institutionId) {
 
-    // functions.logger.log("createUserInDb");
-    // functions.logger.log('uid ' + uid);
-    // functions.logger.log('name ' + name);
-    // functions.logger.log('type ' + type);
-    // functions.logger.log('institutionId ' + institutionId);
-    // functions.logger.log('workshopId ' + workshopId);
 
 
     let _type = type;
@@ -200,15 +187,6 @@ async function createUserInDb(uid, name, type, institutionId) {
         let user= await addDataToDb("users", Types.UserData("", name, _type, institutionId), true, 'id');
         if(user) userId = user.id;
     }
-    // if(userId !== null && institutionId !== null && institutionId !== ""){
-    //     await db.collection("institution").doc(institutionId).update({
-    //         members: firebase.firestore.FieldValue.arrayUnion(userId)
-    //     });
-        // await addToArray("institution", institutionId, "members", userId);
-
-
-    // }
-    // addUserToWorkshop(userId, workshopId, type);    
 
     return userId;
 }
@@ -217,12 +195,7 @@ async function createUserInDb(uid, name, type, institutionId) {
 
 
 app.get('/api/test', async (req, res) => {
-
-    // const r = await db.collection('cities').add({
-    //     name: 'Tokyo',
-    //     country: 'Japan'
-    // });
-
+ 
 
 // 
 //     let users = await db.collection('users').get();
@@ -244,12 +217,16 @@ app.get('/api/test', async (req, res) => {
 //       // console.log(doc.id, '=>', doc.data());
 //     });
 
-    let collectionId = 'boardMessages';
-    const messages = await db.collection(collectionId).get();
+//     let collectionId = 'boardMessages';
+//     const messages = await db.collection(collectionId).get();
+// 
+//     messages.forEach(doc => {
+//         db.collection(collectionId).doc(doc.id).set({color: Types.randomColorHSL()}, {merge:true});
+//     });
 
-    messages.forEach(doc => {
-        db.collection(collectionId).doc(doc.id).set({color: Types.randomColorHSL()}, {merge:true});
-    });
+
+        // createNewUser("rjmacdon@puc.cl", "roy", Types.student, null,   null);
+
 
     // generateDummyUsers();
 //     let t = null;
@@ -264,43 +241,43 @@ app.get('/api/test', async (req, res) => {
 
 
  
-app.post('/api/createUserInDb', async (req, res) => {
+// app.post('/api/createUserInDb', async (req, res) => {
+// 
+//     // let validUser = await checkPostUserId(req, res, Types.admin);
+//     // if (!validUser) return;
+// 
+//     let uid = setDefault(req.body.uid,"");
+//     let name = setDefault(req.body.name,"");
+//     let type = setDefault(req.body.type,"student");
+//     let institutionId = setDefault(req.body.institutionId,"");
+//     let workshopId = setDefault(req.body.workshopId,"");
+// 
+// 
+//     let validUid = await createUserInDb(uid, name, type, institutionId, workshopId);
+// 
+//     return res.status(200).json({success: (validUid?true:false), id: validUid });
+// 
+// });
 
-    // let validUser = await checkPostUserId(req, res, Types.admin);
-    // if (!validUser) return;
-
-    let uid = setDefault(req.body.uid,"");
-    let name = setDefault(req.body.name,"");
-    let type = setDefault(req.body.type,"student");
-    let institutionId = setDefault(req.body.institutionId,"");
-    let workshopId = setDefault(req.body.workshopId,"");
-
-
-    let validUid = await createUserInDb(uid, name, type, institutionId, workshopId);
-
-    return res.status(200).json({success: (validUid?true:false), id: validUid });
-
-});
-
-
-app.post('/api/createNewUser', async (req, res) => {
-
-    let validUser = await checkPostUserId(req, res, Types.admin);
-    if (!validUser) return;
-
-    let email = setDefault(req.body.email,"");
-    let name = setDefault(req.body.name,"");
-    let type = setDefault(req.body.type,"student");
-    let institutionId = setDefault(req.body.institutionId,"");
-    let workshopId = setDefault(req.body.workshopId,"");
-
-
-    let success = await createNewUser(email, name, type, institutionId, workshopId);
-
-    res.status(200).json({success: success });
-
-
-});
+// 
+// app.post('/api/createNewUser', async (req, res) => {
+// 
+//     let validUser = await checkPostUserId(req, res, Types.admin);
+//     if (!validUser) return;
+// 
+//     let email = setDefault(req.body.email,"");
+//     let name = setDefault(req.body.name,"");
+//     let type = setDefault(req.body.type,"student");
+//     let institutionId = setDefault(req.body.institutionId,"");
+//     let workshopId = setDefault(req.body.workshopId,"");
+// 
+// 
+//     let success = await createNewUser(email, name, type, institutionId, workshopId);
+// 
+//     res.status(200).json({success: success });
+// 
+// 
+// });
 
 // 
 // async function generateDummyUsers(){
