@@ -33,27 +33,24 @@ export default function Board() {
 
     const usersMap = useRef(null);
 
-    // const [boardId, setBoardId ] = useState(null);
+    const prevUsers = useRef(null);    
 
-    let boardId = "default";
+    const [ boardId, setBoardIdState ] = useState(null);
 
-    function setBoardId(i) {}
-
-    // setBoardId("default");
 
     const messagesRef = db.collection("boardMessages");
     
     const [selected, setSelected ] = useState(null);
 
     const [selectedMessage, setSelectedMessage] = useState(null);
-
-    // const [teams, teamsLoading] = useCollectionData(db.collection("teams").where("members", "array-contains", auth().currentUser.uid)); 
     
     const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
 
     const [messages, messagesLoading] = useCollectionData(messagesRef.where("boardId", "==", boardId));
 
-    const [currentUser, currentUserLoading] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
+    const currentUserRef = db.collection('users').doc(auth().currentUser.uid);
+
+    const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
 
 
 
@@ -90,7 +87,6 @@ export default function Board() {
 
 
     const boardSelectHandle = (bid) =>{
-        // console.log("boardSelectHandle " + boardId);
         setBoardId(bid);
     }
     
@@ -108,10 +104,9 @@ export default function Board() {
     {
         setSelected(element);
         setSelectedMessage(message);
+        
         let sidebar = getInfoSidebar();
         if(!sidebar.isOpen)sidebar.open();
-        // evt.stopPropagation();
-        // console.log("onMessageClick " + message, evt );
     }
 
     const onClick = (evt) =>
@@ -127,16 +122,9 @@ export default function Board() {
             if(sidebar.isOpen){
                 sidebar.close();
                 sidebar.isOpen = false;
-                // console.log("onClick. sidebar.isOpen: ", sidebar.isOpen);
                 setSelected(null);
                 setSelectedMessage(null);
-        
-
             }
-            
-        // }else
-        // {
-        //     setSelected(evt.target);
         }
     }
 
@@ -147,11 +135,12 @@ export default function Board() {
     function getUser(uid){
         if(users && !usersLoading)
         {
-            if(usersMap.current === null ){
+            if(usersMap.current === null || prevUsers.current !== users ){
                 usersMap.current = {};
                 for(let i = 0; i < users.length; i++){
                     usersMap.current[users[i].id] = users[i];
                 }
+                prevUsers.current = users;
             }
             if( usersMap.current !=null)
             {
@@ -168,11 +157,27 @@ export default function Board() {
         return ({name: "", photoURL:"" });
     }
 
+    function setBoardId(bid) {
+        setBoardIdState(bid);
+        if(bid &&currentUser && !currentUserLoading){
+            if(currentUser.currentBoard !== bid){
+                currentUserRef.update({currentBoard: bid});
+            }
+        }
+    }
    
+
     if(boardId === null)
     {
-        if(currentUser && !currentUserLoading && currentUser.currentBoard !== null){
-            setBoardId(currentUser.currentBoard);
+        if(currentUser && !currentUserLoading){
+            if(currentUser.currentBoard !== null){
+                setBoardId(currentUser.currentBoard);
+            }else{
+                if(currentUser.boards.length > 0)
+                {
+                    setBoardId(currentUser.boards[0]);
+                }
+            }
         }
     }
     
