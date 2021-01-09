@@ -88,6 +88,7 @@ export function BoardMessageData(uid, boardId) {
     created: firebase.firestore.FieldValue.serverTimestamp(),
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     uid,
+    color: randomColorHSL(),
     id: null,
     boardId,
     position: {
