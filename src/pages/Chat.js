@@ -8,7 +8,7 @@ import 'firebase/firestore';
 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Row, Col, Card, CardTitle } from 'react-materialize';
+import { Icon } from 'react-materialize';
 
 import { formatTime } from '../helpers/Formatting' 
 import '../css/chat.css';
@@ -22,7 +22,7 @@ export default function Chat(props) {
 
     const query = messagesRef.where("group", "==", props.group).orderBy('created', 'desc').limit(15);
 
-    const [messages] = useCollectionData(query);
+    const [messages, loadingMessages] = useCollectionData(query);
 
     const [formValue, setFormValue] = useState('');
     
@@ -54,17 +54,21 @@ export default function Chat(props) {
 
 
     const getUser = (uid) =>{
-        console.log("getUser " + uid, props.getUser);
+        // console.log("getUser " + uid, props.getUser);
         return props.getUser(uid);
     }
 
+    // console.log("messages  isComment: " + props.isComment, messages, "props.getUser", props.getUser);
+    // console.log("loadingMessages ", loadingMessages ,
+    // "props.getUser ", props.getUser ,
+    // "messages ", messages
     return (<>
         <div className="chatContainer"
             style={props.isComment?({backgroundColor: props.bgColor}):{}}
         >
         <div className={props.containerClass}>
         <ul>
-            {props.getUser && messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} user={getUser(msg.uid)} isComment={props.isComment} />)}
+            {!loadingMessages && props.getUser && messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} user={getUser(msg.uid)} isComment={props.isComment} />)}
         </ul>
         <span ref={dummy}></span>
         </div>
@@ -92,17 +96,24 @@ function RenderComment(props)
 }
 
 function RenderMessage( props){
-    const { content, uid, timestamp } = props;
     let style = {};
-    if(uid === auth().currentUser.uid) style.float = "right";
+    // if(!props.isComment && props.uid === auth().currentUser.uid) style.float = "right";
   
-    if(props.user) style.backgroundColor = (('color' in props.user)?props.user.color:"grey");
+    if(props.user){
+        let color = (('color' in props.user)?props.user.color:"grey");
+        if(props.isComment){
+            style.color = color;
+        }else{
+            style.backgroundColor = color;
+        }
+    }
 
+    const messageClass = (!props.isComment && props.uid === auth().currentUser.uid)?"ownChatMessage":"";
 
 return (<>
 
     <li id={"chatmessage-"+props.id}
-                className= "chatMessage card  z-depth-0  "
+                className= {"z-depth-0  " + (props.isComment? "messageComment":"card chatMessage ") + messageClass}
                 style={style}
             >
             
@@ -112,13 +123,15 @@ return (<>
                 <span className="black-text">{props.user?props.user.displayName:""}</span> 
             </div>
             <div className="messageCard-content white-text">
-                {content}
+                {props.content}
             </div>
     </li>    
   </>);
 }
 
 function ChatMessage(props) {
-    return (props.isComment?<RenderComment user={props.user} {...props.message} />:
-                            <RenderMessage user={props.user} {...props.message} />);
+    // console.log("ChatMessage: ", props );
+    return <RenderMessage user={props.user} isComment={props.isComment} {...props.message} /> ;
+    // return (props.isComment?<RenderComment user={props.user} {...props.message} />:
+    //                         <RenderMessage user={props.user} {...props.message} />);
 }
