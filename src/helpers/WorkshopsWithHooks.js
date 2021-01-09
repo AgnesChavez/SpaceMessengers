@@ -50,7 +50,7 @@ function AddMembers(props){
 	</>)
 }
 
-const MAKE_DUMMY_USERS = true;
+const MAKE_DUMMY_USERS = false;
 
 async  function createUser( email, name, type, institutionId, workshopId, userIds)
 	{
