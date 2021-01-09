@@ -50,7 +50,9 @@ export function BoardMessage(props)
             <div ref={myRef}
                 id={"msg-"+id}
                 className={ "card messageCard z-depth-0 " + ((!isActive())?"transparent":"") }
-                style={{backgroundColor: props.message.color}}
+                style={{backgroundColor: props.message.color, 
+                    zIndex: (isActive()?1:0)
+                    }}
             >
             
             <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>
