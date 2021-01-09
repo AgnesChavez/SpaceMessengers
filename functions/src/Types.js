@@ -91,6 +91,7 @@ function BoardMessageData(uid, boardId) {
     created: admin.firestore.FieldValue.serverTimestamp(),
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
     uid,
+    color: randomColorHSL(),
     id: null,
     boardId,
     position: {
