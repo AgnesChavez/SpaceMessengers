@@ -89,16 +89,13 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={this.state.authenticated?Board:Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
-            
+            <Route path="/signup" component={Signup} />
+
+
             <PrivateRoute
               path="/board"
               authenticated={this.state.authenticated}
               component={Board}
-            />
-            <PublicRoute
-              path="/signup"
-              authenticated={this.state.authenticated}
-              component={Signup}
             />
             <PublicRoute
               path="/login"
