@@ -21,7 +21,11 @@ export function InfoSidebar(props){
         }
         
     });
+
+    console.log('InfoSidebar ' , props.selectedMessage);
+
     if(!props.boardId) return "";
+
     return (<>
 
     <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text">
@@ -47,6 +51,7 @@ export function InfoSidebar(props){
                 containerClass="sidebar-chat"
                 isComment={true}
                 bgColor={props.selectedMessage.color}
+                getUser={props.getUser}
             />
             :""
         }      
