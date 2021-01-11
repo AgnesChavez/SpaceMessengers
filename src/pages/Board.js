@@ -21,6 +21,8 @@ import { userTypes } from '../helpers/Types'
 
 import { InfoSidebar } from '../components/InfoSidebar'
 
+import { addBoardToUser } from '../helpers/factory'
+
 import '../css/board.css';
 
 function getInfoSidebar(){
@@ -100,8 +102,6 @@ export default function Board() {
         }).catch(function(error) {
             console.error("Error removing document: ", error);
         });
-
-        
     }
 
 
@@ -171,10 +171,11 @@ export default function Board() {
                 if(usersMap.current.hasOwnProperty(uid)){
                     return usersMap.current[uid];      
                 }else{
-                    console.log("add board "+ boardId + " to user " +uid  );
-                     db.collection('users').doc(uid).update({
-                        boards: firebase.firestore.FieldValue.arrayUnion(boardId)
-                    });
+                    // console.log("add board "+ boardId + " to user " +uid  );
+                    //  db.collection('users').doc(uid).update({
+                    //     boards: firebase.firestore.FieldValue.arrayUnion(boardId)
+                    // });
+                    addBoardToUser(boardId, uid);
                 }
             }
         }
@@ -254,9 +255,10 @@ export default function Board() {
                     data-position="right" 
                     data-tooltip="Menu"
                     id="SidebarLeftTrigger"
-                    >
+                    > 
                     <Icon>menu</Icon>
                 </a>
+
 
 
                 {(boardId === null)?
