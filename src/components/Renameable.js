@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 
-import { Button, TextInput } from 'react-materialize';
+// import { Button, TextInput } from 'react-materialize';
 
 import '../css/renameable.css';
 import '../css/board.css';
-// import { isFunction } from '../helpers/utils'
+import { isFunction } from '../helpers/utils'
 
-function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
+// function isFunction(functionToCheck) {
+//  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+// }
 
 export default function Renameable(props){
 
@@ -76,12 +76,11 @@ export default function Renameable(props){
 					className="transparent textButton"
 					onMouseOver={(e)=> onHover(e.target, true)}
 					onMouseOut={(e)=> onHover(e.target, false)}
-					onClick={props.onTextClick}
+					onClick={(e)=>{isFunction(props.onTextClick) && props.onTextClick(e)}}
 					>
 					{props.text}
 				</button>
 				
-              
                 <button ref={buttonRef}
                     className="InlineTinyButton btn "
                     onClick={buttonPressed}
