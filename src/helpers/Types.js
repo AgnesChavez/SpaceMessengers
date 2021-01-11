@@ -16,11 +16,6 @@ export function Color(r=255, g=255, b=255, a=1){
   return {r, g, b, a};
 }
 
-
-// export function randomColor()
-// {
-//   return Color(getRandomInt(0,255), getRandomInt(200,255), getRandomInt(0,255), 1);
-// }
 export function randomColorHSL(){
   return "hsl("+ getRandomInt(0,360) + ", " + getRandomInt(90,100) + "%, 50%)" 
 }
@@ -29,8 +24,7 @@ export function WorkshopData(name) {
   return {
     id: "",
     instructors: [],
-    institutions: [],
-    students: [],
+    institutions: [],    
     name: name,
     date: firebase.firestore.FieldValue.serverTimestamp(),
     created: firebase.firestore.FieldValue.serverTimestamp(),
@@ -38,12 +32,12 @@ export function WorkshopData(name) {
 }
 
 
-export function TeamData(workshopId, membersArray) {
+export function TeamData(name, workshopId) {
   return {
     id: "",
-    name:"",
+    name,
     workshopId,
-    members: Array.isArray(membersArray)?membersArray:[],
+    members: [],
     created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
@@ -60,16 +54,21 @@ export function UserData(uid, name, type, institutionId) {
     photoURL: null,
     displayName: name,
     color: randomColorHSL(),
-    partnerId:"",
+    boards: [],
+    currentBoard: null,
+    currentTeam: null,
+    currentWorkshop: null,
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }
+
 export function BoardData(teamId, name) {
   return {
     id: "",
     messages: [],
     teamId,
     name,
+    color: randomColorHSL(),
     created: firebase.firestore.FieldValue.serverTimestamp(),
   }
 }
