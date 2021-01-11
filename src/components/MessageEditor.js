@@ -22,6 +22,7 @@ export function MessageEditor(props)
             id={"textarea-"+id}
             defaultValue={content}
             className={"materialize-textarea " + (props.active?"activeTextArea":"inactiveTextArea")}
+            style={{margin: "0px", boxShadow: "unset", minHeight: "unset", height: "unset"}}
             onChange={(e)=>props.onMessageChange(id, e.target.value)}
         ></textarea>
         </div>
