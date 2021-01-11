@@ -1,0 +1,29 @@
+.Renambeable{
+	width:100%;
+	display: flex;
+	justify-content: space-between;
+  	align-items: center;
+
+}
+.Renambeable .input-field{
+	margin-top:unset;
+	margin-bottom:unset;
+	padding-left: unset;
+	padding-right: unset;
+}
+.Renambeable input{
+	border-bottom: 0px solid transparent !important;	
+	height: 1rem !important;
+	font-size: 1rem !important;
+	margin-bottom: 0px !important;
+	width: 100%;
+	color: white !important;
+}
+
+.Renambeable .textButton{
+	padding-left:0px !important;
+	border-width:0px !important;
+	font-size: 1rem !important;
+	flex:1;
+	text-align: left;
+}
