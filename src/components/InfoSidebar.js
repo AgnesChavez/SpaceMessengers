@@ -16,18 +16,19 @@ export function InfoSidebar(props){
         let el = document.getElementById('InfoSidebar');
         if(el){
             if(!tabsRef.current){
-                tabsRef.current = window.M.Tabs.init(el.querySelectorAll(".tabs"), null);
+                tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
             }
-
-
             if(!sidenavRef.current){
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "right"  });   
                 // console.log("init InfoSidebar");
                 sidenavRef.current.open();
                 sidenavRef.current.isOpen = true;
             }
-            
         }
+        return () => {
+            if(sidenavRef.current){sidenavRef.current.destroy(); sidenavRef.current = null; }
+            if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
+        };
     });
 
     if(!props.boardId  ) return "";
