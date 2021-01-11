@@ -321,15 +321,18 @@ export  function Sidebar(props) {
         let el = document.getElementById('SidebarLeft');
         if(el){
             if(!tabsRef.current){
-                tabsRef.current = window.M.Tabs.init(el.querySelectorAll(".tabs"), null);
+                tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
             }
             if(!sidenavRef.current){
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
                 sidenavRef.current.open();
                 sidenavRef.current.isOpen = true;
             }
-            
         }
+          return () => {
+            if(sidenavRef.current){sidenavRef.current.destroy(); sidenavRef.current = null; }
+            if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
+        };
     });
 
 
@@ -347,7 +350,7 @@ export  function Sidebar(props) {
     return (<>
 
 
-        <ul id="SidebarLeft" className="sidenav black white-text">
+        <ul id="SidebarLeft" className="sidenav sidenav-fixed black white-text">
     
             <SidebarCurrentUser className="white-text"  user={user} />
             <div className="row">
