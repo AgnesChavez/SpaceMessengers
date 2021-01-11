@@ -36,6 +36,12 @@ function getInfoSidebarTabs(){
     return window.M.Tabs.getInstance(element);
 }
 
+function getLeftSidebar(){
+    let element = document.getElementById("SidebarLeft");
+    if(!element)return null;
+    return window.M.Sidenav.getInstance(element);
+}
+
 export default function Board() {
 
     const boardRef = useRef(null);
@@ -118,6 +124,10 @@ export default function Board() {
         });
     }
 
+    function openMenu(evt){
+        let sidebar = getLeftSidebar();
+        if(sidebar && !sidebar.isOpen)sidebar.open();
+    }
 
     function onMessageClick(evt, element, message)
     {
@@ -148,6 +158,12 @@ export default function Board() {
                 sidebar.isOpen = false;
                 setSelected(null);
                 setSelectedMessage(null);
+            }
+
+            let leftSidebar = getLeftSidebar();   
+            if(leftSidebar && leftSidebar.isOpen){
+                leftSidebar.close();
+                leftSidebar.isOpen = false;
             }
         }
     }
@@ -248,18 +264,18 @@ export default function Board() {
                     tooltip="Click to add a new message"
                 />  :""}
 
-                
-                <a className="red left btn-floating boardButtonLeft waves-effect waves-light btn sidenav-trigger tooltipped" 
-                    href="!#" 
-                    data-target="SidebarLeft"
-                    data-position="right" 
-                    data-tooltip="Menu"
+
+                <Button
                     id="SidebarLeftTrigger"
-                    > 
-                    <Icon>menu</Icon>
-                </a>
-
-
+                    className="red left boardButtonLeft"
+                    floating
+                    icon={<Icon>menu</Icon>}
+                    node="button"
+                    waves="light"
+                    onClick={openMenu}
+                    tooltip="Menu"
+                /> 
+                
 
                 {(boardId === null)?
                 (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
