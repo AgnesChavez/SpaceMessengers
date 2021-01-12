@@ -1,150 +1,138 @@
-import React, { Component } from 'react';
+import React, { useState ,useEffect, useRef } from 'react';
 import { auth } from "../services/firebase";
 import { createUserInDb } from "../helpers/userManagement";
-import { Link } from 'react-router-dom';
+import {  Redirect } from 'react-router-dom';
 
 import { getQueryData } from "../helpers/db"
 import { db } from "../services/firebase";
 
+import { Button, TextInput, Icon, Row, Col, Preloader} from 'react-materialize';
+
 
 import firebase from "firebase";
 
-export default class CompleteRegistration extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            error: null,
-            email: window.localStorage.getItem('emailForSignIn'),
-            completingRegistration: false,
-            requestingEmail: false,
-            userName:""
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.verifyRegistration = this.verifyRegistration.bind(this);
-    }
+import '../css/registration.css';
 
 
+export default function CompleteRegistration(props)  {
 
-    async verifyRegistration() {
-        this.setState({ error: null, completingRegistration: true });
-        // Confirm the link is a sign-in with email link.
+      const error = useRef(null);
+      const email = useRef('');
+      const emailInputRef = useRef(null);
+
+      const [ completingRegistration, setCompletingRegistration] = useState(false);
+      const [ requestingEmail, setRequestingEmail] = useState(false);
+
+
+    async function verifyRegistration() {
+        if (!email.current) {
+            setRequestingEmail(true);
+            setCompletingRegistration(false);
+            return;
+        }
+        error.current = null;
+        setRequestingEmail(false);
+        setCompletingRegistration(true);
+
         if (auth().isSignInWithEmailLink(window.location.href)) {
-            // Additional state parameters can also be passed via URL.
-            // This can be used to continue the user's intended action before triggering
-            // the sign-in operation.
-            // Get the email if available. This should be available if the user completes
-            // the flow on the same device where they started it.
-            // var email = window.localStorage.getItem('emailForSignIn');
-            if (!this.state.email) {
-
-              this.setState({ requestingEmail: true, completingRegistration: false });
-
-              return;
-                // User opened the link on a different device. To prevent session fixation
-                // attacks, ask the user to provide the associated email again. For example:
-            }
-            // The client SDK will parse the code from the link for you.
+            
             try {
-                let result = await auth().signInWithEmailLink(this.state.email, window.location.href).get();
+                let result = await auth().signInWithEmailLink(email.current, window.location.href).get();
+                console.log(result);
                 if (result) {
-                    // Clear email from storage.
+                    
                     window.localStorage.removeItem('emailForSignIn');
                     
-
-                    if (result.additionalUserInfo.isNewUser) {
-                        
-                        let query = db.collection('unauthenticatedUsers').doc(this.state.email);
-                        let user = await getQueryData(query);
-                        if(user !== null){
-                            await createUserInDb(result.user.uid, user.name, user.type, user.institution, user.workshopId);  
-                            await query.delete();
-                        }else{
-                            await createUserInDb(result.user.uid, "", null, "", "");  
-                        }
+                    console.log("result.additionalUserInfo ", result.additionalUserInfo);
+                    
+                    let query = db.collection('unauthenticatedUsers').doc(email.current);
+                    let user = await getQueryData(query);
+                    if(user !== null){
+                        await createUserInDb(result.user.uid, user.name, user.type, user.institution, user.workshopId);  
+                        await query.delete();
+                    }else{
+                        await createUserInDb(result.user.uid, "", null, "", "");  
                     }
                     
-
-                    this.setState({ completingRegistration: false });
-                    // You can access the new user via result.user
-                    // Additional user info profile not available via:
-                    // result.additionalUserInfo.profile == null
-                    // You can check if the user is new or existing:
-                    // result.additionalUserInfo.isNewUser
+                    <Redirect to="/board" />
+                }else{
+                    setCompletingRegistration(false);
                 }
-            } catch (error) {
-                this.setState({ error: error, completingRegistration: false });
-                // Some error occurred, you can inspect the code: error.code
-                // Common errors could be invalid email and invalid or expired OTPs.
+            } catch (e) {
+                error.current = e;
+                setCompletingRegistration(false);
             }
         }
     }
 
-    async componentDidMount() {
-        this.verifyRegistration();
-    }
+    useEffect(()=>verifyRegistration());
 
-    async handleSubmit(event) {
+    
+    
+    async function handleSubmit(event) {
         event.preventDefault();
-        this.setState({ error: null, requestingEmail:false });
-        try {
-            this.verifyRegistration();
-
-        } catch (error) {
-            this.setState({ error: error, requestingEmail:true });
-        }
+        // console.log(emailInputRef.current.value);
+        email.current = emailInputRef.current.value;
+        verifyRegistration();
     }
 
-    handleChange(event) {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    }
-render() {
-        return (
 
-     <div className="container">
-                <h1>
-            Login to
-            <Link className="title ml-2" to="/">
-              Space Messengers
-            </Link>
-          </h1>
-          {this.state.error ? (
-              <p className="text-danger">{this.state.error}</p>
-            ) : null}
-          {this.state.requestingEmail ? 
-        <form
-          className="mt-5 py-5 px-5"
-          autoComplete="off"
-        >
-          <p className="lead">
-            Please write your email address to finish your registration.
-            <br/>
-              It must be the exact same email address where you received your registration link.
-          </p>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Email"
-              name="email"
-              type="email"
-              onChange={this.handleChange}
-              value={this.state.email}
-            />
-          </div>
-          <div className="form-group">
-            <button className="btn btn-primary px-5" type="button" onClick={this.handleSubmit}>Send</button>
-          </div>
-        </form>
+    return (
+     <div className="container black-text">
+        <div className="card-panel white registration-card">
+        <div className='row'>
+            <h4 className="center-align" >Complete your registration to Space Messengers</h4>
+            {error.current ? 
+                <div className="registration-error center-align z-depth-4">
+                    <h6>Your registration Failed :(</h6> 
+                    with the following error:<br/>
+                    {error.current}
+                    <br/>
+                    Please try again or contact the administrator or instructor.
+                </div>
+                 : 
+            null}
+        </div>
+        {requestingEmail ? 
+            <div>
+                <p>
+                    Please write your email address to finish your registration.
+                    <br/>
+                    It must be the exact same email address where you received your registration link.
+                </p>
+                <form onSubmit={handleSubmit}>
+                <TextInput
+                    ref={emailInputRef}
+                    email
+                    id="EmailInput"
+                    label="Email"
+                    validate
+                />
+                <Button
+                    node="button"
+                    type="submit"
+                    waves="light"
+                    
+                >
+                  Submit<Icon right>send</Icon>
+                </Button>
+            </form>
+            </div>
         : ""}
-        {this.state.completingRegistration ? <div className="spinner-border text-success" role="status">
-            <span className="sr-only">Verifying...</span>
-          </div> : ""}
+        {completingRegistration ? (
+            <Row>
+                <Col s={12} className="valign-wrapper" style={{justifyContent: "center"}}>
+                <Preloader
+                    active
+                    color="blue"
+                    flashing
+                />
+                <h5 style={{paddingLeft: "1rem"}}>Verifying...</h5>
+                </Col>
+            </Row>)
+        : ""}
       </div>
-
-        );
-    }
+      </div>
+    );
 
 }
