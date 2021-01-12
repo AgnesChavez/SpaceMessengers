@@ -54,6 +54,7 @@ body {
 
 header{
   position: fixed;
+  top:0px;
 }
 
 
@@ -291,3 +292,8 @@ height: 1.6rem;
   background-color: rgba(255,255,255,0.2);
   
 }
+
+.sidenav-fixed{
+    transition: transform 0.3s !important;
+}
+
