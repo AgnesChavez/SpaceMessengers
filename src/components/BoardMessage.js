@@ -60,10 +60,15 @@ export function BoardMessage(props)
                 <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
+                    <span className="new badge red messageBadge  z-depth-2" data-badge-caption="" 
+                        style={{position: "absolute",
+                                right: "0px",
+                                minWidth:"22px",
+                                borderRadius:"11px",
+                                transform: "translateY(-11px)"
+                                }}
+                        >3</span>
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={canEdit()}/>
-                    {/* {isActive()? */}
-                    {/* <p className="boardMessageTime ">{formatTime(timestamp)}</p>:"" */}
-                    {/* } */}
                     {canEdit()?
                     <Button
                         className="red halfway-fab"
@@ -78,9 +83,6 @@ export function BoardMessage(props)
                      
                 </div>
                 <div className="messageCard-footer">
-                    {/* <Comments  */}
-                    {/*     messageId={id} */}
-                    {/*     ></Comments> */}
                 </div>                    
             </div>
         </Draggable> 
