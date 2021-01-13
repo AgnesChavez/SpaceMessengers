@@ -74,7 +74,9 @@ header{
 
 #SidebarLeft .collapsible-header
 {
-padding: 0px  !important;
+  padding: 6px 0px 0px 0px !important;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  margin-top: 8px;
 }
 
 #SidebarLeft .collapsible-body
