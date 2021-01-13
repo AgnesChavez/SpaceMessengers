@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect,  useState, useRef } from "react";
 
 // import { Button, TextInput } from 'react-materialize';
 
@@ -21,6 +21,7 @@ export default function Renameable(props){
 	const renamebleRef = useRef(null);
 	const textRef = useRef(null);
 
+	const tooltipRef = useRef(null);
 
 	function disableEdit(e){
 		if(isEditing && !isButtonPressed.current){
@@ -44,6 +45,20 @@ export default function Renameable(props){
 		isButtonPressed.current = false;
 		setIsEditing(!isEditing);
 	}
+
+	useEffect(()=>{        
+        if(buttonRef.current){
+            if(!tooltipRef.current){
+                tooltipRef.current = window.M.Tooltip.init(buttonRef.current, null);
+            }
+        }
+        return () => {
+            
+            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+        };
+    });
+
+
 
 	function showButton(){if(!isEditing && buttonRef.current) buttonRef.current.style.visibility = ''}
 	function hideButton(){if(!isEditing && buttonRef.current) buttonRef.current.style.visibility = 'hidden'}
@@ -80,12 +95,14 @@ export default function Renameable(props){
 					>
 					{props.text}
 				</button>
-				
+ 
                 <button ref={buttonRef}
-                    className="InlineTinyButton btn "
+                    className="InlineTinyButton btn tooltipped"
                     onClick={buttonPressed}
                     onMouseDown={()=>isButtonPressed.current = true}
                     style={{visibility: 'hidden'}}
+                    data-position="right"
+                    data-tooltip="Change name"
                     >
                     <i className=" tiny material-icons">{isEditing?"done":"edit"}</i>
                 </button>
