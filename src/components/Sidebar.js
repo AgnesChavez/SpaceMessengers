@@ -29,7 +29,7 @@ import { addToArray } from '../helpers/db'
 
 import { UploadImgButton } from '../helpers/imgStorage'
 
-import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton } from './Modals'
+import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton, ModalAddUserToTeam } from './Modals'
 
 
  
@@ -54,7 +54,18 @@ function SidebarUser(props)
 function addUserTo(newDest){
     // {{dest:props.team, collection:'teams', field: 'members'}}></RenderUsers>
     
+    if(newDest.collection ===  'teams'){
+        let modal = window.M.Modal.getInstance(document.getElementById('AddUserToTeamModal'));
+        if(modal){
+            console.log("addUserToTeam", newDest.dest.id)
+            localStorage.setItem("addUserToTeam", newDest.dest.id);
+            modal.open();        
+        }else{
+            console.log("addUserTo : modal invalid");
+        }
     
+
+    }
     // addToArray(newDest.collection, newDest.dest.id, newDest.field, data);
 
 
@@ -305,6 +316,7 @@ function SidebarWorkshopCollection(props){
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
 
             { (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
+            { (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
 
         </>)
 }

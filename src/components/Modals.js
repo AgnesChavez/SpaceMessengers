@@ -202,13 +202,40 @@ export function CreateTeamModalButton(props){
   >
      Create Team
   </Button>
-	// <button id="CreateTeamModalButton" 
-	// 		className="sidebarButton waves-effect waves-light btn teal white-text" 
-	// 		onClick={ (e) => openModal('modalCreateTeam')}
-	// 		>
-	// 	Create Team
-	// </button>
+
 	);	
+}
+
+export function ModalAddUserToTeam(props){
+	
+	
+	function onChange(e, selectorId){
+		if(!e.target.value)return;
+
+
+   	    let teamId = localStorage.getItem("addUserToTeam");
+   	    localStorage.removeItem("addUserToTeam");
+
+		addUserToTeam(e.target.value, teamId);
+
+		let modal = window.M.Modal.getInstance(document.getElementById('AddUserToTeamModal'));
+		if(modal)modal.close();
+
+		e.target.value="";
+	}
+	
+	return <Modal
+    		actions={[    	
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Add user to team"
+    		id="AddUserToTeamModal"
+    		root={document.getElementById('modalRoot')}
+  		>			
+			<SelectUser selectorId = {0} value={""} onChange={onChange} usersArray={props.currentWorkshop.students} />
+
+        </Modal>
 }
 
 
