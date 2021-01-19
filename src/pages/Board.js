@@ -7,7 +7,7 @@ import firebase from "firebase";
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Button, Row, Col, Preloader } from 'react-materialize';
+import { Modal, TextInput, Icon, Button, Row, Col, Preloader } from 'react-materialize';
 
 import { BoardMessageData } from '../helpers/Types'
 
@@ -67,10 +67,21 @@ export default function Board() {
 
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
 
+    // const testTextInputModalRef = useRef(null);
 
-
-    useEffect(() => {
-        window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null);
+// 
+//     useEffect(()=>{        
+//         if(buttonRef.current){
+//             if(!tooltipRef.current){
+//                 tooltipRef.current = window.M.Tooltip.init(buttonRef.current, null);
+//             }
+//         }
+//         return () => {
+//             
+//             if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+//         };
+//     });
+    // useEffect(() => window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null));
         
         // if(!selectedMessage){
         //     console.log("selectedMessage is  null");
@@ -81,8 +92,7 @@ export default function Board() {
         //         sidebar.isOpen = true;
         //     }
         // }
-    });
-    
+    // });
 
 
     
@@ -247,6 +257,10 @@ export default function Board() {
         <Col id="boardContainerCol" s={12} className="boardContainer">  
             
 
+
+
+
+
             {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
 
             <div ref={boardRef} id="board" 
@@ -295,5 +309,8 @@ export default function Board() {
             <InfoSidebar boardId={boardId} selectedMessage={selectedMessage}  getUser={getUser}/>
             </Col>
         </Row> 
+
+
+
     </>)
 }

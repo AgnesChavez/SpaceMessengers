@@ -1,5 +1,8 @@
 import { db } from "../services/firebase";
 
+import firebase from 'firebase/app';
+
+
 export async function addDataToDb(dataBaseName,data, autoAddId = true, idFieldName="docId") {
     // console.log("addDataToDb", dataBaseName, data, autoAddId, idFieldName);
 	try{
@@ -45,3 +48,12 @@ export async function getQueryData(query) {
     }
     return null;
 } 
+
+export function addToArray(collectionId, docId, arrayId, data)
+{
+    db.collection(collectionId).doc(docId).update({
+        [arrayId] : firebase.firestore.FieldValue.arrayUnion(data)
+    });
+
+}
+

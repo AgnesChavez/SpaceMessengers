@@ -3,10 +3,11 @@
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
-import { addDataToDb } from './db'
+import { addDataToDb, addToArray } from './db'
 
 // import 'firebase/firestore';
 import firebase from 'firebase/app';
+
 
 // import { useAuthState } from 'react-firebase-hooks/auth';
 // import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -41,6 +42,7 @@ import {
 export async function createTeam(teamName, workshopId){
 
 	const newTeam = await addDataToDb("teams", TeamData(teamName, workshopId), true, "id");
+	await createBoard("Your board", newTeam.id);
 	return newTeam.id;
 }
 
@@ -98,3 +100,45 @@ export async function removeUserFromTeam(userId, teamId){
 	let boards = await db.collection('boards').where('teamId', '==', teamId).get();
 	boards.forEach( b => removeBoardFromUser(b.id, userId));
 }
+
+
+
+
+
+export async function createInstitution(name, workshopId, students, instructors){
+
+
+
+    let doc = await addDataToDb("institution", InstitutionData(name) , true, "id");
+    if(!doc) return null;
+
+    students.map(u => addUserToWorkshop(u, workshopId,userTypes().student));
+    instructors.map(u => addUserToWorkshop(u, workshopId,userTypes().instructor));
+
+    return ({
+        id: doc.id,
+        name, 
+        students
+    });
+     // return doc.id;
+    }
+
+
+export function addUserToWorkshop(userId, workshopId, userType){
+    if(!userId || !workshopId) return;
+
+
+    if(userType === userTypes().instructor){
+        addToArray("workshops", workshopId, "instructors", userId);    
+    }
+
+    if(userType === userTypes().student){
+        addToArray("workshops", workshopId, "students", userId);    
+    }
+}
+
+
+
+
+
+

@@ -7,6 +7,8 @@ import { UserData, userTypes } from "./Types"
 
 import { getQueryData, setDataInDb, addDataToDb } from "./db"
 
+import { addUserToWorkshop } from './factory'
+
 // export function createNewUser(_email, _name, _type=userTypes().student) {
 export async function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
 
@@ -19,14 +21,11 @@ export async function createNewUser(_email, _name, _type, _institutionId, _works
     };
 
     
-    setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
 
     auth().sendSignInLinkToEmail(_email, actionCodeSettings)
         .then(function() {
-            // The link was successfully sent. Inform the user.
-            // Save the email locally so you don't need to ask the user for it again
-            // if they open the link on the same device.
-            // window.localStorage.setItem('emailForSignIn', _email);
+            setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
+
             console.log("Succesfully added user");
         })
         .catch(function(error) {
@@ -55,6 +54,9 @@ export async function createUserInDb(uid, name, type, institutionId, workshopId)
             members: firebase.firestore.FieldValue.arrayUnion(uid)
         });
     }
+
+    addUserToWorkshop(uid, workshopId, type);
+
     return retVal;
 }
 
@@ -104,3 +106,24 @@ export async function checkCurrentUserDbData(){
 
 }
 
+
+export async function getWorkshopStudents(workshopId) {
+    console.log("getWorkshopStudents", workshopId);
+    if(!workshopId)return null;
+
+    let workshop = await db.collection("workshops").doc(workshopId).get();
+
+    if(!workshop || !workshop.exists )return null;
+
+    let users = [];
+
+    workshop.data().students.forEach(async (s) =>  {
+
+        let usr = await getUserFromDb(s);
+        if(usr){
+            users.push({id: s, displayName: usr.displayName, photoURL: usr.photoURL });
+        }
+    })
+
+    return users;
+}

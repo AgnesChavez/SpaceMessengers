@@ -124,7 +124,7 @@ async function getQueryData(query) {
 
 
 
-function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
+async function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
 
     if(_email === null || _email === "" || typeof(_email) !== 'string')
         return false;
@@ -137,21 +137,23 @@ function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
     };
 
     
-    setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
-
+    
+    try{
     admin.auth().sendSignInLinkToEmail(_email, actionCodeSettings)
-        .then(()=> {
-            // The link was successfully sent. Inform the user.
-            // Save the email locally so you don't need to ask the user for it again
-            // if they open the link on the same device.
-            // window.localStorage.setItem('emailForSignIn', _email);
-            functions.logger.log("Succesfully added user");
-                return null; 
-        })
-        .catch((error)=> {
-            functions.logger.log("Failed adding user: error: ", error );
-            // Some error occurred, you can inspect the code: error.code
-        });
+        
+        setDataInDb("unauthenticatedUsers", _email, {name:_name, type:_type, institutionId: _institutionId, workshopId:_workshopId});
+        // The link was successfully sent. Inform the user.
+        // Save the email locally so you don't need to ask the user for it again
+        // if they open the link on the same device.
+        // window.localStorage.setItem('emailForSignIn', _email);
+        functions.logger.log("Succesfully added user");
+
+    }
+    catch(error){
+        functions.logger.log("Failed adding user: error: ", error );
+        // return false;
+        // Some error occurred, you can inspect the code: error.code
+    }
 
     return true;
 
@@ -196,6 +198,9 @@ async function createUserInDb(uid, name, type, institutionId) {
 
 app.get('/api/test', async (req, res) => {
  
+    let success = await createNewUser("macdonald.roy@protonmail.com", "Roy Macdonald", Types.student, "", "");
+
+    return res.status(200).json({success});
 
 // 
 //     let users = await db.collection('users').get();
@@ -236,7 +241,7 @@ app.get('/api/test', async (req, res) => {
 //     functions.logger.log("isNull " + ((!t)?"true":"false"));
 //     functions.logger.log("isEmpty " + ((!s)?"true":"false"));
 //     functions.logger.log("isEmpty " + ((!c)?"true":"false"));
-    return res.status(200).json({ok:true});
+    // return res.status(200).json({ok:true});
 });
 
 
@@ -259,25 +264,25 @@ app.get('/api/test', async (req, res) => {
 // 
 // });
 
-// 
-// app.post('/api/createNewUser', async (req, res) => {
-// 
-//     let validUser = await checkPostUserId(req, res, Types.admin);
-//     if (!validUser) return;
-// 
-//     let email = setDefault(req.body.email,"");
-//     let name = setDefault(req.body.name,"");
-//     let type = setDefault(req.body.type,"student");
-//     let institutionId = setDefault(req.body.institutionId,"");
-//     let workshopId = setDefault(req.body.workshopId,"");
-// 
-// 
-//     let success = await createNewUser(email, name, type, institutionId, workshopId);
-// 
-//     res.status(200).json({success: success });
-// 
-// 
-// });
+
+app.post('/api/createNewUser', async (req, res) => {
+
+    let validUser = await checkPostUserId(req, res, Types.admin);
+    if (!validUser) return;
+
+    let email = setDefault(req.body.email,"");
+    let name = setDefault(req.body.name,"");
+    let type = setDefault(req.body.type,"student");
+    let institutionId = setDefault(req.body.institutionId,"");
+    let workshopId = setDefault(req.body.workshopId,"");
+
+
+    let success = await createNewUser(email, name, type, institutionId, workshopId);
+
+    res.status(200).json({success: success });
+
+
+});
 
 // 
 // async function generateDummyUsers(){
@@ -330,7 +335,7 @@ async function createInstitution(name, workshopId){
 
 
 
-    let doc = await addDataToDb("institutions", Types.InstitutionData(name) , true, "id");
+    let doc = await addDataToDb("institution", Types.InstitutionData(name) , true, "id");
     if(!doc) return null;
 
     let students = await generateUsers(Types.student, doc.id, 10);
