@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, Row, Col, Preloader, Modal, Button  } from 'react-materialize';
+import { TextInput, Row, Col, Modal, Button  } from 'react-materialize';
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
@@ -99,22 +99,6 @@ export function CreateWorkshopModalButton(props){
 
 }
 
-function ModalPreloader(props){
-		return (<>
-            <Row>
-                <h6 className="center-align">{props.tilte}</h6>
-            </Row>
-            <Row style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-            <Col s={2} offset="s5" style={{width: "unset", margin: "auto"}}>
-                <Preloader 
-                    active
-                    color="blue"
-                    flashing
-                />
-            </Col>
-            </Row>
-        </>);
-}
 
 async function createTeamFromModal(selectedUsers, workshopId){
 	let modalEl = document.getElementById('CreateTeamModal');

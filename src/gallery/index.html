@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorial-COVID / Rafael Lozano-Hemmer</title>
+    <!-- Material Design Theming -->
+    <!-- <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css"> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="../css/materialize.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header></header>
+     <nav>
+    <div class="nav-wrapper">
+      <form>
+        <div class="input-field">
+          <input id="search" type="search" name="searchQuery" required>
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div>
+  </nav>
+    <div class="content">
+        <!-- <div class="container"> -->
+        <div class="row" id="preloaderImgs">
+            <div class="row">
+                <h5 class="center-align" id="cargandoTxt">Cargando...</h5>
+            </div>
+            <div class="preloader-wrapper big active" style="margin:auto; display: block">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gridImg" id="imageTemplate">
+            <img class="processedImage">
+            <div class="img-title">
+                <h4 class="completename"></h4>
+            </div>
+        </div>
+        <div id="archive">
+            
+        </div>
+        <ul class="pagination">
+            <li id="paginationFirst"><a><i class="material-icons">chevron_left</i></a></li>
+            <li id="paginationLast"><a><i class="material-icons">chevron_right</i></a></li>
+        </ul>
+        <!-- </div> -->
+    </div>
+    <footer class="footer"></footer>
+    <!-- <footer class="footer">
+        <div class="page-footer grey darken-4">
+            <div class="footer-copyright">
+                <div class="container">
+                    © 2020 Rafael Lozano-Hemmer
+                </div>
+            </div>
+        </div>
+    </footer> -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="../js/common.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="../js/materialize.js"></script>
+    <!-- Import and configure the Firebase SDK -->
+    <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
+    <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="/__/firebase/7.21.1/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="/__/firebase/7.21.1/firebase-analytics.js"></script>
+    <script src="/__/firebase/7.21.1/firebase-auth.js"></script>
+    <script src="/__/firebase/7.21.1/firebase-storage.js"></script>
+    <script src="/__/firebase/7.21.1/firebase-firestore.js"></script>
+    <!-- <script src="/__/firebase/init.js"></script> -->
+    <script src="../js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.5.1/dist/algoliasearch-lite.umd.js"></script>
+    <script src="script.js"></script>
+    <script src="../js/common_ui.js"></script>
+</body>
+
+</html>

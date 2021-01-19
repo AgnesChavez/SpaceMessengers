@@ -37,15 +37,11 @@
         "destination": "/index.html"
       },
       {
-        "source": "/signup",
+        "source": "/gallery",
         "destination": "/index.html"
       },
       {
         "source": "/login",
-        "destination": "/index.html"
-      },
-      {
-        "source": "/settings",
         "destination": "/index.html"
       }
     ]

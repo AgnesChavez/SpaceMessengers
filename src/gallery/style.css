@@ -1,0 +1,60 @@
+.img-title{
+      position: absolute;
+    top: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+
+  color:#FFF;
+  transform: translateY(100%);
+  background-color:rgba(0, 0, 0, 0.3);
+
+    transition: all 0.2s ease;
+}
+nav{
+  background-color: #202020;
+}
+
+.gridImg:hover .img-title  {
+    opacity: 1;
+    transform: translateY(0%);
+}
+
+
+.completename {
+    position: absolute;
+    color: #fff;
+    top: 33%;
+    width: 100%;
+    text-align: center;
+}
+
+.gridImg img{
+    width: 100% !important;
+    height: auto !important;
+}
+
+.gridImg{
+
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+   flex-grow: 1;
+   
+}
+
+#archive{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#imageTemplate{
+    display: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+}
