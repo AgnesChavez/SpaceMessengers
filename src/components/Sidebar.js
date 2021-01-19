@@ -31,6 +31,7 @@ import { UploadImgButton } from '../helpers/imgStorage'
 
 import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton, ModalAddUserToTeam } from './Modals'
 
+import { removeUserFromTeam } from '../helpers/factory'
 
  
 function SidebarUser(props)
@@ -46,6 +47,28 @@ function SidebarUser(props)
                 <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
                     {usr.displayName}
                 </span>
+                {props.isNotStudent ?
+                    <Button
+                    className="InlineTinyButton right"
+                    node="button"
+                    tooltip={"Remove"}
+                    tooltipOptions={{
+                        position: 'right'
+                    }}
+                    waves="light"
+                    onClickCapture={(e)=>{
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(props.newUserDestination);
+                        if(props.newUserDestination.collection === 'teams'){
+                            removeUserFromTeam(usr.id, props.newUserDestination.dest.id);
+                        }
+                        // console.log(props.name+ " button clicked");
+                    }}
+                >
+                    <i className=" tiny material-icons">remove_circle_outline</i>
+                </Button>:""
+                }
             </li> 
         </>);  
   }
@@ -100,7 +123,7 @@ function RenderUsers(props)
             </div>
             <div className="collapsible-body">
             <ul>
-                {props.users && props.users.map( i => <SidebarUser key={i} uid={i} />)}
+                {props.users && props.users.map( i => <SidebarUser newUserDestination={props.newUserDestination} key={i} uid={i} isNotStudent={(props.currentUser.type !== userTypes().student)}/>)}
             </ul>
             </div>
         </li>
@@ -185,7 +208,7 @@ function SidebarBoardsCollection(props){
             tooltipRef.current = window.M.Tooltip.init(document.querySelector('#AddBoardButton'), null);
         }
         return ()=>{
-
+            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
         }
     });
     
@@ -346,12 +369,27 @@ function getWorkshopQueryForUser(usr)
 }
 
 function SidebarCurrentUser(props){
+    const tooltipRef = useRef(null);
+    useEffect(() => {
+        if(!tooltipRef.current){
+            let btnEl = document.querySelector('#SidebarCurrentUserButtons .input-field .btn');
+            if(btnEl){
+                btnEl.dataset.tooltip = "Upload image to your gallery"
+                btnEl.dataset.position = "right"
+                tooltipRef.current = window.M.Tooltip.init(btnEl, null);
+            }
+        }
+        return ()=>{
+            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+        }
+    });
 return (<>
     <div id="SidebarCurrentUser">
-        <img className="circle" alt={props.user.name} src={props.user.image}/>
         <div id="SidebarCurrentUserBlock">
-        <p className="name"> {props.user.name} </p>
-            
+            <img className="circle" alt={props.user.name} src={props.user.image}/>
+            <p className="name"> {props.user.name} </p>
+        </div>    
+        <div id="SidebarCurrentUserButtons">
             <Button flat className=" white-text modal-trigger" href="#profileModal" node="button">Profile</Button>
             <Button flat className=" white-text" onClick={() => auth().signOut()}>Logout</Button>
 

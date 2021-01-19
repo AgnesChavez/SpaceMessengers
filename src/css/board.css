@@ -94,7 +94,35 @@ header{
 
 #SidebarCurrentUserBlock{
   padding: 0px 0px 0px 10px ;
-  display: inline-block;
+  display: flex;
+  align-items:center;
+  justify-content: flex-start;
+}
+
+#SidebarCurrentUserBlock .name{
+  padding-left: 1rem;
+}
+#SidebarCurrentUserButtons .input-field{
+  margin-top: unset;
+  margin-bottom: unset;
+  float: right !important;
+}
+
+
+#SidebarCurrentUserButtons .input-field .btn{
+  height: unset;
+  line-height: unset;
+  background-color: unset;
+  color: white;
+}
+
+#SidebarCurrentUserButtons{
+ padding: 0px 0px 0px 10px ;
+  display: block; 
+}
+
+#SidebarCurrentUserButtons .file-path{
+  display: none !important;
 }
 
 .SidebarUser:hover{
@@ -121,6 +149,7 @@ header{
   /*font-size: 20px;*/
   word-wrap: break-word;
   /*max-width: 200px;*/
+  flex: 1;
 }
 
 
@@ -309,6 +338,3 @@ height: 1.6rem;
   display: none;
 }
 
-#SidebarCurrentUserBlock .file-path{
-  display: none !important;
-}

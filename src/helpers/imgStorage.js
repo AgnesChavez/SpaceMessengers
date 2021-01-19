@@ -5,8 +5,9 @@ import firebase from "firebase";
 export function UploadImgButton(props) {
 return <TextInput
   id="uploadImageInput"
-  label="Upload Image"
+  label=<i className="material-icons">file_upload</i>
   type="file"
+  inputClassName="btn-flat"
   onChange={(evt)=>{
       evt.stopPropagation();
       evt.preventDefault();
