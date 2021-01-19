@@ -136,6 +136,7 @@ export function ModalCreateTeam(props){
 	const [selectedUsers, setSelectedUsers ] = useState([]);
 	
 	function onChange(e, selectorId){
+		if(!e.target.value)return;
 		if(selectedUsers.length <= selectorId){
 			setSelectedUsers(selectedUsers.concat( [e.target.value]));
 		}else{
@@ -143,6 +144,7 @@ export function ModalCreateTeam(props){
 			tmp[selectorId] = e.target.value;
 			setSelectedUsers(tmp);
 		}
+		e.target.value = "";
 	}
 	
 	let i = 0;
@@ -172,7 +174,10 @@ export function ModalCreateTeam(props){
 		
 			{/* {/* <div style={{display: "flex"}}> */}
 			{ selectedUsers.map(u => <SelectUser  selectorId = {i++} key={i} value={u}  onChange={onChange} usersArray={props.currentWorkshop.students} />)}
+			
+			
 			<SelectUser selectorId = {selectedUsers.length} value={""} onChange={onChange} usersArray={props.currentWorkshop.students} />
+
 			{/* Modal content */}
 {/*  */}
 {/* 			<ul> */}

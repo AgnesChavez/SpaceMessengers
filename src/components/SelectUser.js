@@ -32,7 +32,7 @@ export function SelectUser(props){
 return <form>
         <label>Select student</label>
             <select defaultValue={props.value} onChange={(e)=>props.onChange(e, props.selectorId)} className="browser-default"  >
-                <option value="" disabled >Select a student</option>
+                <option value="" disabled >Select a student to add</option>
                 
                 {props.usersArray && props.usersArray.map(ws => <RenderOption key={ws} uid={ws} /> )}
                 
