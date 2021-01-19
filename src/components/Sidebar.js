@@ -1,5 +1,7 @@
 import React, {useEffect, useRef } from "react";
 
+
+
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
@@ -9,7 +11,7 @@ import 'firebase/firestore';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 
-// import { getUserFromDb } from "../helpers/userManagement";
+import { getUserFromDb } from "../helpers/userManagement";
 
 import { userTypes } from "../helpers/Types"
 
@@ -21,10 +23,16 @@ import UserProfile from "./UserProfile";
 
 import '../css/board.css';
 
-import { createBoard } from '../helpers/factory'
-
 import Renameable from './Renameable'
 
+import { addToArray } from '../helpers/db'
+
+import { UploadImgButton } from '../helpers/imgStorage'
+
+import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton } from './Modals'
+
+
+ 
 function SidebarUser(props)
 {
   let [usr, usrLoading] = useDocumentData(db.collection('users').doc(props.uid));
@@ -43,21 +51,51 @@ function SidebarUser(props)
   }
   return null;
 }
+function addUserTo(newDest){
+    // {{dest:props.team, collection:'teams', field: 'members'}}></RenderUsers>
+    
+    
+    // addToArray(newDest.collection, newDest.dest.id, newDest.field, data);
+
+
+}
 function RenderUsers(props)     
 {
+    // newUserDestination={{dest:props.workshop, collection:'workshops', field: 
     return (<>
         <li>
-            <div className="sidebarName collapsible-header"> {props.name}</div>
+            <div className="sidebarName collapsible-header"> 
+                <span>{props.name}</span>
+
+                {(props.currentUser.type !== userTypes().student)?
+                <Button
+                    className="InlineTinyButton"
+                    node="button"
+                    tooltip={"Add new " + props.name}
+                    tooltipOptions={{
+                        position: 'right'
+                    }}
+                    waves="light"
+                    onClickCapture={(e)=>{
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addUserTo(props.newUserDestination)
+                        console.log(props.name+ " button clicked");
+                    }}
+                >
+                    <i className=" tiny material-icons">add_circle_outline</i>
+                </Button>
+                :""}
+            </div>
             <div className="collapsible-body">
             <ul>
-                {props.users.map( i => <SidebarUser key={i} uid={i} />)}
+                {props.users && props.users.map( i => <SidebarUser key={i} uid={i} />)}
             </ul>
             </div>
         </li>
     </>);
 }
 function SidebarTeamLi(props){
-    useEffect(() => initCollapsibles(".SidebarTeam"));
     return (<>
         <li>
             <p className="collapsible-header">{props.team.name}</p>
@@ -72,7 +110,7 @@ function SidebarTeam(props){
     useEffect(() => initCollapsibles(".SidebarTeam"));
     return (<>
             <ul className="collapsible SidebarTeam">
-                <RenderUsers name="Members" users={props.team.members} ></RenderUsers>
+                <RenderUsers name="Members" users={props.team.members} currentUser={props.user} newUserDestination={{dest:props.team, collection:'teams', field: 'members'}}></RenderUsers>
                 <SidebarBoardsCollection user={props.user} team={props.team} boardSelectHandle={props.boardSelectHandle}/>
             </ul>
     </>
@@ -101,60 +139,43 @@ function SidebarWorkshop(props){
     return (<>
             <p className="collapsible-header">{props.workshop.name}</p>
             <ul className="collapsible expandable SidebarWorkshop">
-                <RenderUsers name="Instructors" users={props.workshop.instructors} ></RenderUsers>
-                <RenderUsers name="Students" users={props.workshop.students} ></RenderUsers>
-                {/* <SidebarTeamCollection user={props.user} workshopId={props.workshop.id} boardSelectHandle={props.boardSelectHandle}/> */}
+                <RenderUsers
+                    name="Instructors"
+                    users={props.workshop.instructors}
+                    currentUser={props.user}  
+                    newUserDestination={{dest:props.workshop, 
+                                         collection:'workshops',
+                                         field: 'instructors'
+                                        }}>
+                </RenderUsers>
+                <RenderUsers
+                    name="Students" 
+                    users={props.workshop.students} 
+                    currentUser={props.user}  
+                    newUserDestination={{dest:props.workshop, 
+                                         collection:'workshops', 
+                                         field: 'students'
+                                        }}>
+                </RenderUsers>
             </ul>
     </>);
 }
 
-function openAddBoardModal(teamId){
-    var elems = document.querySelectorAll('#modalAddBoard');
-    window.M.Modal.init(elems, {
-        onCloseEnd: ()=>window.M.Modal.getInstance(document.getElementById('modalAddBoard')).destroy()
-    });
 
 
-    localStorage.setItem("addBoardToTeam", teamId);
-
-}
-
-function AddNewBoard(){
-    let name = document.getElementById("NewBoardName").value;
-    if(!name) name = "New Board";
-    
-    let teamId = localStorage.getItem("addBoardToTeam");
-    localStorage.removeItem("addBoardToTeam");
-
-    createBoard(name, teamId);
-
-}
-
-function ModalAddBoard(){
-    return (<>
-        <div id="modalAddBoard" className="modal">
-            <div className="modal-content black-text">
-                <h5>Add a new board </h5>
-                <p>This board will be shared with all the members of team</p>
-                <TextInput
-                    id="NewBoardName"
-                    label="Name your new board"
-                />
-            </div>
-            <div className="modal-footer">
-                <button className="modal-close waves-effect waves-light btn red white-text" onClick={AddNewBoard}>Add</button>
-                <button className="modal-close waves-effect waves-red btn-flat">Cancel</button>
-            </div>
-        </div>
-    </>);
-}
 
 function SidebarBoardsCollection(props){
     const [boards, boardsLoading] = useCollectionData(
         db.collection("boards").where("teamId", "==", props.team.id));
+
+    const tooltipRef = useRef(null);
     useEffect(() => {
-        var elems = document.querySelectorAll('#AddBoardButton');
-        window.M.Tooltip.init(elems, null);
+        if(!tooltipRef.current){
+            tooltipRef.current = window.M.Tooltip.init(document.querySelector('#AddBoardButton'), null);
+        }
+        return ()=>{
+
+        }
     });
     
 
@@ -168,7 +189,12 @@ function SidebarBoardsCollection(props){
                     data-target="modalAddBoard" 
                     data-position="right" 
                     data-tooltip="Add a new board"
-                    onClick={()=>openAddBoardModal(props.team.id)}
+                    onClickCapture={(e)=>{
+                                e.preventDefault();
+                                e.stopPropagation();
+                                openAddBoardModal(props.team.id);
+                            }
+                        }
                     >
                     <i className=" tiny material-icons">add_circle_outline</i>
                 </button>
@@ -192,18 +218,19 @@ function SidebarBoardsCollection(props){
 }
 
 function SidebarTeamCollection(props){
+
     const [teams, teamsLoading] = useCollectionData(getTeamsQueryForUser(props.user, props.workshopId)); 
-    useEffect(() => initCollapsibles(".SidebarTeamCollection"));
+    
+    useEffect(() => initCollapsibles(".SidebarTeamCollection", true));
+
     return (
         <>
-            <li>
-                <p className="collapsible-header">Teams</p>
-                <div className="collapsible-body">
-                    <ul className="collapsible SidebarTeamCollection">
-                        { !teamsLoading && teams && teams.map(team => <SidebarTeamLi key={team.id} team={team} user={props.user} boardSelectHandle={props.boardSelectHandle}/> )}
-                    </ul>
-                </div>
-            </li>
+            <ul className="collapsible SidebarTeamCollection">
+                { !teamsLoading && teams && teams.map(team => <SidebarTeamLi key={team.id} team={team} user={props.user} boardSelectHandle={props.boardSelectHandle}/> )}
+            </ul> 
+
+            <CreateTeamModalButton/>
+
         </>
     );
 }
@@ -215,11 +242,14 @@ function openAllCollapsibles(instance){
     }
 }
 
-function initCollapsibles(elementSelector, numChildren)
+function initCollapsibles(elementSelector, isAccordion = false)
 {
     var elems = document.querySelectorAll(elementSelector);
-    let instances = window.M.Collapsible.init(elems, {accordion:false});
-    instances.forEach(i => openAllCollapsibles(i));
+    let instances = window.M.Collapsible.init(elems, {accordion: isAccordion});
+    if(!isAccordion){
+        instances.forEach(i => openAllCollapsibles(i));
+    }
+    
 }
 function SelectWorkshop(props){
     if(props.workshops.length <= 1) return null;
@@ -264,11 +294,18 @@ function SidebarWorkshopCollection(props){
         // db.collection('users').doc(props.user.id).set({currentWorkshop: currentWorkshop.id}, {merge: true});
     }
 
+
+    
+
     return (
         <>
             {currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
 
             {workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
+            { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
+
+            { (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
+
         </>)
 }
 
@@ -303,20 +340,26 @@ return (<>
         <div id="SidebarCurrentUserBlock">
         <p className="name"> {props.user.name} </p>
             
-            <Button flat className="modal-trigger" href="#profileModal" node="button">Profile</Button>
-            <Button flat onClick={() => auth().signOut()}>Logout</Button>
+            <Button flat className=" white-text modal-trigger" href="#profileModal" node="button">Profile</Button>
+            <Button flat className=" white-text" onClick={() => auth().signOut()}>Logout</Button>
+
+            {/* { (props.userType === userTypes().student)?<UploadImgButton/>:"" } */}
+            <UploadImgButton/>
         </div>
 
     </div>
     </>);
 }
 
-export  function Sidebar(props) {
+export function Sidebar(props) {
 
 
     const tabsRef = useRef(null);
     const sidenavRef = useRef(null);
 
+    let isNotStudent = (props.usr.type !==  userTypes().student);
+
+    
     useEffect(()=>{
         let el = document.getElementById('SidebarLeft');
         if(el){
@@ -335,34 +378,40 @@ export  function Sidebar(props) {
         };
     });
 
-
-    
-    // const [team, loading] = useDocumentData(db.collection("teams").doc('d8puz5F0Q9fZQViDRX2t'));
     
     let user = {
         image:  (props.usr.photoURL  || auth().currentUser.photoURL),
         name: (props.usr.displayName || auth().currentUser.displayName)
     };
-//     const [workshops, workshopsLoading] = useCollectionData(getWorkshopQueryForUser(props.user)); 
-// 
-//     if(!workshops)return null;
+    
+
+    
+    let teamTabLabel = "Team" + (isNotStudent?"s":"");
 
     return (<>
 
 
         <ul id="SidebarLeft" className="sidenav sidenav-fixed black white-text">
     
-            <SidebarCurrentUser className="white-text"  user={user} />
+            <SidebarCurrentUser className="white-text"  user={user} userType={props.usr.type}/>
             <div className="row">
                 <div className="col s12">
                     <ul className="tabs tabs-fixed-width black white-text depth-1">
-                        <li className="tab"><a className="active" href="#teamTab">Team</a></li>
+                        <li className="tab"><a className="active" href="#teamTab">{teamTabLabel}</a></li>
                         <li className="tab"><a href="#schoolsTab">Schools</a></li>
                     </ul>
             
                     <div id="teamTab" className="col s12">
-                        {/* {<SidebarTeamCollection user={props.usr} workshopId={props.workshop.id} boardSelectHandle={props.boardSelectHandle}/>} */}
-                        {<SidebarCurrentTeam user={props.usr} boardSelectHandle={props.boardSelectHandle} /> }
+                        { isNotStudent? 
+                            <SidebarTeamCollection 
+                                user={props.usr} 
+                                workshopId={props.usr.currentWorkshop}
+                                boardSelectHandle={props.boardSelectHandle}
+                                />:
+                            <SidebarCurrentTeam 
+                                user={props.usr} 
+                                boardSelectHandle={props.boardSelectHandle} /> 
+                        }
                     </div>
                     <div id="schoolsTab" className="col s12">
                         <SidebarWorkshopCollection user={props.usr} />
@@ -373,8 +422,14 @@ export  function Sidebar(props) {
             
         </ul>
  
+        
+
     <ModalAddBoard/>
-  
+    
+    
+    { isNotStudent && <ModalCreateWorkshop/> }
+
+
   <Modal
     actions={[
       <Button flat modal="close" node="button" waves="green">Close</Button>

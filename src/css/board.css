@@ -108,6 +108,7 @@ header{
 .SidebarUser{
   display: flex;
   align-items:center;
+  height: 28px;
 }
 
 .SidebarUser img{
@@ -299,3 +300,15 @@ height: 1.6rem;
     transition: transform 0.3s !important;
 }
 
+.sidebarButton{
+  width:100% !important;
+  margin-top: 8px;
+}
+
+#uploadImageInput{
+  display: none;
+}
+
+#SidebarCurrentUserBlock .file-path{
+  display: none !important;
+}
