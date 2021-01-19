@@ -1,0 +1,17 @@
+
+#gallery{
+	padding: 70px 30px  30px 30px;
+}
+.gridImg img{
+    width: 100% !important;
+    height: auto !important;
+}
+
+.gridImg{
+	max-width: 33%;
+    position: relative;
+    /*cursor: pointer;*/
+    overflow: hidden;
+   flex-grow: 1;
+   
+}

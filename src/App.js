@@ -7,12 +7,14 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 // import {ChatFullpage} from "./pages/Chat";
-import Signup from "./pages/Signup";
+
 import Login from "./pages/Login";
 import CompleteRegistration from "./pages/CompleteRegistration";
 import { auth } from "./services/firebase";
 import Header from "./components/Header";
 import Board from "./pages/Board";
+import Gallery from "./pages/Gallery";
+
 import './css/styles.css';
 
 import { checkCurrentUserDbData } from "./helpers/userManagement"
@@ -89,8 +91,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={this.state.authenticated?Board:Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
-            <Route path="/signup" component={Signup} />
-
+            <Route path="/gallery" component={Gallery} />
 
             <PrivateRoute
               path="/board"
