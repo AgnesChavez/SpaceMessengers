@@ -150,11 +150,6 @@ export default function Board() {
 
     function menuButtonClicked(evt){
         toggleLeftSideNav(!isLeftSidebarOpen());
-        // let sidebar = getLeftSidebar();
-        // if(sidebar && !sidebar.isOpen){
-        //     sidebar.open();
-        //     toggleSideElement('left', true);
-        // }
     }
 
     function onMessageClick(evt, element, message)
@@ -163,11 +158,6 @@ export default function Board() {
         setSelectedMessage(message);
 
         toggleRightSideNav(true);
-        // let sidebar = getInfoSidebar();
-        // if(sidebar && !sidebar.isOpen){
-        //     sidebar.open();
-        //     toggleSideElement('right', true);
-        // }
 
         let tabs = getInfoSidebarTabs();
         if(tabs){
@@ -185,28 +175,12 @@ export default function Board() {
             
             evt.stopPropagation();
             evt.preventDefault();
-            // let sidebar = getInfoSidebar();
             
             if(toggleRightSideNav(false)){
                 setSelected(null);
                 setSelectedMessage(null);
             }
-//             if(sidebar && sidebar.isOpen){
-//                 sidebar.close();
-//                 sidebar.isOpen = false;
-//                 setSelected(null);
-//                 setSelectedMessage(null);
-//                 toggleSideElement('right', false);
-//             }
-// 
             toggleLeftSideNav(false);
-
-            // let leftSidebar = getLeftSidebar();   
-            // if(leftSidebar && leftSidebar.isOpen){
-            //     leftSidebar.close();
-            //     leftSidebar.isOpen = false;
-            //     toggleSideElement('left', false);
-            // }
         }
     }
 
@@ -229,10 +203,6 @@ export default function Board() {
                 if(usersMap.current.hasOwnProperty(uid)){
                     return usersMap.current[uid];      
                 }else{
-                    // console.log("add board "+ boardId + " to user " +uid  );
-                    //  db.collection('users').doc(uid).update({
-                    //     boards: firebase.firestore.FieldValue.arrayUnion(boardId)
-                    // });
                     addBoardToUser(boardId, uid);
                 }
             }
