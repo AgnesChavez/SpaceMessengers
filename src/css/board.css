@@ -115,8 +115,9 @@ header{
 }
 
 #SidebarCurrentUserButtons{
- padding: 0px 0px 0px 10px ;
-  display: block; 
+  padding: 0px 0px 0px 10px ;
+  display: flex;
+  align-items: center;
 }
 
 #SidebarCurrentUserButtons .file-path{
@@ -332,10 +333,12 @@ height: 1.6rem;
   margin-top: 8px;
 }
 
-#uploadImageInput{
+
+
+/*#uploadImageInput{
   display: none;
 }
-
+*/
         body,
         #boardContainer {
             width: 100%;
