@@ -52,12 +52,12 @@ export function InfoSidebar(props){
         />
     </div>
         <div id="commentsTab" className="col s12">
-            {props.selectedMessage?
+            {props.selected?
                 <Chat collection="comments"
-                    group={props.selectedMessage.id}
+                    group={props.selected.id}
                     containerClass="sidebar-chat"
                     isComment={true}
-                    bgColor={props.selectedMessage.color}
+                    bgColor={props.selected.color}
                     getUser={props.getUser}
                 />
             :<h6>Select a message on the board and you will see its comments here</h6>

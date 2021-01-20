@@ -26,10 +26,10 @@ export function BoardMessage(props)
     };
     function isActive(){
         // if(props.currentUser.type === userTypes().student && props.message.uid !== props.currentUser.id)return false;
-        if(props.selected === null || myRef.current === null)return false;
-        if(props.selected === myRef.current) return true;
-        if(props.selected === headerRef.current) return true;
-        if(myRef.current.contains(props.selected))return true;
+        if(props.selected === null )return false;
+        if(props.selected.id === id) return true;
+        // if(props.selected === headerRef.current) return true;
+        // if(myRef.current.contains(props.selected))return true;
         return false;
     }
     
@@ -41,11 +41,12 @@ export function BoardMessage(props)
     <>
         <Draggable
             className=""
+            id={"draggable-"+id}
             handle=".messageCard-header"
             defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
             bounds="parent" 
             onStop={onStop}
-            onMouseDown={(e)=>props.onMessageClick(e, myRef.current, props.message)}
+            onMouseDown={(e)=>props.onMessageClick(e, props.message)}
         >
             <div ref={myRef}
                 id={"msg-"+id}
@@ -60,14 +61,14 @@ export function BoardMessage(props)
                 <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
-                    <span className="new badge red messageBadge  z-depth-2" data-badge-caption="" 
-                        style={{position: "absolute",
-                                right: "0px",
-                                minWidth:"22px",
-                                borderRadius:"11px",
-                                transform: "translateY(-11px)"
-                                }}
-                        >3</span>
+                    {/* <span className="new badge red messageBadge  z-depth-2" data-badge-caption=""  */}
+                    {/*     style={{position: "absolute", */}
+                    {/*             right: "0px", */}
+                    {/*             minWidth:"22px", */}
+                    {/*             borderRadius:"11px", */}
+                    {/*             transform: "translateY(-11px)" */}
+                    {/*             }} */}
+                    {/*     >3</span> */}
                     <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={canEdit()}/>
                     {canEdit()?
                     <Button

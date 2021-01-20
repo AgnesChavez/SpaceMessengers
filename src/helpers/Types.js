@@ -82,7 +82,7 @@ export function InstitutionData(name, location) {
   };
 }
 
-export function BoardMessageData(uid, boardId) {
+export function BoardMessageData(uid, boardId, x, y) {
   return {
     content: "",
     created: firebase.firestore.FieldValue.serverTimestamp(),
@@ -92,8 +92,8 @@ export function BoardMessageData(uid, boardId) {
     id: null,
     boardId,
     position: {
-      x: 0,
-      y: 0
+      x,
+      y
     },
     comments:{}
   };

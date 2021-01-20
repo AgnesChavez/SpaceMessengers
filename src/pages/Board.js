@@ -96,9 +96,8 @@ export default function Board() {
 
     const messagesRef = db.collection("boardMessages");
     
-    const [selected, setSelected ] = useState(null);
-
-    const [selectedMessage, setSelectedMessage] = useState(null);
+    const [ selected, setSelected] = useState(null);
+    // const selectedMessage = useRef(null);
     
     const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
 
@@ -116,11 +115,26 @@ export default function Board() {
 
         const { uid } = auth().currentUser;
 
-        let msgRef = await messagesRef.add(BoardMessageData(uid, boardId));
+
+        let center = document.getElementById('center');
+
+
+        let x = center.scrollLeft + (center.clientWidth - 210)/2;
+        let y = center.scrollTop + (center.clientHeight - 88)/2;
+
+
+        let newMessage = BoardMessageData(uid, boardId, x, y);
+        let msgRef = await messagesRef.add(newMessage);
+
+        newMessage.id = msgRef.id;
+
+        setSelected(newMessage)
 
         await messagesRef.doc(msgRef.id).update({
             id: msgRef.id
         });
+
+
     }
 
 
@@ -140,24 +154,26 @@ export default function Board() {
     }
     
     const onStopHandler = (msgId, position) => {
-        messagesRef.doc(msgId).update({
-            position: {
-                x: position.x,
-                y: position.y
-            }
-        });
+        if(msgId){
+            messagesRef.doc(msgId).update({
+                position: {
+                    x: position.x,
+                    y: position.y
+                }
+            });
+        }
     }
 
     function menuButtonClicked(evt){
         toggleLeftSideNav(!isLeftSidebarOpen());
     }
 
-    function onMessageClick(evt, element, message)
+    function onMessageClick(evt, message)
     {
 
         // TODO: al llamar estos setters de estado se renderea todo el boaard de nuevo y es lo que hace que se vean los dos sidebars
-        setSelected(element);
-        setSelectedMessage(message);
+        setSelected(message);
+        // setSelectedMessage(message);
 
         toggleRightSideNav(true);
 
@@ -180,7 +196,7 @@ export default function Board() {
             
             if(toggleRightSideNav(false)){
                 setSelected(null);
-                setSelectedMessage(null);
+                // setSelectedMessage(null);
             }
             toggleLeftSideNav(false);
         }
@@ -260,7 +276,7 @@ export default function Board() {
         
         
             {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
-            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage}  getUser={getUser}/>
+            <InfoSidebar boardId={boardId} selected={selected}  getUser={getUser}/>
 
             <div id="left"></div>
             <div id="center">
