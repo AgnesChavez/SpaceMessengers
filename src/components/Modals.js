@@ -146,6 +146,12 @@ export function ModalCreateTeam(props){
     		header="Create a new team"
     		id="CreateTeamModal"
     		root={document.getElementById('modalRoot')}
+    		options={{
+    			onOpenStart: ()=>{
+    				setSelectedUsers([]);
+    				document.getElementById('NewTeamTextInput').value = '';
+    			}
+  			}}
   		>
 			<Row>
 				<TextInput
