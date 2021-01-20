@@ -1,6 +1,4 @@
-import React, { useEffect, useRef } from "react";
-
-// import {Col, Row, Select } from 'react-materialize';
+import React from "react";
 
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
@@ -10,17 +8,10 @@ function RenderOption(props)
 {
   let [usr, usrLoading] = useDocumentData(db.collection('users').doc(props.uid));
 
-  // let usr = getUserFromDb(props.uid);
   if(usr && ! usrLoading){
       return (
         <>
-            {/* <li key={usr.id} className="SidebarUser"> */}
             <option key={usr.id} value={usr.id}> {usr.displayName} </option>
-                {/* <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/> */}
-                {/* <span className='name' style={('color' in usr)?{color: usr.color}:{}}> */}
-                    {/* {usr.displayName} */}
-                {/* </span> */}
-            {/* </li>  */}
         </>);  
   }
   return null;
@@ -35,10 +26,6 @@ return <form>
                 <option value="" disabled >Select a student to add</option>
                 
                 {props.usersArray && props.usersArray.map(ws => <RenderOption key={ws} uid={ws} /> )}
-                
-
             </select>
         </form>
 }
-
-// {props.usersArray && props.usersArray.map(ws => <option key={ws} value={ws} > {ws} </option> )}

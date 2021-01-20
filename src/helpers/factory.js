@@ -1,40 +1,22 @@
-// import React, {useEffect, useRef } from "react";
 
-import { auth } from "../services/firebase";
+
+
 import { db } from "../services/firebase";
 
 import { addDataToDb, addToArray } from './db'
 
-// import 'firebase/firestore';
 import firebase from 'firebase/app';
-
-
-// import { useAuthState } from 'react-firebase-hooks/auth';
-// import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
-
-
-// import { getUserFromDb } from "../helpers/userManagement";
-
-// import { Link } from 'react-router-dom';
-
-// import { Button,  Modal } from 'react-materialize';
-
-// import UserProfile from "./UserProfile";
-
-// import '../css/board.css';
-
-
 
 import {
 		userTypes,
-		Color,
-		randomColorHSL,
-		WorkshopData,
+		// Color,
+		// randomColorHSL,
+		// WorkshopData,
 		TeamData,
-		UserData,
+		// UserData,
 		BoardData,
 		InstitutionData,
-		BoardMessageData
+		// BoardMessageData
 	}
 
  from "../helpers/Types"

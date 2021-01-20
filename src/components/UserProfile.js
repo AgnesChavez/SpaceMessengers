@@ -195,6 +195,7 @@ export default class UserProfile extends Component {
             case 0: t.type = userTypes().student; break;
             case 1: t.type = userTypes().instructor; break;
             case 2: t.type = userTypes().admin; break;
+            default: break;
         }
 
 

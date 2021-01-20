@@ -1,23 +1,37 @@
+import React, {  useRef, useEffect } from "react";
+
 import { TextInput } from 'react-materialize';
 import { auth, storageRef } from "../services/firebase";
 import firebase from "firebase";
 
 export function UploadImgButton(props) {
-return <TextInput
-  id="uploadImageInput"
-  label=<i className="material-icons">file_upload</i>
-  type="file"
-  inputClassName="btn-flat"
-  onChange={(evt)=>{
-      evt.stopPropagation();
-      evt.preventDefault();
-
-      if (evt.target.files && evt.target.files.length) {
- 
-        uploadImg( evt.target.files[0], auth().currentUser.uid);
-      }
+    const tooltipRef = useRef(null);
+    useEffect(() => {
+        if(!tooltipRef.current){
+            let btnEl = document.querySelector('#SidebarCurrentUserButtons .input-field .btn');
+            if(btnEl){
+                btnEl.dataset.tooltip = "Upload image to your gallery"
+                btnEl.dataset.position = "right"
+                tooltipRef.current = window.M.Tooltip.init(btnEl, null);
+            }
+        }
+        return ()=>{
+            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+        }
+    });
+    return <TextInput
+        id="uploadImageInput"
+        label=<i className="material-icons">file_upload</i>
+        type="file"
+        // inputClassName="btn-flat"
+        onChange={(evt)=>{
+            evt.stopPropagation();
+            evt.preventDefault();
+            if (evt.target.files && evt.target.files.length) {
+                uploadImg( evt.target.files[0], auth().currentUser.uid);
+            }
+        }
     }
-  }
 />
 }
 
@@ -46,24 +60,25 @@ uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
       case firebase.storage.TaskState.RUNNING: // or 'running'
         console.log('Upload is running');
         break;
+      default: break;
     }
   }, function(error) {
 
   // A full list of error codes is available at
   // https://firebase.google.com/docs/storage/web/handle-errors
-  switch (error.code) {
-    case 'storage/unauthorized':
-      // User doesn't have permission to access the object
-      break;
-
-    case 'storage/canceled':
-      // User canceled the upload
-      break;
-
-    case 'storage/unknown':
-      // Unknown error occurred, inspect error.serverResponse
-      break;
-  }
+//   switch (error.code) {
+//     case 'storage/unauthorized':
+//       // User doesn't have permission to access the object
+//       break;
+// 
+//     case 'storage/canceled':
+//       // User canceled the upload
+//       break;
+// 
+//     case 'storage/unknown':
+//       // Unknown error occurred, inspect error.serverResponse
+//       break;
+//   }
 }, function() {
   // Upload completed successfully, now we can get the download URL
   uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
