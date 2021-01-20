@@ -41,23 +41,26 @@ export async function createUserInDb(uid, name, type, institutionId, workshopId)
     let _type = type;
     if(type === null) _type = userTypes().student;
 
-    let retVal = null;
+    let userId = null;
     if(uid){
         await setDataInDb("users", uid, UserData(uid, name, _type, institutionId, workshopId));
-        retVal = uid;
+        userId = uid;
     }else{
         let user= await addDataToDb("users", UserData("", name, _type, institutionId, workshopId), true, 'id');
-        if(user) retVal = user.id;
+        if(user) userId = user.id;
     }
-    if(institutionId !== null && institutionId !== ""){
-        await db.collection("institution").doc(institutionId).update({
-            members: firebase.firestore.FieldValue.arrayUnion(uid)
-        });
+    if(userId){
+        if(institutionId !== null && institutionId !== ""){
+            await db.collection("institution").doc(institutionId).update({
+                members: firebase.firestore.FieldValue.arrayUnion(userId)
+            });
+        }
+        addUserToWorkshop(userId, workshopId, type);
+    }else{
+        console.log("invalid user id when atempting to create user in database");
     }
 
-    addUserToWorkshop(uid, workshopId, type);
-
-    return retVal;
+    return userId;
 }
 
 

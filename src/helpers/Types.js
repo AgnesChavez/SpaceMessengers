@@ -73,10 +73,11 @@ export function BoardData(teamId, name) {
   }
 }
 
-export function InstitutionData(name) {
+export function InstitutionData(name, location) {
   return {
     name,
     color: randomColorHSL(),
+    location,
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
 }

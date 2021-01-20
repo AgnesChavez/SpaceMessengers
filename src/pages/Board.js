@@ -91,7 +91,7 @@ export default function Board() {
 
     const prevUsers = useRef(null);    
 
-    const [ boardId, setBoardIdState ] = useState(null);
+    const [ boardId, setBoardIdState ] = useState("default");
 
 
     const messagesRef = db.collection("boardMessages");
@@ -154,6 +154,8 @@ export default function Board() {
 
     function onMessageClick(evt, element, message)
     {
+
+        // TODO: al llamar estos setters de estado se renderea todo el boaard de nuevo y es lo que hace que se vean los dos sidebars
         setSelected(element);
         setSelectedMessage(message);
 

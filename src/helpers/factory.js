@@ -1,9 +1,7 @@
 
-
-
 import { db } from "../services/firebase";
 
-import { addDataToDb, addToArray } from './db'
+import {  getQueryData, addDataToDb, addToArray } from './db'
 
 import firebase from 'firebase/app';
 
@@ -20,6 +18,9 @@ import {
 	}
 
  from "../helpers/Types"
+
+import { createNewUser, createUserInDb } from "../helpers/userManagement";
+
 
 export async function createTeam(teamName, workshopId){
 
@@ -84,26 +85,52 @@ export async function removeUserFromTeam(userId, teamId){
 }
 
 
+const MAKE_DUMMY_USERS = true;
+
+async  function createUser( email, name, type, institutionId, workshopId)
+	{
+		if(MAKE_DUMMY_USERS){
+			let uid = await createUserInDb(null, name, type, institutionId, workshopId);
+			return uid;
+		}else{
+			await createNewUser(email, name, type, institutionId, workshopId);
+		}
+		return null;
+	}
 
 
 
-export async function createInstitution(name, workshopId, students, instructors){
+
+export async function createSchool(name, location, workshopId, instructors, students){
+
+	let instRef = await getQueryData(db.collection("institution").where("name", "==", name));
+
+	let instId = "";
+	if(instRef){
+		instId = instRef.id;
+	}else{
+		let inst = await addDataToDb("institution",InstitutionData(name, location), true, 'id');
+		if(inst){
+			instId = inst.id;	
+		} else{
+			console.log("Failed creating school");
+			return;
+		}
+	}
+
+	addToArray('workshops', workshopId, "institutions", instId);
+
+	for(let i = 0; i < instructors.length; i++){
+		await createUser(instructors[i].email, instructors[i].name, userTypes().instructor , instId, workshopId );
+	}
 
 
+	for(let i = 0; i < students.length; i++){
+		await createUser(students[i].email, students[i].name, userTypes().student , instId, workshopId );
+	}
+}
 
-    let doc = await addDataToDb("institution", InstitutionData(name) , true, "id");
-    if(!doc) return null;
 
-    students.map(u => addUserToWorkshop(u, workshopId,userTypes().student));
-    instructors.map(u => addUserToWorkshop(u, workshopId,userTypes().instructor));
-
-    return ({
-        id: doc.id,
-        name, 
-        students
-    });
-     // return doc.id;
-    }
 
 
 export function addUserToWorkshop(userId, workshopId, userType){
