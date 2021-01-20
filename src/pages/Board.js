@@ -1,5 +1,6 @@
 import React, {  useRef, useEffect, useState} from "react";
 
+import { Link } from 'react-router-dom';
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import 'firebase/firestore';
@@ -42,6 +43,47 @@ function getLeftSidebar(){
     return window.M.Sidenav.getInstance(element);
 }
 
+function isLeftSidebarOpen(){
+    let sidebar = getLeftSidebar();
+    return (sidebar && sidebar.isOpen);
+}
+function toggleRightSideNav(open){
+    let sidebar = getInfoSidebar()
+    return toggleSideNav(sidebar, open, 'right');
+}
+function toggleLeftSideNav(open){
+    let sidebar = getLeftSidebar();
+    return toggleSideNav(sidebar, open, 'left');
+}
+
+function toggleSideNav(sidebar, open, side){
+    let toggled = false;
+    if(sidebar){
+        if(!sidebar.isOpen && open){
+            sidebar.open();
+            toggled=true;
+        }else if(sidebar.isOpen && !open){
+            sidebar.close();
+            toggled=true;
+        }
+    }
+    toggleSideElement(side, open);
+    return toggled;
+}
+
+function toggleSideElement(side, open){
+    let sideElement = document.getElementById(side);
+    if(sideElement){
+        if(!open){
+            sideElement.style.width="0px";
+        }else{
+            sideElement.style.width="300px";
+        }
+    }else{
+        console.log('side element with id "'+ side + '" does not exist');
+    }
+}
+
 export default function Board() {
 
     const boardRef = useRef(null);
@@ -66,33 +108,6 @@ export default function Board() {
     const currentUserRef = db.collection('users').doc(auth().currentUser.uid);
 
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
-
-    // const testTextInputModalRef = useRef(null);
-
-// 
-//     useEffect(()=>{        
-//         if(buttonRef.current){
-//             if(!tooltipRef.current){
-//                 tooltipRef.current = window.M.Tooltip.init(buttonRef.current, null);
-//             }
-//         }
-//         return () => {
-//             
-//             if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
-//         };
-//     });
-    // useEffect(() => window.M.Tooltip.init(document.getElementById('SidebarLeftTrigger'), null));
-        
-        // if(!selectedMessage){
-        //     console.log("selectedMessage is  null");
-        //     let sidebar = getInfoSidebar();
-        //     if(sidebar){
-        // //         console.log("sidebar");
-        //         sidebar.open();
-        //         sidebar.isOpen = true;
-        //     }
-        // }
-    // });
 
 
     
@@ -134,18 +149,26 @@ export default function Board() {
         });
     }
 
-    function openMenu(evt){
-        let sidebar = getLeftSidebar();
-        if(sidebar && !sidebar.isOpen)sidebar.open();
+    function menuButtonClicked(evt){
+        toggleLeftSideNav(!isLeftSidebarOpen());
+        // let sidebar = getLeftSidebar();
+        // if(sidebar && !sidebar.isOpen){
+        //     sidebar.open();
+        //     toggleSideElement('left', true);
+        // }
     }
 
     function onMessageClick(evt, element, message)
     {
         setSelected(element);
         setSelectedMessage(message);
-        
-        let sidebar = getInfoSidebar();
-        if(sidebar && !sidebar.isOpen)sidebar.open();
+
+        toggleRightSideNav(true);
+        // let sidebar = getInfoSidebar();
+        // if(sidebar && !sidebar.isOpen){
+        //     sidebar.open();
+        //     toggleSideElement('right', true);
+        // }
 
         let tabs = getInfoSidebarTabs();
         if(tabs){
@@ -154,6 +177,8 @@ export default function Board() {
 
     }
 
+    
+
     const onClick = (evt) =>
     {
         if( evt.target === boardRef.current)
@@ -161,20 +186,28 @@ export default function Board() {
             
             evt.stopPropagation();
             evt.preventDefault();
-            let sidebar = getInfoSidebar();
-         
-            if(sidebar && sidebar.isOpen){
-                sidebar.close();
-                sidebar.isOpen = false;
+            // let sidebar = getInfoSidebar();
+            
+            if(toggleRightSideNav(false)){
                 setSelected(null);
                 setSelectedMessage(null);
             }
+//             if(sidebar && sidebar.isOpen){
+//                 sidebar.close();
+//                 sidebar.isOpen = false;
+//                 setSelected(null);
+//                 setSelectedMessage(null);
+//                 toggleSideElement('right', false);
+//             }
+// 
+            toggleLeftSideNav(false);
 
-            let leftSidebar = getLeftSidebar();   
-            if(leftSidebar && leftSidebar.isOpen){
-                leftSidebar.close();
-                leftSidebar.isOpen = false;
-            }
+            // let leftSidebar = getLeftSidebar();   
+            // if(leftSidebar && leftSidebar.isOpen){
+            //     leftSidebar.close();
+            //     leftSidebar.isOpen = false;
+            //     toggleSideElement('left', false);
+            // }
         }
     }
 
@@ -252,22 +285,15 @@ export default function Board() {
     }
 
     return ( <>
-        <Row id="boardContainerRow">
+        <div id="boardContainer">
         
-        <Col id="boardContainerCol" s={12} className="boardContainer">  
-            
-
-
-
-
-
+        
             {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
+            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage}  getUser={getUser}/>
 
-            <div ref={boardRef} id="board" 
-                className="col s12 z-depth-2 "
-                onClick={onClick}
-                >
-                {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
+            <div id="left"></div>
+            <div id="center">
+            {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
                 <Button
                     className="red right boardButtonRight"
                     floating
@@ -277,20 +303,38 @@ export default function Board() {
                     onClick={addMessage}
                     tooltip="Click to add a new message"
                 />  :""}
-
-
-                <Button
+            <ul className="left leftButtonsContainer">
+            <li><Button
                     id="SidebarLeftTrigger"
-                    className="red left boardButtonLeft"
+                    className="red boardButtonLeft"
                     floating
                     icon={<Icon>menu</Icon>}
                     node="button"
                     waves="light"
-                    onClick={openMenu}
+                    onClick={menuButtonClicked}
                     tooltip="Menu"
-                /> 
-                
-
+                /> </li>
+            <li>
+                <Link
+                    to={"/gallery"} >
+            <Button
+                id="GalleryButton"
+                className="cyan galleryButton"
+                floating
+                icon={<Icon>photo_library</Icon>}
+                node='button'
+                waves="light"
+                tooltip="Go to your image gallery"
+                />
+                </Link>
+                </li>
+            </ul>
+            
+              
+            <div ref={boardRef} id="board" 
+                className="col s12 z-depth-2 "
+                onClick={onClick}
+                >
                 {(boardId === null)?
                 (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
                 :( users && messages && messages.map(msg => <BoardMessage
@@ -306,10 +350,10 @@ export default function Board() {
                                                     />))}
 
             </div>
-            <InfoSidebar boardId={boardId} selectedMessage={selectedMessage}  getUser={getUser}/>
-            </Col>
-        </Row> 
-
+            </div>
+            <div id="right"></div>
+            
+            </div>
 
 
     </>)
