@@ -100,28 +100,46 @@ header{
 #SidebarCurrentUserBlock .name{
   padding-left: 1rem;
 }
-#SidebarCurrentUserButtons .input-field{
+
+#UploadImageInput .input-field{
   margin-top: unset;
   margin-bottom: unset;
-  float: right !important;
+  float: unset !important;
 }
 
 
-#SidebarCurrentUserButtons .input-field .btn{
-  height: unset;
+
+#UploadImageInput .file-field .btn{
   line-height: unset;
-  background-color: unset;
+  height: unset;
+}
+
+#UploadImageInput .input-field .btn{
+  /*height: unset;
+  line-height: unset;
+  background-color: unset;*/
   color: white;
+}
+
+#UploadImageInput .file-path-wrapper{
+  /*display: none !important;*/
+  opacity: 0;
+  line-height:1px;
+  /*height:1px;*/
+  width:1px;
+  padding-left: 0px !important;
+}
+
+#UploadImageInput .file-path{
+  height:unset;
+  /*height:unset;*/
 }
 
 #SidebarCurrentUserButtons{
   padding: 0px 0px 0px 10px ;
   display: flex;
   align-items: center;
-}
-
-#SidebarCurrentUserButtons .file-path{
-  display: none !important;
+  justify-content: center;
 }
 
 .SidebarUser:hover{
@@ -333,12 +351,6 @@ height: 1.6rem;
   margin-top: 8px;
 }
 
-
-
-/*#uploadImageInput{
-  display: none;
-}
-*/
         body,
         #boardContainer {
             width: 100%;

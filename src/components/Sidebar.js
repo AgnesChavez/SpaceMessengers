@@ -25,10 +25,6 @@ import '../css/board.css';
 
 import Renameable from './Renameable'
 
-// import { addToArray } from '../helpers/db'
-
-import { UploadImgButton } from '../helpers/imgStorage'
-
 import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton, ModalAddUserToTeam } from './Modals'
 
 import { removeUserFromTeam } from '../helpers/factory'
@@ -379,9 +375,6 @@ return (<>
         <div id="SidebarCurrentUserButtons">
             <Button flat className=" white-text modal-trigger" href="#profileModal" node="button">Profile</Button>
             <Button flat className=" white-text" onClick={() => auth().signOut()}>Logout</Button>
-
-            {/* { (props.userType === userTypes().student)?<UploadImgButton/>:"" } */}
-            <UploadImgButton/>
         </div>
 
     </div>

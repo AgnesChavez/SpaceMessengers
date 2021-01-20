@@ -13,7 +13,6 @@ import { BoardMessageData } from '../helpers/Types'
 
 import { BoardMessage } from '../components/BoardMessage'
 
-
 import { Sidebar } from '../components/Sidebar'
 
 import { userTypes } from '../helpers/Types'
@@ -21,6 +20,8 @@ import { userTypes } from '../helpers/Types'
 import { InfoSidebar } from '../components/InfoSidebar'
 
 import { addBoardToUser } from '../helpers/factory'
+
+import { UploadImgButton } from '../helpers/imgStorage'
 
 import '../css/board.css';
 
@@ -325,6 +326,9 @@ export default function Board() {
                 tooltip="Go to your image gallery"
                 />
                 </Link>
+                </li>
+                <li>
+                    <UploadImgButton/>
                 </li>
             </ul>
             

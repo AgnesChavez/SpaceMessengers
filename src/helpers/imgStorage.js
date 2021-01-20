@@ -8,8 +8,9 @@ export function UploadImgButton(props) {
     const tooltipRef = useRef(null);
     useEffect(() => {
         if(!tooltipRef.current){
-            let btnEl = document.querySelector('#SidebarCurrentUserButtons .input-field .btn');
+            let btnEl = document.querySelector('#UploadImageInput .input-field .btn');
             if(btnEl){
+                btnEl.classList.add('btn-floating');
                 btnEl.dataset.tooltip = "Upload image to your gallery"
                 btnEl.dataset.position = "right"
                 tooltipRef.current = window.M.Tooltip.init(btnEl, null);
@@ -19,11 +20,13 @@ export function UploadImgButton(props) {
             if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
         }
     });
-    return <TextInput
-        id="uploadImageInput"
+    return(<>
+        <div id="UploadImageInput">
+        <TextInput
+        id="UploadImageTextInput"
         label=<i className="material-icons">file_upload</i>
         type="file"
-        // inputClassName="btn-flat"
+       
         onChange={(evt)=>{
             evt.stopPropagation();
             evt.preventDefault();
@@ -32,7 +35,9 @@ export function UploadImgButton(props) {
             }
         }
     }
-/>
+    />
+        </div>
+    </>)
 }
 
 
