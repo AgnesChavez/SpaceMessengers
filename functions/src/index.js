@@ -198,9 +198,12 @@ async function createUserInDb(uid, name, type, institutionId) {
 
 app.get('/api/test', async (req, res) => {
  
-    let success = await createNewUser("macdonald.roy@protonmail.com", "Roy Macdonald", Types.student, "", "");
+    // let success = await createNewUser("macdonald.roy@protonmail.com", "Roy Macdonald", Types.student, "", "");
 
-    return res.status(200).json({success});
+    await createUserInDb("e5ohIfDKFsMuuSVGi2Xa3bpkHH53", 'Roy Macdonald', Types.admin, null);
+    await createUserInDb("G86Q9rf4KvfDdF61ciDLZ78xbWG2", 'Agnes Chavez', Types.admin, null);
+
+    return res.status(200).json({success: true});
 
 // 
 //     let users = await db.collection('users').get();

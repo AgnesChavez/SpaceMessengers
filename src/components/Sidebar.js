@@ -163,31 +163,84 @@ function SidebarCurrentTeam(props){
     return "";
 }
 
+
+function SidebarStudent(props)
+{
+  let [usr, usrLoading] = useDocumentData(db.collection('users').doc(props.uid));
+
+  // let usr = getUserFromDb(props.uid);
+  if(usr && ! usrLoading){
+      return (<>
+        {usr.institutionId === props.schoolId?
+        
+            <li key={usr.id} className="SidebarUser">
+                <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/>
+                <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
+                    {usr.displayName}
+                </span>
+            </li> 
+            :""}
+        </>);  
+  }
+  return null;
+}
+function RenderStudents(props)     
+{
+    return (<>
+        {props.students && props.students.map( i => <SidebarStudent key={i} uid={i} schoolId={props.schoolId} />)}
+    </>);
+}
+
+function SidebarSchool(props){
+    
+    return (<>
+            <div id={"schoolTab"+props.schoolId} className="col s12">
+                <h6 className="schoollocation">{props.schoolLocation}</h6>
+            <ul className="SidebarSchool">
+                {props.workshopStudents && props.workshopStudents.map( i => <SidebarStudent key={i} uid={i} schoolId={props.schoolId} />)}    
+            </ul>
+        </div>
+    </>);
+}
+
 function SidebarWorkshop(props){
     // console.log(props.workshop);
-    useEffect(() => initCollapsibles(".SidebarWorkshop"));
+    // useEffect(() => initCollapsibles(".SidebarWorkshop"));
+    const tabsRef = useRef(null);
+    
+
+    let [school1, schoolLoading1] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[0]));    
+    let [school2, schoolLoading2] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[1]));    
+
+    useEffect(()=>{
+        let el = document.getElementById('SidebarWorkshop');
+        if(el){
+            if(!tabsRef.current){
+                tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
+            }
+        }
+          return () => {
+            if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
+        };
+    });
+
+
     return (<>
-            <p className="collapsible-header">{props.workshop.name}</p>
-            <ul className="collapsible expandable SidebarWorkshop">
-                <RenderUsers
-                    name="Instructors"
-                    users={props.workshop.instructors}
-                    currentUser={props.user}  
-                    newUserDestination={{dest:props.workshop, 
-                                         collection:'workshops',
-                                         field: 'instructors'
-                                        }}>
-                </RenderUsers>
-                <RenderUsers
-                    name="Students" 
-                    users={props.workshop.students} 
-                    currentUser={props.user}  
-                    newUserDestination={{dest:props.workshop, 
-                                         collection:'workshops', 
-                                         field: 'students'
-                                        }}>
-                </RenderUsers>
-            </ul>
+        <div id="SidebarWorkshop" className='row'>
+            <h5>{props.workshop.name}</h5>
+            {school1 &&  !schoolLoading1 &&
+             school2 &&  !schoolLoading2 && 
+            <div className="col s12">
+                    <ul className="tabs tabs-fixed-width black white-text depth-1">
+                        <li className="tab"><a style={{color: school1.color}} className="active" href={"#schoolTab"+school1.id}>{school1.name}</a></li>
+                        <li className="tab"><a style={{color: school2.color}} href={"#schoolTab"+school2.id}>{school2.name}</a></li>
+                    </ul>
+            
+                    <SidebarSchool schoolId={school1.id} schoolLocation={school1.location} workshopStudents={props.workshop.students}/>
+                    <SidebarSchool schoolId={school2.id} schoolLocation={school2.location} workshopStudents={props.workshop.students}/>
+            </div>
+            }
+        </div>
     </>);
 }
 
@@ -305,43 +358,45 @@ function SidebarWorkshopCollection(props){
     
     // useEffect(() => initCollapsibles(".SidebarWorkshopCollection"));
 
-    if(!workshops)return null;
-    if(workshops.length === 0) return (<h6>You are not part of any workshop!</h6> );
+    
+    if(props.user.type === userTypes().student && ( !workshops || ( workshops && workshops.length === 0 ))) 
+        return (<h6>You are not part of any workshop!</h6> );
     
     let currentWorkshop = null; 
-
-    if(props.user.currentWorkshop){
-        for(let i = 0; i < workshops.length; i++){
-            if(props.user.currentWorkshop === workshops[i].id ){
-                currentWorkshop = workshops[i];
+    console.log(workshops);
+    if(workshops){
+        if(props.user.currentWorkshop ){
+            for(let i = 0; i < workshops.length; i++){
+                if(props.user.currentWorkshop === workshops[i].id ){
+                    currentWorkshop = workshops[i];
+                }
             }
         }
+        if(! currentWorkshop && workshops && workshops.length > 0){
+            currentWorkshop = workshops[0];
+            console.log("settings users current workshop to ", currentWorkshop);
+            setCurrentWorkshop(props.user.id, currentWorkshop.id);
+            // db.collection('users').doc(props.user.id).set({currentWorkshop: currentWorkshop.id}, {merge: true});
+        }
     }
-    if(! currentWorkshop){
-        currentWorkshop = workshops[0];
-        console.log("settings users current workshop to ", currentWorkshop);
-        setCurrentWorkshop(props.user.id, currentWorkshop.id);
-        // db.collection('users').doc(props.user.id).set({currentWorkshop: currentWorkshop.id}, {merge: true});
-    }
-
-
-    
 
     return (
         <>
-            {currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
+            { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
 
-            {workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
+            { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
 
-            { (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
-            { (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
+            { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
+            { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
 
         </>)
 }
 
 function getTeamsQueryForUser(usr, workshopId){
-    let teams = db.collection("teams").where("workshopId", "==", workshopId);
+    let wsId = (workshopId || "defaultWorkshop")
+    
+    let teams = db.collection("teams").where("workshopId", "==", wsId);
 
     if(usr.type === userTypes().student){
         return teams.where("members", "array-contains", usr.id);
@@ -400,12 +455,13 @@ export function Sidebar(props) {
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
                 sidenavRef.current.open();
                 sidenavRef.current.isOpen = true;
-
+                console.log("initing sidenav");
             }
         }
           return () => {
             if(sidenavRef.current){sidenavRef.current.destroy(); sidenavRef.current = null; }
             if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
+            console.log("destroying sidenav");
         };
     });
 
@@ -438,7 +494,8 @@ export function Sidebar(props) {
                                 user={props.usr} 
                                 workshopId={props.usr.currentWorkshop}
                                 boardSelectHandle={props.boardSelectHandle}
-                                />:
+                                />
+                            :
                             <SidebarCurrentTeam 
                                 user={props.usr} 
                                 boardSelectHandle={props.boardSelectHandle} /> 

@@ -2,15 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { Button, Row, Col, TextInput, Preloader } from 'react-materialize';
 
-import { createNewUser, createUserInDb } from "../helpers/userManagement";
-
 import { userTypes, InstitutionData, WorkshopData } from "../helpers/Types";
 
 import { getQueryData, addDataToDb, addToArray } from "../helpers/db";
 
 import { db } from "../services/firebase";
 
-
+import {createSchool} from '../helpers/factory'
 
 
 function EmptyUserEmail(){return ({name: "", email:""})}
@@ -52,70 +50,17 @@ function AddMembers(props){
 	</>)
 }
 
-const MAKE_DUMMY_USERS = true;
-
-async  function createUser( email, name, type, institutionId, workshopId)
-	{
-		if(MAKE_DUMMY_USERS){
-			let uid = await createUserInDb(null, name, type, institutionId, workshopId);
-			return uid;
-		}else{
-			await createNewUser(email, name, type, institutionId, workshopId);
-		}
-		return null;
-	}
 
 
-
-
-async function createSchool(wsId, institution, instructors, students, setSending){
+async function makeSchool(wsId, institution, location, instructors, students, setSending){
 
 
 	setSending(true);
-	
-	let instRef = await getQueryData(db.collection("institution").where("name", "==", institution));
+	createSchool(institution, location, wsId, instructors, students);
+	setSending(false);
 
-	let instId = "";
-	if(instRef){
-		instId = instRef.id;
-	}else{
-		let inst = await addDataToDb("institution",InstitutionData(institution), true, 'id');
-		if(inst){
-			instId = inst.id;	
-		} else{
-			console.log("Failed creating school");
-			return;
-		}
+
 	}
-
-	addToArray('workshops', wsId, "institutions", instId);
-
-	// var membersIds = [];
-	for(let i = 0; i < instructors.length; i++){
-		await createUser(instructors[i].email, instructors[i].name, userTypes().instructor , instId, wsId );
-	}
-
-
-	for(let i = 0; i < students.length; i++){
-		await createUser(students[i].email, students[i].name, userTypes().student , instId, wsId );
-	}
-
-// 	if(MAKE_DUMMY_USERS){
-// 
-// 		await setDataInDb("institution", instId, {members: membersIds}, true);
-// 
-// 	}
-		setSending(false);
-
-		// setInstitution("" );
-		// setInstructors([]);
-		// setStudents([]);
-		// props.setSending(false);
-	}
-
-
-
-
 
 
 function School(props){
@@ -123,7 +68,8 @@ function School(props){
 		
 
     return (<>
-		<TextInput id={"inst"+props.id} label= {"School "+props.id} s={12} onChange={ evt => {props.setInstitution(evt.target.value) }}/>
+		<TextInput id={"inst"+props.id} label= {"School name"} s={12} m={6} onChange={ evt => {props.setInstitution(evt.target.value) }}/>
+		<TextInput id={"instLoc"+props.id} label= {"School Location"} s={12} m={6} onChange={ evt => {props.setLocation(evt.target.value) }}/>
 		<AddMembers name="Instructors" data={props.instructors} setData={props.setInstructors} buttonLabel="Add Instructor"/>
 		<AddMembers name="Students" data={props.students} setData={props.setStudents} buttonLabel="Add Student"/>
 	</>);
@@ -150,8 +96,9 @@ export function Workshop (props){
         const [institution2, setInstitution2 ] = useState( "" );
         const [instructors2, setInstructors2 ] = useState( []);
         const [students2, setStudents2 ] = useState( []);
-	
-
+		
+		const [location1, setLocation1 ] = useState('');
+        const [location2, setLocation2 ] = useState( '');
         
     	const tabsRef = useRef(null);
 
@@ -168,8 +115,8 @@ async function create(onCreateDone){
 		return ;	
 	}
 
-	await createSchool(wsRef.id, institution1, instructors1, students1, setSchool1Sending);
-	await createSchool(wsRef.id, institution2, instructors2, students2, setSchool2Sending);
+	await makeSchool(wsRef.id, institution1, location1, instructors1, students1, setSchool1Sending);
+	await makeSchool(wsRef.id, institution2, location2, instructors2, students2, setSchool2Sending);
 
 	setSending(false);
 	window.M.toast({html: 'Successfully created workshop!'})
@@ -240,6 +187,7 @@ async function create(onCreateDone){
 					setInstructors={setInstructors1}
 					students={students1}
 					setStudents={setStudents1}
+					setLocation={setLocation1}
 				/>
 			</div>
 			<div id="schoolsTab2" className="col s12">
@@ -250,6 +198,7 @@ async function create(onCreateDone){
 					setInstructors={setInstructors2}
 					students={students2}
 					setStudents={setStudents2}
+					setLocation={setLocation2}
  				/>
  			</div>
 
