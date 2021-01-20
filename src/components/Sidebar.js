@@ -420,6 +420,7 @@ export function Sidebar(props) {
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
                 sidenavRef.current.open();
                 sidenavRef.current.isOpen = true;
+                
             }
         }
           return () => {
