@@ -9,7 +9,6 @@ import { db } from "../services/firebase";
 import { Button, TextInput, Icon, Row, Col, Preloader} from 'react-materialize';
 
 
-import firebase from "firebase";
 
 import '../css/registration.css';
 

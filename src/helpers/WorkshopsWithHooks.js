@@ -6,7 +6,7 @@ import { createNewUser, createUserInDb } from "../helpers/userManagement";
 
 import { userTypes, InstitutionData, WorkshopData } from "../helpers/Types";
 
-import { getQueryData, addDataToDb, setDataInDb, addToArray } from "../helpers/db";
+import { getQueryData, addDataToDb, addToArray } from "../helpers/db";
 
 import { db } from "../services/firebase";
 

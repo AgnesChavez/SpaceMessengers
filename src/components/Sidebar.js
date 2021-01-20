@@ -11,13 +11,13 @@ import 'firebase/firestore';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 
-import { getUserFromDb } from "../helpers/userManagement";
+// import { getUserFromDb } from "../helpers/userManagement";
 
 import { userTypes } from "../helpers/Types"
 
 // import { Link } from 'react-router-dom';
 
-import { Button, TextInput,  Modal } from 'react-materialize';
+import { Button, Modal } from 'react-materialize';
 
 import UserProfile from "./UserProfile";
 
@@ -25,7 +25,7 @@ import '../css/board.css';
 
 import Renameable from './Renameable'
 
-import { addToArray } from '../helpers/db'
+// import { addToArray } from '../helpers/db'
 
 import { UploadImgButton } from '../helpers/imgStorage'
 
@@ -369,20 +369,7 @@ function getWorkshopQueryForUser(usr)
 }
 
 function SidebarCurrentUser(props){
-    const tooltipRef = useRef(null);
-    useEffect(() => {
-        if(!tooltipRef.current){
-            let btnEl = document.querySelector('#SidebarCurrentUserButtons .input-field .btn');
-            if(btnEl){
-                btnEl.dataset.tooltip = "Upload image to your gallery"
-                btnEl.dataset.position = "right"
-                tooltipRef.current = window.M.Tooltip.init(btnEl, null);
-            }
-        }
-        return ()=>{
-            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
-        }
-    });
+
 return (<>
     <div id="SidebarCurrentUser">
         <div id="SidebarCurrentUserBlock">
@@ -420,7 +407,7 @@ export function Sidebar(props) {
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
                 sidenavRef.current.open();
                 sidenavRef.current.isOpen = true;
-                
+
             }
         }
           return () => {

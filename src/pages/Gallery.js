@@ -2,7 +2,6 @@
 import React,  { useEffect, useState} from "react";
 import CenteredPreloader from '../components/CenteredPreloader'
 import { useDownloadURL } from 'react-firebase-hooks/storage';
-import firebase from "firebase";
 
 import { auth, storageRef } from "../services/firebase";
 
@@ -11,7 +10,7 @@ import '../css/gallery.css';
 function LoadAndShowImage(props){
 	// let ref = firebase.storage().ref('images/' + auth().currentUser.uid + "/cvWHAAzbDEMUdkXS2d8s.png");
 	// console.log(props.img);
-  const [value, loading, error] = useDownloadURL(props.img);
+  const [value, loading] = useDownloadURL(props.img);
   	
   
   return (<>

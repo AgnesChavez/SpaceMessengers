@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, Row, Col, Modal, Button  } from 'react-materialize';
+import { TextInput, Row, Modal, Button  } from 'react-materialize';
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
@@ -9,7 +9,7 @@ import { SelectUser } from './SelectUser'
 
 import { useState } from "react";
 
-import { getWorkshopStudents } from "../helpers/userManagement";
+// import { getWorkshopStudents } from "../helpers/userManagement";
 
 // import {useAsync} from 'react-use';
 

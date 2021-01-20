@@ -1,20 +1,18 @@
-import React, {  useRef, useEffect, useState} from "react";
+import React, {  useRef, useState} from "react";
 
 import { Link } from 'react-router-dom';
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 import 'firebase/firestore';
-import firebase from "firebase";
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Modal, TextInput, Icon, Button, Row, Col, Preloader } from 'react-materialize';
+import { Icon, Button, Row, Col, Preloader } from 'react-materialize';
 
 import { BoardMessageData } from '../helpers/Types'
 
 import { BoardMessage } from '../components/BoardMessage'
 
-// import { SidebarNav } from '../components/SidebarNav'
 
 import { Sidebar } from '../components/Sidebar'
 

@@ -10,7 +10,6 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { Icon } from 'react-materialize';
 
-import { formatTime } from '../helpers/Formatting' 
 import '../css/chat.css';
 
 
@@ -89,11 +88,6 @@ export default function Chat(props) {
     </>)
 }
 
-function RenderComment(props)
-{
-  let classType = ((props.uid === auth().currentUser.uid)?"comment-current-user":"");
-  return (<p  className={classType} >{props.content}</p>);
-}
 
 function RenderMessage( props){
     let style = {};

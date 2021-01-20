@@ -1,6 +1,6 @@
 import React, {useEffect, useRef } from "react";
 
-import { Button, Tabs, Tab, SideNav } from 'react-materialize';
+// import { Button, Tabs, Tab, SideNav } from 'react-materialize';
 
 import Chat from "../pages/Chat";
 

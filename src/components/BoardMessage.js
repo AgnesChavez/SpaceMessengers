@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 
 import Draggable from 'react-draggable';
 
-import { formatTime } from '../helpers/Formatting'
+// import { formatTime } from '../helpers/Formatting'
 
 import { MessageEditor } from './MessageEditor'
 
@@ -15,7 +15,7 @@ import '../css/board.css';
 
 export function BoardMessage(props) 
 {
-    const { id, timestamp } = props.message;
+    const { id } = props.message;
 
     const myRef = useRef(null);
     const headerRef = useRef(null);
