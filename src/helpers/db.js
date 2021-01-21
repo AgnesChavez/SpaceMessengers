@@ -57,3 +57,11 @@ export function addToArray(collectionId, docId, arrayId, data)
 
 }
 
+export function removeFromArray(collectionId, docId, arrayId, data){
+    db.collection(collectionId).doc(docId).update({
+        [arrayId] : firebase.firestore.FieldValue.arrayRemove(data)
+    });
+}
+
+
+

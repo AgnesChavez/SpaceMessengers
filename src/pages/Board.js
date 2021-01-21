@@ -23,6 +23,9 @@ import { addBoardToUser } from '../helpers/factory'
 
 import { UploadImgButton } from '../helpers/imgStorage'
 
+import { addToArray, removeFromArray } from '../helpers/db'
+
+
 import '../css/board.css';
 
 function getInfoSidebar(){
@@ -42,33 +45,6 @@ function getLeftSidebar(){
     return window.M.Sidenav.getInstance(element);
 }
 
-function isLeftSidebarOpen(){
-    let sidebar = getLeftSidebar();
-    return (sidebar && sidebar.isOpen);
-}
-function toggleRightSideNav(open){
-    let sidebar = getInfoSidebar()
-    return toggleSideNav(sidebar, open, 'right');
-}
-function toggleLeftSideNav(open){
-    let sidebar = getLeftSidebar();
-    return toggleSideNav(sidebar, open, 'left');
-}
-
-function toggleSideNav(sidebar, open, side){
-    let toggled = false;
-    if(sidebar){
-        if(!sidebar.isOpen && open){
-            sidebar.open();
-            toggled=true;
-        }else if(sidebar.isOpen && !open){
-            sidebar.close();
-            toggled=true;
-        }
-    }
-    toggleSideElement(side, open);
-    return toggled;
-}
 
 function toggleSideElement(side, open){
     let sideElement = document.getElementById(side);
@@ -93,6 +69,8 @@ export default function Board() {
 
     const [ boardId, setBoardIdState ] = useState("default");
 
+    const [ sidebarOpenLeft, setSidebarOpenLeft] = useState(true);
+    const [ sidebarOpenRight, setSidebarOpenRight] = useState(true);
 
     const messagesRef = db.collection("boardMessages");
     
@@ -101,12 +79,13 @@ export default function Board() {
     
     const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
 
-    const [messages, messagesLoading] = useCollectionData(messagesRef.where("boardId", "==", boardId));
+    // const [messages, messagesLoading] = useCollectionData(messagesRef.where("boardId", "==", boardId));
+
+    const [boardData, loadingBoardData] = useDocumentData(db.collection("boards").doc(boardId));
 
     const currentUserRef = db.collection('users').doc(auth().currentUser.uid);
 
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
-
 
     
 
@@ -133,7 +112,7 @@ export default function Board() {
         await messagesRef.doc(msgRef.id).update({
             id: msgRef.id
         });
-
+        addToArray('boards', boardId, 'messages',msgRef.id);
 
     }
 
@@ -142,7 +121,12 @@ export default function Board() {
         if(!messageId) return;
 
         messagesRef.doc(messageId).delete().then(function() {
-            console.log("Document successfully deleted!");
+            if(messageId === selected.id){
+                setSelected(null);
+            }
+
+            removeFromArray('boards', boardId, 'messages',messageId);
+            // console.log("Document successfully deleted!");
         }).catch(function(error) {
             console.error("Error removing document: ", error);
         });
@@ -165,7 +149,7 @@ export default function Board() {
     }
 
     function menuButtonClicked(evt){
-        toggleLeftSideNav(!isLeftSidebarOpen());
+        toggleLeftSideNav(!sidebarOpenLeft);
     }
 
     function onMessageClick(evt, message)
@@ -202,9 +186,58 @@ export default function Board() {
         }
     }
 
-    const onMessageChange = async (msgId, msg) => {
-        messagesRef.doc(msgId).update({ content: msg });
+    // function isLeftSidebarOpen(){
+    //     let sidebar = getLeftSidebar();
+    //     return (sidebar && sidebar.isOpen);
+    // }
+    function toggleRightSideNav(open){
+        // let sidebar = getInfoSidebar()
+        return toggleSideNav( open, 'right');
     }
+    function toggleLeftSideNav(open){
+        // let sidebar = getLeftSidebar();
+        return toggleSideNav( open, 'left');
+    }
+    
+    // function setSidebarOpen(side, open){
+    //     console.log('setSidebarOpen: '+ side,  open);
+    //     let temp = sidebarOpenState;
+    //     temp[side] = open;
+    //     setSidebarOpenState(temp);    
+    //     console.log("sidebarOpenState", sidebarOpenState);
+    // }
+
+    
+
+    function toggleSideNav(open, side){
+        let toggled = false;
+        
+            if(side === 'left'){
+                if((!sidebarOpenLeft && open) || (sidebarOpenLeft && !open)){
+                    setSidebarOpenLeft(open);
+                    toggled=true;
+                } 
+            }else if(side === 'right'){
+                if((!sidebarOpenRight && open) || (sidebarOpenRight && !open)){
+                    setSidebarOpenRight(open);
+                    toggled=true;
+                } 
+            }
+        // if(sidebar){
+            // if(!sidebarOpenState[side] && open){
+            //     // sidebar.open();
+            //     setSidebarOpen(side, open);
+            //     toggled=true;
+            // }else if(sidebarOpenState[side] && !open){
+            //     setSidebarOpen(side, open);
+            //     // sidebar.close();
+            //     toggled=true;
+            // }
+        // }
+        toggleSideElement(side, open);
+        return toggled;
+    }
+
 
     function getUser(uid){
         if(users && !usersLoading)
@@ -238,7 +271,7 @@ export default function Board() {
     }
    
 
-    if(boardId === null)
+    if(boardId === null || boardId === 'default')
     {
         if(currentUser && !currentUserLoading){
             if(currentUser.currentBoard !== null){
@@ -253,7 +286,7 @@ export default function Board() {
     }
     
 
-    if(!messages && messagesLoading){
+    if(!boardData || loadingBoardData || !currentUser && currentUserLoading ){
     // if(true){
         return (<>
             <Row>
@@ -270,13 +303,14 @@ export default function Board() {
             </Row>
         </>);
     }
+    
 
     return ( <>
         <div id="boardContainer">
         
         
-            {currentUser && !currentUserLoading && <Sidebar usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar> }
-            <InfoSidebar boardId={boardId} selected={selected}  getUser={getUser}/>
+            <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>
+            <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />
 
             <div id="left"></div>
             <div id="center">
@@ -289,52 +323,64 @@ export default function Board() {
                     waves="light"
                     onClick={addMessage}
                     tooltip="Click to add a new message"
-                />  :""}
+                    tooltipOptions={{position:'left'}}
+                />  
+                :
+            ""}
+
             <ul className="left leftButtonsContainer">
-            <li><Button
-                    id="SidebarLeftTrigger"
-                    className="red boardButtonLeft"
-                    floating
-                    icon={<Icon>menu</Icon>}
-                    node="button"
-                    waves="light"
-                    onClick={menuButtonClicked}
-                    tooltip="Menu"
-                /> </li>
-            <li>
-                <Link
-                    to={"/gallery"} >
-            <Button
-                id="GalleryButton"
-                className="cyan galleryButton"
-                floating
-                icon={<Icon>photo_library</Icon>}
-                node='button'
-                waves="light"
-                tooltip="Go to your image gallery"
-                />
-                </Link>
+                <li>
+                    <Button
+                        id="SidebarLeftTrigger"
+                        className="red boardButtonLeft"
+                        floating
+                        icon={<Icon>menu</Icon>}
+                        node="button"
+                        waves="light"
+                        onClick={menuButtonClicked}
+                        tooltip="Menu"
+                        tooltipOptions={{position:'right'}}
+                    /> 
                 </li>
+                <li>
+                    <Link to={"/gallery"} >
+                        <Button
+                            id="GalleryButton"
+                            className="cyan galleryButton"
+                            floating
+                            icon={<Icon>photo_library</Icon>}
+                            node='button'
+                            waves="light"
+                            tooltip="Go to your image gallery"
+                            tooltipOptions={{position:'right'}}
+                        />
+                    </Link>
+                </li>
+
                 <li>
                     <UploadImgButton/>
                 </li>
+
             </ul>
             
               
             <div ref={boardRef} id="board" 
                 className="col s12 z-depth-2 "
-                onClick={onClick}
+                onMouseDown={onClick}
                 >
                 {(boardId === null)?
                 (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
-                :( users && messages && messages.map(msg => <BoardMessage
-                                                    key={msg.id} 
-                                                    message={msg}
+                :( users 
+                    && !loadingBoardData 
+                    && boardData 
+                    && boardData.messages 
+                    && boardData.messages.map(msg => <BoardMessage
+                                                    key={msg} 
+                                                    messageId={msg}
                                                     onStopHandler={onStopHandler}
                                                     selected={selected}
                                                     onMessageClick={onMessageClick}
-                                                    user={getUser(msg.uid)}
-                                                    onMessageChange={onMessageChange}
+                                                    getUser={getUser}
                                                     currentUser={currentUser} 
                                                     deleteMessage={deleteMessage}
                                                     />))}

@@ -1,5 +1,7 @@
 import React, { useRef, useEffect} from "react";
 
+import { db } from "../services/firebase";
+
 import '../css/board.css';
 
 
@@ -15,6 +17,13 @@ export function MessageEditor(props)
         [props.message.content],
     );
 
+
+
+    const onMessageChange = async (msgId, msg) => {
+        const messagesRef = db.collection("boardMessages");
+        messagesRef.doc(msgId).update({ content: msg });
+    }
+
     return ( 
     <>
         <div className="textEditor">
@@ -23,7 +32,7 @@ export function MessageEditor(props)
             defaultValue={content}
             className={"materialize-textarea " + (props.active?"activeTextArea":"inactiveTextArea")}
             style={{margin: "0px", boxShadow: "unset", minHeight: "unset", height: "unset"}}
-            onChange={(e)=>props.onMessageChange(id, e.target.value)}
+            onChange={(e)=>onMessageChange(id, e.target.value)}
         ></textarea>
         </div>
     </>)

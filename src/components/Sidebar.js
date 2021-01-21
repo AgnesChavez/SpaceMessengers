@@ -453,15 +453,15 @@ export function Sidebar(props) {
             }
             if(!sidenavRef.current){
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
-                sidenavRef.current.open();
-                sidenavRef.current.isOpen = true;
-                console.log("initing sidenav");
+                // sidenavRef.current.open();
+                // sidenavRef.current.isOpen = true;
+                // console.log("initing sidenav");
             }
         }
           return () => {
             if(sidenavRef.current){sidenavRef.current.destroy(); sidenavRef.current = null; }
             if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
-            console.log("destroying sidenav");
+            // console.log("destroying sidenav");
         };
     });
 
@@ -476,9 +476,9 @@ export function Sidebar(props) {
     let teamTabLabel = "Team" + (isNotStudent?"s":"");
 
     return (<>
+    <div id="SidebarLeftContainer" style={{transform: "translateX("+(props.isOpen?0:-300)+"px)"}}>
 
-
-        <ul id="SidebarLeft" className="sidenav sidenav-fixed black white-text">
+        <ul id="SidebarLeft" className="sidenav sidenav-fixed black white-text" >
     
             <SidebarCurrentUser className="white-text"  user={user} userType={props.usr.type}/>
             <div className="row">
@@ -505,11 +505,9 @@ export function Sidebar(props) {
                         <SidebarWorkshopCollection user={props.usr} />
                     </div>
                 </div>
-            </div>
-
-            
+            </div>        
         </ul>
- 
+    </div> 
         
 
     <ModalAddBoard/>

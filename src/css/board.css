@@ -4,7 +4,10 @@ body {
 }
 
 #root,
-#InfoSidebar{
+#InfoSidebar,
+#InfoSidebarContainer,
+#SidebarLeftContainer
+{
   height: 100%;
   min-height: 100%;
 }
@@ -22,6 +25,28 @@ body {
   /*padding: 15px;*/
   position: relative;
 }
+
+#InfoSidebarContainer{
+  position:fixed;
+  right:0px;
+  left:auto;
+  width:300px;
+  transition: transform 0.3s !important;
+}
+
+#SidebarLeftContainer{
+  position:fixed;
+  /*right:auto;*/
+  left:0px;
+  width:300px;
+  transition: transform 0.3s !important;
+}
+
+
+
+  .sidenav-fixed{
+    position:absolute !important;
+  }
 
 #SidebarLeft{
   max-width:300px;
@@ -342,9 +367,7 @@ height: 1.6rem;
   
 }
 
-.sidenav-fixed{
-    transition: transform 0.3s !important;
-}
+
 
 .sidebarButton{
   width:100% !important;

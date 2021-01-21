@@ -1,4 +1,4 @@
-import React, {useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 // import { Button, Tabs, Tab, SideNav } from 'react-materialize';
 
@@ -12,6 +12,9 @@ export function InfoSidebar(props){
     const tabsRef = useRef(null);
     const sidenavRef = useRef(null);
 
+    // const [translate, setTranslate] = useState(0);
+    // let translateMax  = 300;
+
     useEffect(()=>{
         let el = document.getElementById('InfoSidebar');
         if(el){
@@ -21,8 +24,18 @@ export function InfoSidebar(props){
             if(!sidenavRef.current){
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "right"  });   
                 // console.log("init InfoSidebar");
-                sidenavRef.current.open();
-                sidenavRef.current.isOpen = true;
+                // 
+                // if(props.isOpen){
+                //     sidenavRef.current.open();
+                // }else{
+                //     sidenavRef.current.close();
+                // }
+                // sidenavRef.current.isOpen = props.isOpen;
+                // console.log("isOpen", props.isOpen);
+                // console.log(el.style);
+                // el.style.transform = "translateX("+ ((props.isOpen)?0:translateMax) +"px)";
+                // console.log(el.style);
+                //style={{transform: "translateX("+ (translateMax) +"px)"}}
             }
         }
         return () => {
@@ -31,11 +44,29 @@ export function InfoSidebar(props){
         };
     });
 
+
+    
+// 
+//     if(props.isOpen && translate !== 0){
+//         setTranslate(0);
+//     }else if(!props.isOpen && translate !== translateMax){
+//         setTranslate(translateMax);
+//     }
+
     if(!props.boardId  ) return "";
 
-    return (<>
+    
 
-    <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text">
+    // "translateX("+ (props.isOpen?300:0) +")";
+    // console.log(translate);
+    
+    // console.log("translate", translate);
+    
+
+
+    return (<>
+        <div id="InfoSidebarContainer" style={{transform: "translateX("+(props.isOpen?0:300)+"px)"}}>
+        <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text" >}
 
     <div id="TabsContainer" className="fullheight">
 
@@ -65,5 +96,6 @@ export function InfoSidebar(props){
         </div>
     </div>
     </ul>
+    </div>
     </>);
 }
