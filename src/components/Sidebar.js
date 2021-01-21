@@ -170,35 +170,37 @@ function SidebarStudent(props)
 
   // let usr = getUserFromDb(props.uid);
   if(usr && ! usrLoading){
+
+    let schoolColor = "transparent";
+
+    if(usr.institutionId === props.school1.id){
+        schoolColor = props.school1.color;
+    }else 
+    if(usr.institutionId === props.school2.id){
+        schoolColor = props.school2.color;
+    }
+
       return (<>
-        {usr.institutionId === props.schoolId?
-        
-            <li key={usr.id} className="SidebarUser">
+            <li key={usr.id} className="SidebarUser" style={{borderRight: schoolColor+ "solid 4px"}}>
                 <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/>
                 <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
                     {usr.displayName}
                 </span>
             </li> 
-            :""}
         </>);  
   }
   return null;
 }
-function RenderStudents(props)     
-{
-    return (<>
-        {props.students && props.students.map( i => <SidebarStudent key={i} uid={i} schoolId={props.schoolId} />)}
-    </>);
-}
+
 
 function SidebarSchool(props){
     
     return (<>
-            <div id={"schoolTab"+props.schoolId} className="col s12">
-                <h6 className="schoollocation">{props.schoolLocation}</h6>
-            <ul className="SidebarSchool">
-                {props.workshopStudents && props.workshopStudents.map( i => <SidebarStudent key={i} uid={i} schoolId={props.schoolId} />)}    
-            </ul>
+        <div className='row'>
+            <div id={"schoolTab"+props.data.id} className="col s12 black-text" style={{backgroundColor: props.data.color}}>
+                <h5 className="schoolname">{props.data.name}</h5>
+                <h6 className="schoollocation">{props.data.location}</h6>
+            </div>
         </div>
     </>);
 }
@@ -206,40 +208,37 @@ function SidebarSchool(props){
 function SidebarWorkshop(props){
     // console.log(props.workshop);
     // useEffect(() => initCollapsibles(".SidebarWorkshop"));
-    const tabsRef = useRef(null);
+    // const tabsRef = useRef(null);
     
 
     let [school1, schoolLoading1] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[0]));    
     let [school2, schoolLoading2] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[1]));    
+// 
+//     useEffect(()=>{
+//         let el = document.getElementById('SidebarWorkshop');
+//         if(el){
+//             if(!tabsRef.current){
+//                 tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
+//             }
+//         }
+//           return () => {
+//             if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
+//         };
+//     });
 
-    useEffect(()=>{
-        let el = document.getElementById('SidebarWorkshop');
-        if(el){
-            if(!tabsRef.current){
-                tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
-            }
-        }
-          return () => {
-            if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
-        };
-    });
-
+    if(schoolLoading1 ||  !school1 || schoolLoading2 ||  !school2) return null;
 
     return (<>
         <div id="SidebarWorkshop" className='row'>
             <h5>{props.workshop.name}</h5>
-            {school1 &&  !schoolLoading1 &&
-             school2 &&  !schoolLoading2 && 
-            <div className="col s12">
-                    <ul className="tabs tabs-fixed-width black white-text depth-1">
-                        <li className="tab"><a style={{color: school1.color}} className="active" href={"#schoolTab"+school1.id}>{school1.name}</a></li>
-                        <li className="tab"><a style={{color: school2.color}} href={"#schoolTab"+school2.id}>{school2.name}</a></li>
-                    </ul>
-            
-                    <SidebarSchool schoolId={school1.id} schoolLocation={school1.location} workshopStudents={props.workshop.students}/>
-                    <SidebarSchool schoolId={school2.id} schoolLocation={school2.location} workshopStudents={props.workshop.students}/>
-            </div>
-            }
+                 <SidebarSchool data={school1} />
+                 <SidebarSchool data={school2} />
+
+            <div className='row'>
+                <ul className="SidebarWorkshopStudents col s12">
+                    {props.workshop.students && props.workshop.students.map( i => <SidebarStudent key={i} uid={i} school1={school1} school2={school2}  />)}    
+                </ul>
+            </div>    
         </div>
     </>);
 }

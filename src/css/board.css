@@ -367,7 +367,10 @@ height: 1.6rem;
   
 }
 
+.SidebarWorkshopStudents{
+  padding-right:0px !important;
 
+}
 
 .sidebarButton{
   width:100% !important;
