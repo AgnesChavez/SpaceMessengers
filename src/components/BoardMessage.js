@@ -10,55 +10,69 @@ import { userTypes } from '../helpers/Types'
 
 import { Icon, Button } from 'react-materialize';
 
+import { useDocumentData } from 'react-firebase-hooks/firestore';
+
+import { db } from "../services/firebase";
+
 import '../css/board.css';
 
+// props:
+// messageId
+// onStopHandler
+// selected
+// onMessageClick
+// getUser
+// currentUser
+// deleteMessage
 
 export function BoardMessage(props) 
 {
-    const { id } = props.message;
+
+    const [message, loadingMessage] = useDocumentData(db.collection("boardMessages").doc(props.messageId));
 
     const myRef = useRef(null);
     const headerRef = useRef(null);
     const onStop = (e, position) => {
-        props.onStopHandler(id, position);
+        props.onStopHandler(props.messageId, position);
         e.preventDefault();
         e.stopPropagation();
     };
     function isActive(){
-        // if(props.currentUser.type === userTypes().student && props.message.uid !== props.currentUser.id)return false;
         if(props.selected === null )return false;
-        if(props.selected.id === id) return true;
-        // if(props.selected === headerRef.current) return true;
-        // if(myRef.current.contains(props.selected))return true;
+        if(props.selected.id === props.messageId) return true;
         return false;
     }
     
     function canEdit(){
-        return (isActive() && (props.currentUser.type !== userTypes().student || props.message.uid === props.currentUser.id));
+        return (isActive() && (props.currentUser.type !== userTypes().student || (!loadingMessage && message && message.uid === props.currentUser.id)));
     }
 
+
+    if(!loadingMessage && message)
+        {
+            let user = props.getUser(message.uid);
     return ( 
     <>
         <Draggable
             className=""
-            id={"draggable-"+id}
+            id={"draggable-"+props.messageId}
             handle=".messageCard-header"
-            defaultPosition={{x: props.message.position.x, y: props.message.position.y }}
+            defaultPosition={{x: message.position.x, y: message.position.y }}
             bounds="parent" 
             onStop={onStop}
-            onMouseDown={(e)=>props.onMessageClick(e, props.message)}
+            onMouseDown={(e)=>props.onMessageClick(e, message)}
         >
             <div ref={myRef}
-                id={"msg-"+id}
+                id={"msg-"+props.messageId}
                 className={ "card messageCard z-depth-0 " + ((!isActive())?"transparent":"") }
-                style={{backgroundColor: props.message.color, 
+                style={{backgroundColor: message.color, 
                     zIndex: (isActive()?1:0)
                     }}
             >
             
             <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>
-                <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
-                <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
+                <img src={user.photoURL} alt="" className="circle messageHeaderImg "/> 
+                <span style={{color: ('color' in user)?user.color:"white"}}>{user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
                     {/* <span className="new badge red messageBadge  z-depth-2" data-badge-caption=""  */}
@@ -69,14 +83,14 @@ export function BoardMessage(props)
                     {/*             transform: "translateY(-11px)" */}
                     {/*             }} */}
                     {/*     >3</span> */}
-                    <MessageEditor id={id}  onMessageChange={props.onMessageChange} message={props.message} active={canEdit()}/>
+                    <MessageEditor id={props.messageId}  message={message} active={canEdit()}/>
                     {canEdit()?
                     <Button
-                        className="red halfway-fab"
+                        className="red small halfway-fab"
                         floating
                         small
                         icon={<Icon>delete</Icon>}
-                        onClick={(e)=>props.deleteMessage(id)}
+                        onClick={(e)=>props.deleteMessage(props.messageId)}
                         node="button"
                         tooltip="Delete this message"
                         waves="light"
@@ -88,4 +102,6 @@ export function BoardMessage(props)
             </div>
         </Draggable> 
     </>)
+    }
+    return null;
 }
