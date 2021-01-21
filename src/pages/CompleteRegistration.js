@@ -47,10 +47,10 @@ export default function CompleteRegistration(props)  {
                     let query = db.collection('unauthenticatedUsers').doc(email.current);
                     let user = await getQueryData(query);
                     if(user !== null){
-                        await createUserInDb(result.user.uid, user.name, user.type, user.institution, user.workshopId);  
+                        await createUserInDb(result.user.uid, {name: user.name}, user.type, user.institution, user.workshopId);  
                         await query.delete();
                     }else{
-                        await createUserInDb(result.user.uid, "", null, "", "");  
+                        await createUserInDb(result.user.uid, null, null, "", "");  
                     }
                     
                     <Redirect to="/board" />

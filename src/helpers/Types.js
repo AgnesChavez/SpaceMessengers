@@ -43,16 +43,16 @@ export function TeamData(name, workshopId) {
 }
 
 
-export function UserData(uid, name, type, institutionId) {
-  // console.log("UserData: ", uid, name, type, institutionId);
-  return {
+export function UserData(uid, data, type, institutionId) {
+  // console.log("UserData: ", uid, data, type, institutionId);
+  let u ={
     id: uid,
     type: type,
     location: "",
     bio: "",
     institutionId: institutionId,
     photoURL: null,
-    displayName: name,
+    displayName: "" ,
     color: randomColorHSL(),
     boards: [],
     currentBoard: null,
@@ -60,6 +60,13 @@ export function UserData(uid, name, type, institutionId) {
     currentWorkshop: null,
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
+  if(data.name) u.displayName = data.name;
+  if(data.email) u.email = data.email;
+  if(data.team) u.team = data.team;
+
+  return u;
+
+
 }
 
 export function BoardData(teamId, name) {

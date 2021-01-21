@@ -11,7 +11,11 @@ import { db } from "../services/firebase";
 import {createSchool} from '../helpers/factory'
 
 
-function EmptyUserEmail(){return ({name: "", email:""})}
+function EmptyUserEmail(useTeam){
+	let u = {name: "", email:""};
+	if(useTeam)u.team ="";
+	return u;
+}
 
 
 
@@ -24,8 +28,9 @@ function NameEmail(props){
 
 	return (
 			<>
-			<TextInput label="Name" name="name" onChange={ evt => handleChange(evt, props.data)}   s={12} m={6} />
-			<TextInput label="Email" name="email" onChange={ evt => handleChange(evt, props.data)}  s={12} m={6}  email />
+			<TextInput label="Name" name="name" onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
+			<TextInput label="Email" name="email" onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
+			{props.useTeam && <TextInput label="Team name" name="team" onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
 			</>
 		)
 }
@@ -40,11 +45,11 @@ function AddMembers(props){
 				<h6>{props.name}</h6>
 				<Row>
 					<Col s={12}>
-						 { props.data.map(i=> <NameEmail key={j++} data={i} />)}
+						 { props.data.map(i=> <NameEmail key={j++} data={i} useTeam={props.useTeam}/>)}
 						 
 					</Col>
 				</Row>
-				<Button node="button" waves="light" onClick={()=>props.setData([...props.data, EmptyUserEmail()])} >{props.buttonLabel}</Button> 
+				<Button node="button" waves="light" onClick={()=>props.setData([...props.data, EmptyUserEmail(props.useTeam)])} >{props.buttonLabel}</Button> 
 			</Col>
 		</Row>
 	</>)
@@ -54,7 +59,7 @@ function AddMembers(props){
 
 async function makeSchool(wsId, institution, location, instructors, students, setSending){
 
-
+	// console.log("makeSchool", students);
 	setSending(true);
 	createSchool(institution, location, wsId, instructors, students);
 	setSending(false);
@@ -70,8 +75,8 @@ function School(props){
     return (<>
 		<TextInput id={"inst"+props.id} label= {"School name"} s={12} m={6} onChange={ evt => {props.setInstitution(evt.target.value) }}/>
 		<TextInput id={"instLoc"+props.id} label= {"School Location"} s={12} m={6} onChange={ evt => {props.setLocation(evt.target.value) }}/>
-		<AddMembers name="Instructors" data={props.instructors} setData={props.setInstructors} buttonLabel="Add Instructor"/>
-		<AddMembers name="Students" data={props.students} setData={props.setStudents} buttonLabel="Add Student"/>
+		<AddMembers name="Instructors" data={props.instructors} setData={props.setInstructors} buttonLabel="Add Instructor" />
+		<AddMembers name="Students" data={props.students} setData={props.setStudents} buttonLabel="Add Student" useTeam/>
 	</>);
 
 }
