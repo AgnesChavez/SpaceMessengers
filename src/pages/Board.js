@@ -27,23 +27,23 @@ import { addToArray, removeFromArray } from '../helpers/db'
 
 
 import '../css/board.css';
-
-function getInfoSidebar(){
-    let element = document.getElementById("InfoSidebar");
-    if(!element)return null;
-    return window.M.Sidenav.getInstance(element);
-}
+// 
+// function getInfoSidebar(){
+//     let element = document.getElementById("InfoSidebar");
+//     if(!element)return null;
+//     return window.M.Sidenav.getInstance(element);
+// }
 function getInfoSidebarTabs(){
     let element = document.getElementById("InfoSidebarTabs");
     if(!element)return null;
     return window.M.Tabs.getInstance(element);
 }
 
-function getLeftSidebar(){
-    let element = document.getElementById("SidebarLeft");
-    if(!element)return null;
-    return window.M.Sidenav.getInstance(element);
-}
+// function getLeftSidebar(){
+//     let element = document.getElementById("SidebarLeft");
+//     if(!element)return null;
+//     return window.M.Sidenav.getInstance(element);
+// }
 
 
 function toggleSideElement(side, open){
@@ -286,7 +286,7 @@ export default function Board() {
     }
     
 
-    if(!boardData || loadingBoardData || !currentUser && currentUserLoading ){
+    if(!boardData || loadingBoardData || !currentUser ||  currentUserLoading ){
     // if(true){
         return (<>
             <Row>
