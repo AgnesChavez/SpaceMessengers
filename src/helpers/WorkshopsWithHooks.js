@@ -2,11 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { Button, Row, Col, TextInput, Preloader } from 'react-materialize';
 
-import { userTypes, InstitutionData, WorkshopData } from "../helpers/Types";
+import { WorkshopData } from "../helpers/Types";
 
-import { getQueryData, addDataToDb, addToArray } from "../helpers/db";
-
-import { db } from "../services/firebase";
+import { addDataToDb } from "../helpers/db";
 
 import {createSchool} from '../helpers/factory'
 
