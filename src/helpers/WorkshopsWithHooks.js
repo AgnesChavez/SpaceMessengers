@@ -145,7 +145,16 @@ async function create(onCreateDone){
         };
     });
 
+    function selectTab(tabId){
+    	let i = window.M.Tabs.getInstance(document.getElementById("CreateWorkshopTabs"));
+    	i.select(tabId);
+    	i.updateTabIndicator();
+    }
 
+    function next(){
+    	selectTab('schoolsTab2');
+    }
+    
 
 
 
@@ -179,7 +188,7 @@ async function create(onCreateDone){
       		<TextInput id="workshop_name" label="Workshop name" s={12} onChange={ evt => {setName(evt.target.value)}}/>
 
 
-            <ul className="tabs tabs-fixed-width white black-text depth-1">
+            <ul id="CreateWorkshopTabs" className="tabs tabs-fixed-width white black-text depth-1">
                 <li className="tab"><a className="active" href="#schoolsTab1">School 1</a></li>
                 <li className="tab"><a href="#schoolsTab2">School 2</a></li>
             </ul>
@@ -194,6 +203,7 @@ async function create(onCreateDone){
 					setStudents={setStudents1}
 					setLocation={setLocation1}
 				/>
+				<Button className="right" node="button" waves="light"  onClick={()=>next()}>Next</Button> 
 			</div>
 			<div id="schoolsTab2" className="col s12">
 				<School id={2} 
@@ -205,10 +215,11 @@ async function create(onCreateDone){
 					setStudents={setStudents2}
 					setLocation={setLocation2}
  				/>
+ 				<Button className="right" node="button" waves="light"  onClick={()=>create(props.onCreateDone)}>Create</Button> 
  			</div>
 
 
-			<Button className="right" node="button" waves="light"  onClick={()=>create(props.onCreateDone)}>Create</Button> 
+			
 			</Col>
 		</Row>
 	</Col>

@@ -128,7 +128,7 @@ export default function Board() {
 
         newMessage.id = msgRef.id;
 
-        setSelected(newMessage)
+        setSelected(newMessage);
 
         await messagesRef.doc(msgRef.id).update({
             id: msgRef.id

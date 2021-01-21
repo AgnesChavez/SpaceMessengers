@@ -15,9 +15,10 @@ import { useState } from "react";
 
 
 
-function openModal(id){
+function openModal(id, onOpenStart=null){
     var elems = document.querySelector('#' + id);
     let modal = window.M.Modal.init(elems, {
+    	onOpenStart: onOpenStart,
         onCloseEnd: ()=>window.M.Modal.getInstance(document.getElementById(id)).destroy()
     });
 
@@ -91,7 +92,12 @@ export function CreateWorkshopModalButton(props){
 	return (
 	<button id="CreateWorkshopModalButton" 
 			className="sidebarButton waves-effect waves-light btn teal white-text" 
-			onClick={ (e) => openModal('modalCreateWorkshop')}
+			onClick={ (e) => openModal('modalCreateWorkshop', 
+				()=>{	let i = window.M.Tabs.getInstance(document.getElementById("CreateWorkshopTabs"));
+						i.select('schoolsTab1');
+						i.updateTabIndicator();
+					})
+			}
 			>
 		Create Workshop
 	</button>
