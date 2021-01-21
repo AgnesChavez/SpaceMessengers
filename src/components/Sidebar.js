@@ -363,7 +363,7 @@ function SidebarWorkshopCollection(props){
         return (<h6>You are not part of any workshop!</h6> );
     
     let currentWorkshop = null; 
-    console.log(workshops);
+    // console.log(workshops);
     if(workshops){
         if(props.user.currentWorkshop ){
             for(let i = 0; i < workshops.length; i++){

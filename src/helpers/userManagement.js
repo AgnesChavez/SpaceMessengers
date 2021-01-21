@@ -36,17 +36,17 @@ export async function createNewUser(_email, _name, _type, _institutionId, _works
 
 
 
-export async function createUserInDb(uid, name, type, institutionId, workshopId) {
-
+export async function createUserInDb(uid, userData, type, institutionId, workshopId) {
+    // console.log("createUserInDb", uid, userData, type, institutionId, workshopId);
     let _type = type;
     if(type === null) _type = userTypes().student;
 
     let userId = null;
     if(uid){
-        await setDataInDb("users", uid, UserData(uid, name, _type, institutionId, workshopId));
+        await setDataInDb("users", uid, UserData(uid, userData, _type, institutionId, workshopId));
         userId = uid;
     }else{
-        let user= await addDataToDb("users", UserData("", name, _type, institutionId, workshopId), true, 'id');
+        let user= await addDataToDb("users", UserData("", userData, _type, institutionId, workshopId), true, 'id');
         if(user) userId = user.id;
     }
     if(userId){
