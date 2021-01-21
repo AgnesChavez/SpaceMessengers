@@ -334,7 +334,7 @@ function initCollapsibles(elementSelector, isAccordion = false)
     
 }
 function SelectWorkshop(props){
-    if(props.workshops.length <= 1) return null;
+    if(props.workshops.length === 0) return null;
     return (<>
         <form>
             <label>Select Workshop</label>
@@ -373,7 +373,7 @@ function SidebarWorkshopCollection(props){
         }
         if(! currentWorkshop && workshops && workshops.length > 0){
             currentWorkshop = workshops[0];
-            console.log("settings users current workshop to ", currentWorkshop);
+            // console.log("settings users current workshop to ", currentWorkshop);
             setCurrentWorkshop(props.user.id, currentWorkshop.id);
             // db.collection('users').doc(props.user.id).set({currentWorkshop: currentWorkshop.id}, {merge: true});
         }
