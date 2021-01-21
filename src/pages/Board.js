@@ -19,7 +19,7 @@ import { userTypes } from '../helpers/Types'
 
 import { InfoSidebar } from '../components/InfoSidebar'
 
-import { addBoardToUser } from '../helpers/factory'
+import { addBoardToUser, makeDefaultBoard } from '../helpers/factory'
 
 import { UploadImgButton } from '../helpers/imgStorage'
 
@@ -262,6 +262,7 @@ export default function Board() {
     }
 
     function setBoardId(bid) {
+        // console.log( "setBoardIdState",bid);
         setBoardIdState(bid);
         if(bid &&currentUser && !currentUserLoading){
             if(currentUser.currentBoard !== bid){
@@ -274,17 +275,23 @@ export default function Board() {
     if(boardId === null || boardId === 'default')
     {
         if(currentUser && !currentUserLoading){
-            if(currentUser.currentBoard !== null){
+            if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
                 setBoardId(currentUser.currentBoard);
             }else{
-                if(currentUser.boards.length > 0)
+                if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
                 {
                     setBoardId(currentUser.boards[0]);
                 }
             }
         }
     }
-    
+
+    // if(!boardData && !loadingBoardData){
+    //     makeDefaultBoard();
+    //     if(currentUser ||  !currentUserLoading ){
+    //         setBoardId('default');
+    //     }
+    // }
 
     if(!boardData || loadingBoardData || !currentUser ||  currentUserLoading ){
     // if(true){

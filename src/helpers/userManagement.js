@@ -7,7 +7,7 @@ import { UserData, userTypes } from "./Types"
 
 import { getQueryData, setDataInDb, addDataToDb } from "./db"
 
-import { addUserToWorkshop } from './factory'
+import { createTeam, addUserToTeam, addUserToWorkshop } from './factory'
 
 // export function createNewUser(_email, _name, _type=userTypes().student) {
 export async function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
@@ -34,7 +34,23 @@ export async function createNewUser(_email, _name, _type, _institutionId, _works
         });
 }
 
+async function addOrCreateTeam(teamName, uid, workshopId){
+    try{    
+    // console.log("addOrCreateTeam", teamName, uid, workshopId);
 
+    let team = await db.collection("teams").where("name", '==', teamName).where('workshopId','==', workshopId).get();
+    let teamId;
+    // console.log(team);
+    if(team.empty){
+        teamId = await createTeam(teamName, workshopId);
+    }else{
+        teamId = team.docs[0].id;
+    }
+    await addUserToTeam(uid, teamId);
+    }catch(error){
+        console.log("addOrCreateTeam error", error);
+    }
+}
 
 export async function createUserInDb(uid, userData, type, institutionId, workshopId) {
     // console.log("createUserInDb", uid, userData, type, institutionId, workshopId);
@@ -49,7 +65,11 @@ export async function createUserInDb(uid, userData, type, institutionId, worksho
         let user= await addDataToDb("users", UserData("", userData, _type, institutionId, workshopId), true, 'id');
         if(user) userId = user.id;
     }
+    
     if(userId){
+        if( 'team' in userData){
+            await addOrCreateTeam(userData.team, userId, workshopId);
+        }
         if(institutionId !== null && institutionId !== ""){
             await db.collection("institution").doc(institutionId).update({
                 members: firebase.firestore.FieldValue.arrayUnion(userId)
@@ -59,6 +79,7 @@ export async function createUserInDb(uid, userData, type, institutionId, worksho
     }else{
         console.log("invalid user id when atempting to create user in database");
     }
+
 
     return userId;
 }

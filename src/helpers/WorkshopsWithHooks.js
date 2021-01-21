@@ -6,7 +6,7 @@ import { WorkshopData } from "../helpers/Types";
 
 import { addDataToDb } from "../helpers/db";
 
-import {createSchool} from '../helpers/factory'
+import { createSchool, deleteUser } from '../helpers/factory'
 
 
 function EmptyUserEmail(useTeam){
@@ -23,12 +23,19 @@ function handleChange(event, data){
 
 
 function NameEmail(props){
+	// return (
+	// 		<>
+	// 		<TextInput label="Name" name="name" value={props.data.name} onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
+	// 		<TextInput label="Email" name="email" value={props.data.email} onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
+	// 		{props.useTeam && <TextInput label="Team name" name="team" value={props.data.team} onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
+	// 		</>
+		// )
 
 	return (
 			<>
-			<TextInput label="Name" name="name" onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
-			<TextInput label="Email" name="email" onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
-			{props.useTeam && <TextInput label="Team name" name="team" onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
+			<TextInput label="Name" name="name" value={props.data.name} onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
+			<TextInput label="Email" name="email" value={props.data.email} onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
+			{props.useTeam && <TextInput label="Team name" name="team" value={props.data.team} onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
 			</>
 		)
 }
@@ -153,7 +160,81 @@ async function create(onCreateDone){
     	selectTab('schoolsTab2');
     }
     
-
+// function NewStudent(name, email, team){
+// 	return {name, email, team}
+// }
+// 
+// 
+// async function prefillData(){
+// 
+// 
+// 
+// 
+// await deleteUser("19v4YUArtSbef8qxwozJ");
+// await deleteUser("1DL91LxgwlXHJTqHn76k");
+// await deleteUser("1QXlX8F7FOiZOXg4tXwc");
+// await deleteUser("4M1P7OAfUIcaYUqHjazt");
+// await deleteUser("7AukVbcU2ZQLrQcvHpMI");
+// await deleteUser("7v3uYZ3hRxFWKfBa5TH0");
+// await deleteUser("Bd8D7WS1uFUqIPZor6sz");
+// await deleteUser("BuOeicg84vvpnaWVHrbB");
+// await deleteUser("E3ndmB4X0GGlxcr1zg0J");
+// await deleteUser("EMEm9QjqR4QmjgydY538");
+// await deleteUser("IcIspSPxA3qaItkmCnEf");
+// await deleteUser("JVfCXmP7y69emrtuxGf8");
+// await deleteUser("L7HT0FuoTfCfjwVHO2Lt");
+// await deleteUser("Pp6Gqy3klnFEgws1IAPS");
+// await deleteUser("Qcj7WTbGipRu274Oswgu");
+// await deleteUser("SgYzeYnk4z7gJVGJsMVz");
+// await deleteUser("W4Dv4I0h5AUAPRgekzDj");
+// await deleteUser("WuFBzYk6OhTtb7uwBZAy");
+// await deleteUser("bqaN3ceZ0STUPTTge5Bw");
+// await deleteUser("qoWmGkv2J1hI5mA7eZ13");
+// await deleteUser("sWkJee6QpaQlsDqwTdW2");
+// await deleteUser("tmbeNXAoGs94HCVzGzGr");
+// await deleteUser("uNZNWF9IpoBcpgFE03CJ");
+// await deleteUser("xBMLZQCQuKaShjslH23z");
+// await deleteUser("xxUGidHuDmhrqnohrjYL");
+// 
+// 
+// 	setStudents1(
+// [NewStudent("Josephine Dicks" ,"jdicks@tisataos.org", "A"),
+// 
+// NewStudent("Sol Valadez-Little" ,"sol@tisataos.org", "B"),
+// NewStudent("Tori Thomas" ,"torit@tisataos.org", "B"),
+// NewStudent("Hayden Greywolf" ,"milagro@tisataos.org", "B"),
+// 
+// NewStudent("Oliver LaMure" ,"olamure@tisataos.org", "C"),
+// NewStudent("Elsie Clayton" ,"elsie@tisataos.org", "C"),
+// NewStudent("Avery Bel" ,"abell@tisataos.org", "C"),
+// 
+// NewStudent("Amelia Martinez" ,"amelia@tisataos.org", "D"),
+// NewStudent("Joaquin Robles" ,"jrobles@tisataos.org", "D"),
+// 
+// NewStudent("Brytin Ryan" ,"brytin@tisataos.org", "E"),
+// NewStudent("Mikhalo Romero" ,"mikhalor@tisataos.org", "E"),
+// NewStudent("Brooklyn Maestas" ,"brooklynm@tisataos.org", "E"),
+// 
+// NewStudent("Hudson Jones-Carroll" ,"hudson@tisataos.org", "F"),
+// NewStudent("Jazelle Chavira" ,"jazelle@tisataos.org", "F"),
+// NewStudent("Miko Cox" ,"miko@tisataos.org", "A", "F"),
+// 
+// NewStudent("Santiago Archuleta" ,"santiago@tisataos.org", "G"),
+// NewStudent("Julian Alvardo" ,"julianalvardo@tisataos.org", "G"),
+// 
+// NewStudent("Rosetta Ryan" ,"rosetta@tisataos.org", "H"),
+// 
+// NewStudent("Noah Joseph" ,"noah@tisataos.org", "I"),
+// NewStudent("Nevaeh Valerio" ,"nevaeh@tisataos.org", "I"),
+// NewStudent("Mateo Love" ,"mateo@tisataos.org", "I"),
+// 
+// NewStudent("Estevan Martinez" ,"estevan@tisataos.org", "J"),
+// 
+// NewStudent("Christy Alvarado" ,"christy@tisataos.org", "K"),
+// 
+// NewStudent("Madeleine Sooy" ,"msooy@tisataos.org", "L"),
+// NewStudent("Youssef Weinman" ,"youssefweinman@tisataos.org", "L")]);
+// }
 
 
 	if(sending || school1Sending || school2Sending ){
@@ -215,6 +296,10 @@ async function create(onCreateDone){
  				/>
  				<Button className="right" node="button" waves="light"  onClick={()=>create(props.onCreateDone)}>Create</Button> 
  			</div>
+
+		{/* <Button className="right red" node="button" waves="light"  onClick={()=>prefillData()}>Prefill Data</Button>  */}
+
+
 
 
 			

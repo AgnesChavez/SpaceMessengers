@@ -1,14 +1,14 @@
 
 import { db } from "../services/firebase";
 
-import {  getQueryData, addDataToDb, addToArray } from './db'
+import {  getQueryData, addDataToDb, addToArray, setDataInDb } from './db'
 
 import firebase from 'firebase/app';
 
 import {
 		userTypes,
 		// Color,
-		// randomColorHSL,
+		randomColorHSL,
 		// WorkshopData,
 		TeamData,
 		// UserData,
@@ -22,6 +22,17 @@ import {
 import { createNewUser, createUserInDb } from "../helpers/userManagement";
 
 
+export async function deleteUser(userId){
+        if(!userId) return;
+        try{
+        	await db.collection('users').doc(userId).delete();
+        }catch(error){
+            console.error("Error removing document: ", error);
+        }
+        
+ }
+
+
 export async function createTeam(teamName, workshopId){
 
 	const newTeam = await addDataToDb("teams", TeamData(teamName, workshopId), true, "id");
@@ -29,6 +40,17 @@ export async function createTeam(teamName, workshopId){
 	return newTeam.id;
 }
 
+
+export function makeDefaultBoard(){
+	setDataInDb('boards', 'default',{
+        id: "default",
+    messages: [],
+    teamId:null,
+    name: "",
+    color: randomColorHSL(),
+    created: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+}
 
 export async function createBoard(boardName, teamId){
 	const newBoard = await addDataToDb("boards", BoardData(teamId, boardName), true, "id");
