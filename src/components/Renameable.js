@@ -25,7 +25,7 @@ export default function Renameable(props){
 
 	function disableEdit(e){
 		if(isEditing && !isButtonPressed.current){
-			console.log("disableEdit");
+			// console.log("disableEdit");
 			setIsEditing(false);
 		}
 	}
@@ -88,7 +88,7 @@ export default function Renameable(props){
 					style={{color: "white",
 							display: isEditing?"none":""
 					}}
-					className="transparent textButton"
+					className={"transparent textButton " + (props.textClassName? props.textClassName:"") }
 					onMouseOver={(e)=> onHover(e.target, true)}
 					onMouseOut={(e)=> onHover(e.target, false)}
 					onClick={(e)=>{isFunction(props.onTextClick) && props.onTextClick(e)}}
