@@ -117,7 +117,7 @@ export default function Board() {
     }
 
 
-     const deleteMessage = (messageId) => {
+    const deleteMessage = (messageId) => {
         if(!messageId) return;
 
         messagesRef.doc(messageId).delete().then(function() {
@@ -168,8 +168,6 @@ export default function Board() {
 
     }
 
-    
-
     const onClick = (evt) =>
     {
         if( evt.target === boardRef.current)
@@ -186,29 +184,13 @@ export default function Board() {
         }
     }
 
-    // function isLeftSidebarOpen(){
-    //     let sidebar = getLeftSidebar();
-    //     return (sidebar && sidebar.isOpen);
-    // }
     function toggleRightSideNav(open){
-        // let sidebar = getInfoSidebar()
         return toggleSideNav( open, 'right');
     }
     function toggleLeftSideNav(open){
-        // let sidebar = getLeftSidebar();
         return toggleSideNav( open, 'left');
     }
     
-    // function setSidebarOpen(side, open){
-    //     console.log('setSidebarOpen: '+ side,  open);
-    //     let temp = sidebarOpenState;
-    //     temp[side] = open;
-    //     setSidebarOpenState(temp);    
-    //     console.log("sidebarOpenState", sidebarOpenState);
-    // }
-
-    
-
     function toggleSideNav(open, side){
         let toggled = false;
         
@@ -223,17 +205,6 @@ export default function Board() {
                     toggled=true;
                 } 
             }
-        // if(sidebar){
-            // if(!sidebarOpenState[side] && open){
-            //     // sidebar.open();
-            //     setSidebarOpen(side, open);
-            //     toggled=true;
-            // }else if(sidebarOpenState[side] && !open){
-            //     setSidebarOpen(side, open);
-            //     // sidebar.close();
-            //     toggled=true;
-            // }
-        // }
         toggleSideElement(side, open);
         return toggled;
     }
@@ -262,7 +233,6 @@ export default function Board() {
     }
 
     function setBoardId(bid) {
-        // console.log( "setBoardIdState",bid);
         setBoardIdState(bid);
         if(bid &&currentUser && !currentUserLoading){
             if(currentUser.currentBoard !== bid){
@@ -286,15 +256,7 @@ export default function Board() {
         }
     }
 
-    // if(!boardData && !loadingBoardData){
-    //     makeDefaultBoard();
-    //     if(currentUser ||  !currentUserLoading ){
-    //         setBoardId('default');
-    //     }
-    // }
-
     if(!boardData || loadingBoardData || !currentUser ||  currentUserLoading ){
-    // if(true){
         return (<>
             <Row>
                 <h6 className="center-align">Loading board data</h6>
@@ -313,91 +275,82 @@ export default function Board() {
     
 
     return ( <>
-        <div id="boardContainer">
-        
-        
+        <div id="boardContainer">   
             <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>
             <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />
 
             <div id="left"></div>
             <div id="center">
-            {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
-                <Button
-                    className="red right boardButtonRight"
-                    floating
-                    icon={<Icon>add</Icon>}
-                    node="button"
-                    waves="light"
-                    onClick={addMessage}
-                    tooltip="Click to add a new message"
-                    tooltipOptions={{position:'left'}}
-                />  
-                :
-            ""}
-
-            <ul className="left leftButtonsContainer">
-                <li>
+                {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
                     <Button
-                        id="SidebarLeftTrigger"
-                        className="red boardButtonLeft"
+                        className="red right boardButtonRight"
                         floating
-                        icon={<Icon>menu</Icon>}
+                        icon={<Icon>add</Icon>}
                         node="button"
                         waves="light"
-                        onClick={menuButtonClicked}
-                        tooltip="Menu"
-                        tooltipOptions={{position:'right'}}
-                    /> 
-                </li>
-                <li>
-                    <Link to={"/gallery"} >
+                        onClick={addMessage}
+                        tooltip="Click to add a new message"
+                        tooltipOptions={{position:'left'}}
+                    />  
+                    :
+                ""}
+                <ul className="left leftButtonsContainer">
+                    <li>
                         <Button
-                            id="GalleryButton"
-                            className="cyan galleryButton"
+                            id="SidebarLeftTrigger"
+                            className="red boardButtonLeft"
                             floating
-                            icon={<Icon>photo_library</Icon>}
-                            node='button'
+                            icon={<Icon>menu</Icon>}
+                            node="button"
                             waves="light"
-                            tooltip="Go to your image gallery"
+                            onClick={menuButtonClicked}
+                            tooltip="Menu"
                             tooltipOptions={{position:'right'}}
-                        />
-                    </Link>
-                </li>
-
-                <li>
-                    <UploadImgButton/>
-                </li>
-
-            </ul>
+                        /> 
+                    </li>
+                    <li>
+                        <Link to={"/gallery"} >
+                            <Button
+                                id="GalleryButton"
+                                className="cyan galleryButton"
+                                floating
+                                icon={<Icon>photo_library</Icon>}
+                                node='button'
+                                waves="light"
+                                tooltip="Go to your image gallery"
+                                tooltipOptions={{position:'right'}}
+                            />
+                        </Link>
+                    </li>
+                    <li>
+                        <UploadImgButton/>
+                    </li>
+                </ul>
             
               
-            <div ref={boardRef} id="board" 
-                className="col s12 z-depth-2 "
-                onMouseDown={onClick}
-                >
-                {(boardId === null)?
-                (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
-                :( users 
-                    && !loadingBoardData 
-                    && boardData 
-                    && boardData.messages 
-                    && boardData.messages.map(msg => <BoardMessage
-                                                    key={msg} 
-                                                    messageId={msg}
-                                                    onStopHandler={onStopHandler}
-                                                    selected={selected}
-                                                    onMessageClick={onMessageClick}
-                                                    getUser={getUser}
-                                                    currentUser={currentUser} 
-                                                    deleteMessage={deleteMessage}
-                                                    />))}
-
-            </div>
+                <div ref={boardRef} id="board" 
+                    className="col s12 z-depth-2 "
+                    onMouseDown={onClick}
+                    >
+                    {(boardId === null)?
+                    (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
+                    :( users 
+                        && !loadingBoardData 
+                        && boardData 
+                        && boardData.messages 
+                        && boardData.messages.map(msg => <BoardMessage
+                                                        key={msg} 
+                                                        messageId={msg}
+                                                        onStopHandler={onStopHandler}
+                                                        selected={selected}
+                                                        onMessageClick={onMessageClick}
+                                                        getUser={getUser}
+                                                        currentUser={currentUser} 
+                                                        deleteMessage={deleteMessage}
+                                                        />))}
+                </div>
             </div>
             <div id="right"></div>
-            
-            </div>
-
-
+        </div>
     </>)
 }
