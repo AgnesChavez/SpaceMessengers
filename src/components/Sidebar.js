@@ -128,7 +128,17 @@ function RenderUsers(props)
 function SidebarTeamLi(props){
     return (<>
         <li>
+            {(props.user.type === userTypes().student)?
             <p className="collapsible-header">{props.team.name}</p>
+            :
+             <Renameable 
+                textClassName="collapsible-header"
+                text={props.team.name} 
+                // hoverColor= {}
+                onTextClick={null}
+                onRename={(newName)=> db.collection('teams').doc(props.team.id).update({name:newName})}
+                />
+            }
             <div className="collapsible-body">
                 <SidebarTeam user={props.user} team={props.team} boardSelectHandle={props.boardSelectHandle}/>
             </div>
@@ -206,25 +216,9 @@ function SidebarSchool(props){
 }
 
 function SidebarWorkshop(props){
-    // console.log(props.workshop);
-    // useEffect(() => initCollapsibles(".SidebarWorkshop"));
-    // const tabsRef = useRef(null);
-    
 
     let [school1, schoolLoading1] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[0]));    
     let [school2, schoolLoading2] = useDocumentData(db.collection('institution').doc(props.workshop.institutions[1]));    
-// 
-//     useEffect(()=>{
-//         let el = document.getElementById('SidebarWorkshop');
-//         if(el){
-//             if(!tabsRef.current){
-//                 tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
-//             }
-//         }
-//           return () => {
-//             if(tabsRef.current){tabsRef.current.destroy(); tabsRef.current = null; }
-//         };
-//     });
 
     if(schoolLoading1 ||  !school1 || schoolLoading2 ||  !school2) return null;
 
