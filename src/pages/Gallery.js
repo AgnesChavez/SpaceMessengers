@@ -58,6 +58,8 @@ export default  function Gallery(props) {
 			}).catch((error)=> {
   				console.log("Loading gallery failed with error:", error);
 			});
+			document.querySelector('body').style.backgroundColor = "black";
+			document.querySelector('body').style.backgroundImage = "unset";
 		}
 	});
 
