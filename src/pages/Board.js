@@ -50,30 +50,7 @@ function toggleSideElement(side, open){
         console.log('side element with id "'+ side + '" does not exist');
     }
 }
-// function RenderAddUsersButton(props){
-//     return (
-//     <>
-//         <li>
-//             <Button
-//                 id="AddUserButton"
-//                 className="cyan galleryButton"
-//                 floating
-//                 icon={<Icon>person_add</Icon>}
-//                 node='button'
-//                 waves="light"
-//                 tooltip="Go to your image gallery"
-//                 tooltipOptions={{position:'right'}}
-//                 onClick={()=>{
-//                     // createNewUser("macdonald.roy@protonmail.com", "Roy  Macdonald", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-//                     createNewUser("biaemidiio@gmail.com", "Bianca Emidio", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-//                     createNewUser("aaminbean@gmail.com", "Amina Abdrazakova", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-//                     createNewUser("danialoya2013@yahoo.com", "Dania Loya", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-//                     createNewUser("estaciah@gmail.com", "Estacia Huddleston", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-//                     }}
-//             />
-//         </li>
-//     </>)
-// }
+
 
 
 export default function Board() {
@@ -92,11 +69,8 @@ export default function Board() {
     const messagesRef = db.collection("boardMessages");
     
     const [ selected, setSelected] = useState(null);
-    // const selectedMessage = useRef(null);
     
     const [users, usersLoading] = useCollectionData(db.collection("users").where("boards", "array-contains", boardId)); 
-
-    // const [messages, messagesLoading] = useCollectionData(messagesRef.where("boardId", "==", boardId));
 
     const [boardData, loadingBoardData] = useDocumentData(db.collection("boards").doc(boardId));
 
@@ -143,7 +117,7 @@ export default function Board() {
             }
 
             removeFromArray('boards', boardId, 'messages',messageId);
-            // console.log("Document successfully deleted!");
+            
         }).catch(function(error) {
             console.error("Error removing document: ", error);
         });
@@ -172,9 +146,7 @@ export default function Board() {
     function onMessageClick(evt, message)
     {
 
-        // TODO: al llamar estos setters de estado se renderea todo el boaard de nuevo y es lo que hace que se vean los dos sidebars
         setSelected(message);
-        // setSelectedMessage(message);
 
         toggleRightSideNav(true);
 
@@ -353,7 +325,6 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
-                    {/* <RenderAddUsersButton /> */}
                 </ul>
             
               
