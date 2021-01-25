@@ -21,29 +21,21 @@ import { InfoSidebar } from '../components/InfoSidebar'
 
 import { addBoardToUser, makeDefaultBoard } from '../helpers/factory'
 
+import { createNewUser } from '../helpers/userManagement'
+
+
 import { UploadImgButton } from '../helpers/imgStorage'
 
 import { addToArray, removeFromArray } from '../helpers/db'
 
 
 import '../css/board.css';
-// 
-// function getInfoSidebar(){
-//     let element = document.getElementById("InfoSidebar");
-//     if(!element)return null;
-//     return window.M.Sidenav.getInstance(element);
-// }
+
 function getInfoSidebarTabs(){
     let element = document.getElementById("InfoSidebarTabs");
     if(!element)return null;
     return window.M.Tabs.getInstance(element);
 }
-
-// function getLeftSidebar(){
-//     let element = document.getElementById("SidebarLeft");
-//     if(!element)return null;
-//     return window.M.Sidenav.getInstance(element);
-// }
 
 
 function toggleSideElement(side, open){
@@ -58,6 +50,31 @@ function toggleSideElement(side, open){
         console.log('side element with id "'+ side + '" does not exist');
     }
 }
+// function RenderAddUsersButton(props){
+//     return (
+//     <>
+//         <li>
+//             <Button
+//                 id="AddUserButton"
+//                 className="cyan galleryButton"
+//                 floating
+//                 icon={<Icon>person_add</Icon>}
+//                 node='button'
+//                 waves="light"
+//                 tooltip="Go to your image gallery"
+//                 tooltipOptions={{position:'right'}}
+//                 onClick={()=>{
+//                     // createNewUser("macdonald.roy@protonmail.com", "Roy  Macdonald", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+//                     createNewUser("biaemidiio@gmail.com", "Bianca Emidio", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+//                     createNewUser("aaminbean@gmail.com", "Amina Abdrazakova", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+//                     createNewUser("danialoya2013@yahoo.com", "Dania Loya", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+//                     createNewUser("estaciah@gmail.com", "Estacia Huddleston", userTypes().instructor, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+//                     }}
+//             />
+//         </li>
+//     </>)
+// }
+
 
 export default function Board() {
 
@@ -258,6 +275,17 @@ export default function Board() {
 
     if(!boardData || loadingBoardData || !currentUser ||  currentUserLoading ){
         return (<>
+            <Button
+                    id="SidebarLeftTrigger"
+                    className="grey right"
+                    floating
+                    icon={<Icon>exit_to_app</Icon>}
+                    node="button"
+                    waves="light"
+                    onClick={() => auth().signOut()}
+                    tooltip="Log out"
+                    tooltipOptions={{position:'left'}}
+                /> 
             <Row>
                 <h6 className="center-align">Loading board data</h6>
             </Row>
@@ -325,6 +353,7 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
+                    {/* <RenderAddUsersButton /> */}
                 </ul>
             
               
