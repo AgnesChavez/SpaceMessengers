@@ -208,8 +208,7 @@ function SidebarSchool(props){
     return (<>
         <div className='row'>
             <div id={"schoolTab"+props.data.id} className="col s12 black-text" style={{backgroundColor: props.data.color}}>
-                <h5 className="schoolname">{props.data.name}</h5>
-                <h6 className="schoollocation">{props.data.location}</h6>
+                <h6 className="schoolname">{props.data.name + ', ' + props.data.location}</h6>
             </div>
         </div>
     </>);
