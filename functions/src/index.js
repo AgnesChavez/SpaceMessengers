@@ -196,14 +196,14 @@ async function createUserInDb(uid, name, type, institutionId) {
 
 
 
-app.get('/api/test', async (req, res) => {
+// app.get('/api/test', async (req, res) => {
  
     // let success = await createNewUser("macdonald.roy@protonmail.com", "Roy Macdonald", Types.student, "", "");
 
-    await createUserInDb("e5ohIfDKFsMuuSVGi2Xa3bpkHH53", 'Roy Macdonald', Types.admin, null);
-    await createUserInDb("G86Q9rf4KvfDdF61ciDLZ78xbWG2", 'Agnes Chavez', Types.admin, null);
+    // await createUserInDb("e5ohIfDKFsMuuSVGi2Xa3bpkHH53", 'Roy Macdonald', Types.admin, null);
+    // await createUserInDb("G86Q9rf4KvfDdF61ciDLZ78xbWG2", 'Agnes Chavez', Types.admin, null);
 
-    return res.status(200).json({success: true});
+    // return res.status(200).json({success: true});
 
 // 
 //     let users = await db.collection('users').get();
@@ -245,7 +245,7 @@ app.get('/api/test', async (req, res) => {
 //     functions.logger.log("isEmpty " + ((!s)?"true":"false"));
 //     functions.logger.log("isEmpty " + ((!c)?"true":"false"));
     // return res.status(200).json({ok:true});
-});
+// });
 
 
  
@@ -268,24 +268,24 @@ app.get('/api/test', async (req, res) => {
 // });
 
 
-app.post('/api/createNewUser', async (req, res) => {
-
-    let validUser = await checkPostUserId(req, res, Types.admin);
-    if (!validUser) return;
-
-    let email = setDefault(req.body.email,"");
-    let name = setDefault(req.body.name,"");
-    let type = setDefault(req.body.type,"student");
-    let institutionId = setDefault(req.body.institutionId,"");
-    let workshopId = setDefault(req.body.workshopId,"");
-
-
-    let success = await createNewUser(email, name, type, institutionId, workshopId);
-
-    res.status(200).json({success: success });
-
-
-});
+// app.post('/api/createNewUser', async (req, res) => {
+// 
+//     let validUser = await checkPostUserId(req, res, Types.admin);
+//     if (!validUser) return;
+// 
+//     let email = setDefault(req.body.email,"");
+//     let name = setDefault(req.body.name,"");
+//     let type = setDefault(req.body.type,"student");
+//     let institutionId = setDefault(req.body.institutionId,"");
+//     let workshopId = setDefault(req.body.workshopId,"");
+// 
+// 
+//     let success = await createNewUser(email, name, type, institutionId, workshopId);
+// 
+//     res.status(200).json({success: success });
+// 
+// 
+// });
 
 // 
 // async function generateDummyUsers(){
