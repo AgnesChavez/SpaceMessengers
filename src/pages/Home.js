@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 import { auth } from "../services/firebase";
 export default function HomePage(props) {
