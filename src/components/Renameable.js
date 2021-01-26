@@ -64,8 +64,14 @@ export default function Renameable(props){
 	function hideButton(){if(!isEditing && buttonRef.current) buttonRef.current.style.visibility = 'hidden'}
 
 	function onHover(target, isOver){
-		target.style.color=isOver?props.hoverColor:"white";
+		if(props.isCurrent){
+			target.style.color=isOver?"black":"white";	
+			target.style.backgroundColor=props.hoverColor ;
+		}else{
+			target.style.color=isOver?props.hoverColor:"white";	
+		}
 		target.style.cursor=isOver?'pointer':'';
+
 	}
 
 		return (<>
@@ -86,9 +92,10 @@ export default function Renameable(props){
 				/>
 				<button ref={textRef}
 					style={{color: "white",
-							display: isEditing?"none":""
+							display: isEditing?"none":"",
+							backgroundColor: (props.isCurrent && props.isCurrent===true)?props.hoverColor:"transparent"
 					}}
-					className={"transparent textButton " + (props.textClassName? props.textClassName:"") }
+					className={ "textButton " + ((props.isCurrent && props.isCurrent===true)?"":"transparent ") + (props.textClassName? props.textClassName:"") }
 					onMouseOver={(e)=> onHover(e.target, true)}
 					onMouseOut={(e)=> onHover(e.target, false)}
 					onClick={(e)=>{isFunction(props.onTextClick) && props.onTextClick(e)}}
