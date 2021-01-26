@@ -334,10 +334,8 @@ export default function Board() {
                     >
                     {(boardId === null)?
                     (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
-                    :( users 
-                        && !loadingBoardData 
-                        && boardData 
-                        && boardData.messages 
+                    :
+                    ( users && !loadingBoardData && boardData && boardData.messages 
                         && boardData.messages.map(msg => <BoardMessage
                                                         key={msg} 
                                                         messageId={msg}
@@ -348,6 +346,8 @@ export default function Board() {
                                                         currentUser={currentUser} 
                                                         deleteMessage={deleteMessage}
                                                         />))}
+                    {( users && !loadingBoardData && boardData && boardData.name)? (<h6 className="center-align"> {boardData.name}</h6>):""
+                    }
                 </div>
             </div>
             <div id="right"></div>
