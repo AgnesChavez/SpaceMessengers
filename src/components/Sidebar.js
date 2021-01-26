@@ -280,6 +280,7 @@ function SidebarBoardsCollection(props){
                             key={board.id} 
                             text={board.name} 
                             hoverColor= {board.color}
+                            isCurrent={board.id === props.user.currentBoard}
                             onTextClick={()=> props.boardSelectHandle(board.id)}
                             onRename={(newName)=> db.collection('boards').doc(board.id).update({name:newName})}
                             />
