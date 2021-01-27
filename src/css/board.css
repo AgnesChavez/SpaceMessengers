@@ -1,359 +1,360 @@
 html,
 body {
-  height: 100%;
+    height: 100%;
 }
 
 #root,
 #InfoSidebar,
 #InfoSidebarContainer,
-#SidebarLeftContainer
-{
-  height: 100%;
-  min-height: 100%;
-}
-.fullheight{
-  height: 100% !important;
-  min-height: 100% !important;
+#SidebarLeftContainer {
+    height: 100%;
+    min-height: 100%;
 }
 
-#board{
-  height: 800px;
-  width: 1400px;
-  /*margin-left:-500px;*/
-  /*left: 50%;*/
-  
-  /*padding: 15px;*/
-  position: relative;
+.fullheight {
+    height: 100% !important;
+    min-height: 100% !important;
 }
 
-#InfoSidebarContainer{
-  position:fixed;
-  right:0px;
-  left:auto;
-  width:300px;
-  transition: transform 0.3s !important;
+#board {
+    height: 800px;
+    width: 1400px;
+    /*margin-left:-500px;*/
+    /*left: 50%;*/
+
+    /*padding: 15px;*/
+    position: relative;
 }
 
-#SidebarLeftContainer{
-  position:fixed;
-  /*right:auto;*/
-  left:0px;
-  width:300px;
-  transition: transform 0.3s !important;
+#InfoSidebarContainer {
+    position: fixed;
+    right: 0px;
+    left: auto;
+    width: 300px;
+    transition: transform 0.3s !important;
 }
 
-
-
-  .sidenav-fixed{
-    position:absolute !important;
-  }
-
-#SidebarLeft{
-  max-width:300px;
-  color:#FFFFFF !important;
-  top: unset !important;
-}
-
-.SidebarBoard:hover
-{
-  cursor: pointer;
-  color:#FFFFFF !important;
-}
-
-#InfoSidebar{
-  /*top: unset !important;*/
-  padding-bottom: 0px !important;
-}
-
-#TabsContainer{
-  display: flex;
-  flex-direction: column; 
-}
-
-#commentsTab{
-  flex:1;
-
-}
-
-header{
-  position: fixed;
-  top:0px;
-}
-
-
-#SidebarLeft p{
-  color:white !important;
-  margin: 0px !important;
-}
-
-.boardsCollection li{
-  color:white !important;
-}
-
-
-.sidebarFooter{
-  color:white !important;
-}
-
-#SidebarLeft .collapsible-header
-{
-  padding: 6px 0px 0px 0px !important;
-  border-top: 1px solid rgba(255,255,255,0.3);
-  margin-top: 8px;
-}
-
-#SidebarLeft .collapsible-body
-{
-
-  padding: 0px 0px 0px 16px !important;
-  
-  background-color: transparent !important;
-}
-
-#SidebarLeft li{
-  line-height: 20px;
-
-}
-
-#SidebarCurrentUserBlock{
-  padding: 0px 0px 0px 10px ;
-  display: flex;
-  align-items:center;
-  justify-content: flex-start;
-}
-
-#SidebarCurrentUserBlock .name{
-  padding-left: 1rem;
-}
-
-#UploadImageInput .input-field{
-  margin-top: unset;
-  margin-bottom: unset;
-  float: unset !important;
+#SidebarLeftContainer {
+    position: fixed;
+    /*right:auto;*/
+    left: 0px;
+    width: 300px;
+    transition: transform 0.3s !important;
 }
 
 
 
-#UploadImageInput .file-field .btn{
-  line-height: unset;
-  height: unset;
+.sidenav-fixed {
+    position: absolute !important;
 }
 
-#UploadImageInput .input-field .btn{
-  /*height: unset;
+#SidebarLeft {
+    max-width: 300px;
+    color: #FFFFFF !important;
+    top: unset !important;
+}
+
+.SidebarBoard:hover {
+    cursor: pointer;
+    color: #FFFFFF !important;
+}
+
+#InfoSidebar {
+    /*top: unset !important;*/
+    padding-bottom: 0px !important;
+}
+
+#TabsContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+#commentsTab {
+    flex: 1;
+
+}
+
+header {
+    position: fixed;
+    top: 0px;
+}
+
+
+#SidebarLeft p {
+    color: white !important;
+    margin: 0px !important;
+}
+
+.boardsCollection li {
+    color: white !important;
+}
+
+
+.sidebarFooter {
+    color: white !important;
+}
+
+#SidebarLeft .collapsible-header {
+    padding: 6px 0px 0px 0px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 8px;
+}
+
+#SidebarLeft .collapsible-body {
+
+    padding: 0px 0px 0px 16px !important;
+
+    background-color: transparent !important;
+}
+
+#SidebarLeft li {
+    line-height: 20px;
+
+}
+
+#SidebarCurrentUserBlock {
+    padding: 0px 0px 0px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#SidebarCurrentUserBlock .name {
+    padding-left: 1rem;
+}
+
+#UploadImageInput .input-field {
+    margin-top: unset;
+    margin-bottom: unset;
+    float: unset !important;
+}
+
+
+
+#UploadImageInput .file-field .btn {
+    line-height: unset;
+    height: unset;
+}
+
+#UploadImageInput .input-field .btn {
+    /*height: unset;
   line-height: unset;
   background-color: unset;*/
-  color: white;
+    color: white;
 }
 
-#UploadImageInput .file-path-wrapper{
-  /*display: none !important;*/
-  opacity: 0;
-  line-height:1px;
-  /*height:1px;*/
-  width:1px;
-  padding-left: 0px !important;
+#UploadImageInput .file-path-wrapper {
+    /*display: none !important;*/
+    opacity: 0;
+    line-height: 1px;
+    /*height:1px;*/
+    width: 1px;
+    padding-left: 0px !important;
 }
 
-#UploadImageInput .file-path{
-  height:unset;
-  /*height:unset;*/
+#UploadImageInput .file-path {
+    height: unset;
+    /*height:unset;*/
 }
 
-#SidebarCurrentUserButtons{
-  padding: 0px 0px 0px 10px ;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#SidebarCurrentUserButtons {
+    padding: 0px 0px 0px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.SidebarUser:hover{
-  cursor: pointer;
+.SidebarUser:hover {
+    cursor: pointer;
 }
 
-.SidebarUser .name:hover{
-  color:#FFFFFF !important; 
+.SidebarUser .name:hover {
+    color: #FFFFFF !important;
 }
 
-.SidebarUser{
-  display: flex;
-  align-items:center;
-  height: 28px;
+.SidebarUser {
+    display: flex;
+    align-items: center;
+    height: 28px;
 }
 
-.SidebarUser img{
-  width: 24px;
-  height: 24px;
+.SidebarUser img {
+    width: 24px;
+    height: 24px;
 }
 
-.SidebarUser .name{
-  padding-left:10px;
-  /*font-size: 20px;*/
-  word-wrap: break-word;
-  /*max-width: 200px;*/
-  flex: 1;
+.SidebarUser .name {
+    padding-left: 10px;
+    /*font-size: 20px;*/
+    word-wrap: break-word;
+    /*max-width: 200px;*/
+    flex: 1;
 }
 
 
 
 
-#SidebarCurrentUser{
-  padding: 10px;
+#SidebarCurrentUser {
+    padding: 10px;
 }
 
-#SidebarCurrentUser img{
-  display: inline-block;
-  width: 48px;
-  height: 48px;
-  vertical-align: top;
+#SidebarCurrentUser img {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    vertical-align: top;
 }
 
-#SidebarCurrentUser .name{
-  font-size: 20px;
-  word-wrap: break-word;
-  max-width: 200px;
+#SidebarCurrentUser .name {
+    font-size: 20px;
+    word-wrap: break-word;
+    max-width: 200px;
 }
 
-#SidebarCurrentUser .profileLink > a{
-  color: #FFF !important;
+#SidebarCurrentUser .profileLink>a {
+    color: #FFF !important;
 }
 
-.SidebarNavLeft{
- padding: 0px !important; 
+.SidebarNavLeft {
+    padding: 0px !important;
 }
 
-.boardButtonRight{
-  /*position: fixed;*/
-  top: 86px;
-  right: 16px;
+.boardButtonRight {
+    /*position: fixed;*/
+    top: 86px;
+    right: 16px;
 }
 
-.leftButtonsContainer{
-  position:relative;
+.leftButtonsContainer {
+    position: relative;
     top: 74px;
     left: 16px;
-    margin-top:0px;
+    margin-top: 0px;
 }
 
-.leftButtonsContainer li{
-    margin-top:12px;
-}
-
-
-.boardButtonLeft{
-  /*position: fixed;*/
-  /*top: 86px;*/
-  /*left: 16px;*/
+.leftButtonsContainer li {
+    margin-top: 12px;
 }
 
 
-.galleryButton{
+.boardButtonLeft {
+    /*position: fixed;*/
+    /*top: 86px;*/
+    /*left: 16px;*/
+}
+
+
+.galleryButton {
     /*top: 110px;*/
     /*left: 16px; */
 }
 
-.rightSideChat{
-  padding:10px !important;
+.rightSideChat {
+    padding: 10px !important;
 }
 
-.messageCard{
-  max-width:500px;
-  position:absolute;
-}
-.messageCard:hover{
-  background-color: rgb(200,200, 200, 0.2);
-}
-.boardMessageTime{
-  text-align: end;  
-  margin: 0px;
+.messageCard {
+    max-width: 500px;
+    position: absolute;
 }
 
-.messageCard-content{
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 14px !important;
+.messageCard:hover {
+    background-color: rgb(200, 200, 200, 0.2);
+}
+
+.boardMessageTime {
+    text-align: end;
+    margin: 0px;
+}
+
+.messageCard-content {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 14px !important;
 
 }
 
-.messageCard-header{
-  padding-top: 4px;
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #ddd;
-}
-.messageCard-handle:hover
-{
-  cursor: grab;
+.messageCard-header {
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ddd;
 }
 
-.messageCard-footer{
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
+.messageCard-handle:hover {
+    cursor: grab;
 }
 
-.textEditor{
-  border-radius: 7px;
+.messageCard-footer {
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
+
+.textEditor {
+    border-radius: 7px;
+}
+
 .textEditor textarea {
-  padding: 5px;
-  color : rgb(255,255,255);
-  font-size : 14px;
+    padding: 5px;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
 }
 
-.textEditor .activeTextArea{
+.textEditor .activeTextArea {
     border-bottom-width: 1px;
-    background-color : rgba(0,0,0, 0.3);
-}
-.textEditor .inactiveTextArea{
-  border-bottom: 0px solid transparent !important;
-  background-color: unset; 
-
-
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
-.messageCard-footer .collapsible-body{
-  padding: 0px !important;
-  border-width: 0px !important;
-}
+.textEditor .inactiveTextArea {
+    border-bottom: 0px solid transparent !important;
+    background-color: unset;
 
-.messageHeaderImg{
-  height:100%;
-  max-height:25px;
-  margin-right: 10px;
-}
-
-.collapsible{
-  border-top: 0px;
-  border-right: 0px;
-  border-left: 0px;
-  margin-bottom: 0px;
 
 }
 
-#AddBoardButton{
-  /*background-color: red;*/
-  /*background-color: transparent !important;
+.messageCard-footer .collapsible-body {
+    padding: 0px !important;
+    border-width: 0px !important;
+}
+
+.messageHeaderImg {
+    height: 100%;
+    max-height: 25px;
+    margin-right: 10px;
+}
+
+.collapsible {
+    border-top: 0px;
+    border-right: 0px;
+    border-left: 0px;
+    margin-bottom: 0px;
+
+}
+
+#AddBoardButton {
+    /*background-color: red;*/
+    /*background-color: transparent !important;
   padding-left:0px !important;
   padding-right:0px !important;*/
 }
 
-.InlineTinyButton{
-  background-color: transparent !important;
-  padding-left:0px !important;
-  padding-right:0px !important;
-  height: unset;
-  line-height: unset;
+.InlineTinyButton {
+    background-color: transparent !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    height: unset;
+    line-height: unset;
 }
 
-.collapsible-header
-{
-  background-color: transparent;
-  padding:0px;
-  justify-content: space-between;
-  align-items: center;
+.collapsible-header {
+    background-color: transparent;
+    padding: 0px;
+    justify-content: space-between;
+    align-items: center;
 }
+
 /*.collapsible-header i{
 width: unset!important;
 margin-right: unset !important;
@@ -361,65 +362,100 @@ height: 1.6rem;
 }
 */
 
-.collapsible-header:hover
-{
-  background-color: rgba(255,255,255,0.2);
-  
-}
-
-.SidebarWorkshopStudents{
-  padding-right:0px !important;
+.collapsible-header:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 
 }
 
-.sidebarButton{
-  width:100% !important;
-  margin-top: 8px;
+.SidebarWorkshopStudents {
+    padding-right: 0px !important;
+
 }
 
-        body,
-        #boardContainer {
-            width: 100%;
-            min-width: 100%;
-            height: 100vh;
-            min-height: 100%;
-        }
+.sidebarButton {
+    width: 100% !important;
+    margin-top: 8px;
+}
 
-        #boardContainer {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+body,
+#boardContainer {
+    width: 100%;
+    min-width: 100%;
+    height: 100vh;
+    min-height: 100%;
+}
 
-        #left,
-        #right {
-            flex: 0 0 auto;
-            height: 100%;
-            transition: width 0.3s;
-            /*min-height: 100%;*/
-            /*position: relative;*/
-            /*display: inline-block;*/
-            width: 300px;
-        }
+#boardContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
 
-        
-        /*
+#left,
+#right {
+    flex: 0 0 auto;
+    height: 100%;
+    transition: width 0.3s;
+    /*min-height: 100%;*/
+    /*position: relative;*/
+    /*display: inline-block;*/
+    width: 300px;
+}
+
+
+/*
         #innerContainer{
             position: fixed;
             top:0px;
             left:0px;
         }*/
 
-        
 
-        #center {
-            flex: 1;
-            /*display: inline-block;*/
-            /*position: relative;*/
-            /*width:1000px;*/
-            overflow: scroll;
-            max-width: 1400px;
-          
 
-        }
+#center {
+    flex: 1;
+    /*display: inline-block;*/
+    /*position: relative;*/
+    /*width:1000px;*/
+    overflow: scroll;
+    max-width: 1400px;
+
+
+}
+
+
+#UploadsModal {
+    background-color: black !important;
+
+}
+
+#UploadsModal .modal {
+    background-color: black !important;
+    /*background-color: transparent !important;*/
+
+}
+
+#UploadsModal .modal-footer {
+    display: none;
+}
+
+#UploadsModal .modal-content {
+    padding-top: 4px !important;
+    padding-bottom: 1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+#UploadsModal .modal-content p {
+    margin: 0px !important;
+}
+
+#UploadsModal .modal-content h4 {
+    display: none;
+}
+
+#UploadsModal .uploadsContent {
+    width: 50%;
+    float: right;
+}
