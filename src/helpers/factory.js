@@ -109,7 +109,7 @@ export async function removeUserFromTeam(userId, teamId){
 
 const MAKE_DUMMY_USERS = true;
 
-async  function createUser( userData, type, institutionId, workshopId)
+export async  function createUser( userData, type, institutionId, workshopId)
 	{
 		if(MAKE_DUMMY_USERS){
 			let uid = await createUserInDb(null, userData, type, institutionId, workshopId);
