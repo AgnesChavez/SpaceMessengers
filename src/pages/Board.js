@@ -19,9 +19,11 @@ import { userTypes } from '../helpers/Types'
 
 import { InfoSidebar } from '../components/InfoSidebar'
 
-import { addBoardToUser, makeDefaultBoard } from '../helpers/factory'
-
-import { createNewUser } from '../helpers/userManagement'
+import {  addBoardToUser } from '../helpers/factory'
+// import {  makeDefaultBoard } from '../helpers/factory' 
+// import {  createSchool } from '../helpers/factory'
+import {  createUser } from '../helpers/factory'
+// import { createNewUser } from '../helpers/userManagement'
 
 
 import { UploadImgButton } from '../helpers/imgStorage'
@@ -50,6 +52,90 @@ function toggleSideElement(side, open){
         console.log('side element with id "'+ side + '" does not exist');
     }
 }
+
+
+// function NewStudent(name, email){
+//  return {name, email}
+// }
+// function makeSchool(){
+//     console.log("makeSchool");
+//     
+//     
+// let students = [NewStudent("Carolina Lemos", "carollemos496@gmail.com"),
+// NewStudent("Carolina Oliveira", "carolina.pacheco.oliveira008@gmail.com"),
+// NewStudent("Francisco Tavares", "franciscobessatavares@hotmail.com"),
+// NewStudent("Gabriel Neto", "gabriel.neto.escola@gmail.com"),
+// NewStudent("Guido Rezende", "guido.rezende47@gmail.com"),
+// NewStudent("Guilherme Abreu", "guilhermeabreu857@gmail.com"),
+// NewStudent("Joana Branco", "joanabranco336@gmail.com"),
+// NewStudent("Mafalda Gorgulho", "mafaldagorgulho@gmail.com"),
+// NewStudent("Mafalda Lavareda", "mafalda.lavareda6@gmail.com"),
+// NewStudent("Manuel Proença", "manuel.proenca.esss@gmail.com"),
+// NewStudent("Manuel Monteiro", "manel.6.monteiro@gmail.com"),
+// NewStudent("Leonor Francisco", "leonorfrancisco16a@gmail.com"),
+// NewStudent("Martim Lança", "martimlanca07@gmail.com"),
+// NewStudent("Miguel Baptista", "miguelmgpbaptista@gmail.com"),
+// NewStudent("Pedro Guimarães", "pmmendesguimaraes@gmail.com"),
+// NewStudent("Rafael Balão", "rafael.balao.esss@gmail.com"),
+// NewStudent("Rita Afonso", "ritafonso2006@gmail.com"),
+// NewStudent("Rita Ferreira", "ritaroferreira@gmail.com"),
+// NewStudent("Tiago Salvador", "tiago.sousa.salvador@gmail.com"),
+// NewStudent("Vicente Silva", "vrjss23@gmail.com"),
+// NewStudent("NAME SURNAME", "STUDENT EMAILS"),
+// NewStudent("Alexandre Ferreira", "alexandrebrunoferreira6@gmail.com"),
+// NewStudent("Bernardo Valente", "bernardo.neto.valente@gmail.com"),
+// NewStudent("Diogo Velez", "diogoserravelez@gmail.com"),
+// NewStudent("Francisco Teixeira", "frft10@gmail.com"),
+// NewStudent("Guilherme Verdelho", "gui.m.verdelho@gmail.com"),
+// NewStudent("Isabella Palombo", "belinhapalombo@gmail.com"),
+// NewStudent("Laura Galvão", "lauragalvao@zonmail.pt"),
+// NewStudent("Lourenço Torrinha", "lourencotorrinha@gmail.com"),
+// NewStudent("Patrícia Galveias", "prg2003@gmail.com"),
+// NewStudent("Rafael Caetano", "rafael.f.m.caetano@gmail.com"),
+// NewStudent("Ricardo Horta", "ricardo.s.horta@gmail.com"),
+// NewStudent("Sara Vendas", "saramv2003@gmail.com")];
+// 
+// let instructors = [NewStudent("Bianca Emídio", "biaemidiio@gmail.com"),
+// NewStudent("Amina Abdrazakova", "aaminbean@gmail.com"),
+// NewStudent("Dania Loya", "danialoya2013@yahoo.com"),
+// NewStudent("Sally Greywolf", "sally@tisataos.org"),
+// NewStudent("Gina Gargone", "gina@tisataos.org"),
+// NewStudent("Cristina Pinho", "cristpinho@gmail.com"),
+// NewStudent("Ana Carla Oliveira",  "ana.carvalholiveira2021@gmail.com")];
+// 
+// 
+// 
+//     createSchool("Oeiras", "Portugal", "XIWfFl9mm0GxYZb7svG6", instructors, students);
+// 
+// }
+// <li>
+
+// function AddUsersButton(props){
+//     return <Button
+//                 id="AddUsers"
+//                 className="cyan boardButtonLeft"
+//                 floating
+//                 icon={<Icon>person_add</Icon>}
+//                 node="button"
+//                 waves="light"
+//                 onClick={createUsers}
+//                 tooltip="Add users"
+//                 tooltipOptions={{position:'right'}}
+//             /> 
+// }
+//                     </li>
+
+// createUser( userData, type, institutionId, workshopId)
+
+// function createUsers(){
+// createUser(NewStudent("Flora Mack", "flora@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// createUser(NewStudent("Emilio    Martinez", "emiliom@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// createUser(NewStudent("Siena Price", "sienap@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// createUser(NewStudent("Nadijah   Kostich", "nadijak@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// createUser(NewStudent("Judah Bromley", "judah@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// createUser(NewStudent("Vera  Bell", "verab@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
+// }
+
 
 
 
@@ -106,7 +192,6 @@ export default function Board() {
         addToArray('boards', boardId, 'messages',msgRef.id);
 
     }
-
 
     const deleteMessage = (messageId) => {
         if(!messageId) return;
@@ -325,6 +410,9 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
+                    {/* <li> */}
+                    {/* <AddUsersButton /> */}
+                    {/* </li> */}
                 </ul>
             
               
@@ -349,8 +437,10 @@ export default function Board() {
                     {( users && !loadingBoardData && boardData && boardData.name)? (<h6 className="center-align"> {boardData.name}</h6>):""
                     }
                 </div>
+                <div id="UploadsModal"></div>
             </div>
             <div id="right"></div>
         </div>
+        
     </>)
 }
