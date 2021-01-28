@@ -58,7 +58,7 @@ export default class UserProfile extends Component {
         
         this.handleFileSelect = this.handleFileSelect.bind(this);
         this.getPhotoUrl = this.getPhotoUrl.bind(this);
-        this.setUserType = this.setUserType.bind(this);
+        // this.setUserType = this.setUserType.bind(this);
         
     }
     componentDidMount() {
@@ -187,31 +187,31 @@ export default class UserProfile extends Component {
         this.handleChange(event, "dbUser");
     }
     
-    setUserType(e){
-        console.log("Type change: ", e.target.selectedIndex );
-
-        let t = {type:""};
-        switch(e.target.selectedIndex){
-            case 0: t.type = userTypes().student; break;
-            case 1: t.type = userTypes().instructor; break;
-            case 2: t.type = userTypes().admin; break;
-            default: break;
-        }
-
-
-         db.collection("users").doc(this.state.user.uid).set(t, { merge: true })
-        .then(function() {
-            createToast("Succesfully updated your profile");
-            console.log("successfully updated user type to  " + t.type);
-        })
-        .catch(function(error) {
-            console.error("Error creating updating user type: ", error);
-        });
-       
-
-
-
-    }
+//     setUserType(e){
+//         console.log("Type change: ", e.target.selectedIndex );
+// 
+//         let t = {type:""};
+//         switch(e.target.selectedIndex){
+//             case 0: t.type = userTypes().student; break;
+//             case 1: t.type = userTypes().instructor; break;
+//             case 2: t.type = userTypes().admin; break;
+//             default: break;
+//         }
+// 
+// 
+//          db.collection("users").doc(this.state.user.uid).set(t, { merge: true })
+//         .then(function() {
+//             createToast("Succesfully updated your profile");
+//             console.log("successfully updated user type to  " + t.type);
+//         })
+//         .catch(function(error) {
+//             console.error("Error creating updating user type: ", error);
+//         });
+//        
+// 
+// 
+// 
+//     }
 
     async handleFileSelect(evt) {
         evt.stopPropagation();
@@ -297,11 +297,11 @@ export default class UserProfile extends Component {
 
                         <label htmlFor="types">Select user type:</label>
 
-                        <select style={{display:"unset"}} name="types" id="types" onChange={this.setUserType}>
-                          <option value={userTypes().student}>Student</option>
-                          <option value={userTypes().instructor}>Instructor</option>
-                          <option value={userTypes().admin}>Admin</option>
-                        </select>
+                        {/* <select style={{display:"unset"}} name="types" id="types" onChange={this.setUserType}> */}
+                        {/*   <option value={userTypes().student}>Student</option> */}
+                        {/*   <option value={userTypes().instructor}>Instructor</option> */}
+                        {/*   <option value={userTypes().admin}>Admin</option> */}
+                        {/* </select> */}
 
                     </div>
 

@@ -22,8 +22,8 @@ import { InfoSidebar } from '../components/InfoSidebar'
 import {  addBoardToUser } from '../helpers/factory'
 // import {  makeDefaultBoard } from '../helpers/factory' 
 // import {  createSchool } from '../helpers/factory'
-import {  createUser } from '../helpers/factory'
-// import { createNewUser } from '../helpers/userManagement'
+// import {  createUser } from '../helpers/factory'
+import { createUserInDb } from '../helpers/userManagement'
 
 
 import { UploadImgButton } from '../helpers/imgStorage'
@@ -54,90 +54,52 @@ function toggleSideElement(side, open){
 }
 
 
-// function NewStudent(name, email){
-//  return {name, email}
-// }
-// function makeSchool(){
-//     console.log("makeSchool");
-//     
-//     
-// let students = [NewStudent("Carolina Lemos", "carollemos496@gmail.com"),
-// NewStudent("Carolina Oliveira", "carolina.pacheco.oliveira008@gmail.com"),
-// NewStudent("Francisco Tavares", "franciscobessatavares@hotmail.com"),
-// NewStudent("Gabriel Neto", "gabriel.neto.escola@gmail.com"),
-// NewStudent("Guido Rezende", "guido.rezende47@gmail.com"),
-// NewStudent("Guilherme Abreu", "guilhermeabreu857@gmail.com"),
-// NewStudent("Joana Branco", "joanabranco336@gmail.com"),
-// NewStudent("Mafalda Gorgulho", "mafaldagorgulho@gmail.com"),
-// NewStudent("Mafalda Lavareda", "mafalda.lavareda6@gmail.com"),
-// NewStudent("Manuel Proença", "manuel.proenca.esss@gmail.com"),
-// NewStudent("Manuel Monteiro", "manel.6.monteiro@gmail.com"),
-// NewStudent("Leonor Francisco", "leonorfrancisco16a@gmail.com"),
-// NewStudent("Martim Lança", "martimlanca07@gmail.com"),
-// NewStudent("Miguel Baptista", "miguelmgpbaptista@gmail.com"),
-// NewStudent("Pedro Guimarães", "pmmendesguimaraes@gmail.com"),
-// NewStudent("Rafael Balão", "rafael.balao.esss@gmail.com"),
-// NewStudent("Rita Afonso", "ritafonso2006@gmail.com"),
-// NewStudent("Rita Ferreira", "ritaroferreira@gmail.com"),
-// NewStudent("Tiago Salvador", "tiago.sousa.salvador@gmail.com"),
-// NewStudent("Vicente Silva", "vrjss23@gmail.com"),
-// NewStudent("NAME SURNAME", "STUDENT EMAILS"),
-// NewStudent("Alexandre Ferreira", "alexandrebrunoferreira6@gmail.com"),
-// NewStudent("Bernardo Valente", "bernardo.neto.valente@gmail.com"),
-// NewStudent("Diogo Velez", "diogoserravelez@gmail.com"),
-// NewStudent("Francisco Teixeira", "frft10@gmail.com"),
-// NewStudent("Guilherme Verdelho", "gui.m.verdelho@gmail.com"),
-// NewStudent("Isabella Palombo", "belinhapalombo@gmail.com"),
-// NewStudent("Laura Galvão", "lauragalvao@zonmail.pt"),
-// NewStudent("Lourenço Torrinha", "lourencotorrinha@gmail.com"),
-// NewStudent("Patrícia Galveias", "prg2003@gmail.com"),
-// NewStudent("Rafael Caetano", "rafael.f.m.caetano@gmail.com"),
-// NewStudent("Ricardo Horta", "ricardo.s.horta@gmail.com"),
-// NewStudent("Sara Vendas", "saramv2003@gmail.com")];
-// 
-// let instructors = [NewStudent("Bianca Emídio", "biaemidiio@gmail.com"),
-// NewStudent("Amina Abdrazakova", "aaminbean@gmail.com"),
-// NewStudent("Dania Loya", "danialoya2013@yahoo.com"),
-// NewStudent("Sally Greywolf", "sally@tisataos.org"),
-// NewStudent("Gina Gargone", "gina@tisataos.org"),
-// NewStudent("Cristina Pinho", "cristpinho@gmail.com"),
-// NewStudent("Ana Carla Oliveira",  "ana.carvalholiveira2021@gmail.com")];
-// 
-// 
-// 
-//     createSchool("Oeiras", "Portugal", "XIWfFl9mm0GxYZb7svG6", instructors, students);
-// 
-// }
-// <li>
-
-// function AddUsersButton(props){
-//     return <Button
-//                 id="AddUsers"
-//                 className="cyan boardButtonLeft"
-//                 floating
-//                 icon={<Icon>person_add</Icon>}
-//                 node="button"
-//                 waves="light"
-//                 onClick={createUsers}
-//                 tooltip="Add users"
-//                 tooltipOptions={{position:'right'}}
-//             /> 
-// }
-//                     </li>
-
-// createUser( userData, type, institutionId, workshopId)
-
-// function createUsers(){
-// createUser(NewStudent("Flora Mack", "flora@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// createUser(NewStudent("Emilio    Martinez", "emiliom@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// createUser(NewStudent("Siena Price", "sienap@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// createUser(NewStudent("Nadijah   Kostich", "nadijak@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// createUser(NewStudent("Judah Bromley", "judah@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// createUser(NewStudent("Vera  Bell", "verab@tisataos.org"), userTypes().student, "EeMPldZ8Ii1iNw6eTlzA", "XIWfFl9mm0GxYZb7svG6");
-// }
+function AddUsersButton(props){
+    return <Button
+                id="AddUsers"
+                className="cyan boardButtonLeft"
+                floating
+                icon={<Icon>person_add</Icon>}
+                node="button"
+                waves="light"
+                onClick={()=>
+                    createUserInDb(null, {name: "Roy Macdonald", email:"macdonald.roy@protonmail.com"}, userTypes().instructor, null, "XIWfFl9mm0GxYZb7svG6")
+                    }
+                tooltip="Add users"
+                tooltipOptions={{position:'right'}}
+            /> 
+}
+ 
 
 
 
+function LoadingData(props){
+    return (<>
+            <Button
+                    id="SidebarLeftTrigger"
+                    className="grey right"
+                    floating
+                    icon={<Icon>exit_to_app</Icon>}
+                    node="button"
+                    waves="light"
+                    onClick={() => auth().signOut()}
+                    tooltip="Log out"
+                    tooltipOptions={{position:'left'}}
+                /> 
+            <Row>
+                <h6 className="center-align">Loading board data</h6>
+            </Row>
+            <Row style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <Col s={2} offset="s5" style={{width: "unset", margin: "auto"}}>
+                <Preloader 
+                    active
+                    color="blue"
+                    flashing
+                />
+            </Col>
+            </Row>
+        </>);
+}
 
 export default function Board() {
 
@@ -316,57 +278,88 @@ export default function Board() {
     }
    
 
-    if(boardId === null || boardId === 'default')
-    {
-        if(currentUser && !currentUserLoading){
+    
+    if(currentUser && !currentUserLoading){
+        if(boardId === null || boardId === 'default'){
             if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
                 setBoardId(currentUser.currentBoard);
             }else{
                 if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
                 {
                     setBoardId(currentUser.boards[0]);
+                }else{                    
+
                 }
+            }
+        }
+        if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
+            if(currentUser.team){
+                currentUserRef.update({currentTeam: currentUser.team});
+            }else{
+                db.collection("teams").where("members", "array-contains", currentUser.id).get()
+                .then(function(querySnapshot) {
+                    if(querySnapshot.docs.length){
+                        currentUserRef.update({currentTeam: querySnapshot.docs[0].id});
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Error getting documents: ", error);
+                });
+            }
+        }
+        if(currentUser.currentWorkshop === null){
+            if(currentUser.type === userTypes().admin){
+                db.collection("workshops").orderBy("created", "desc").limit(1).get()
+                .then(function(querySnapshot) {
+                    if(querySnapshot.docs.length){
+                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Error getting documents: ", error);
+                });
+            }else if(currentUser.type === userTypes().instructor){
+                db.collection("workshops").where('instructors', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
+                .then(function(querySnapshot) {
+                    if(querySnapshot.docs.length){
+                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Error getting documents: ", error);
+                });
+
+            }else if(currentUser.type === userTypes().student){
+                db.collection("workshops").where('students', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
+                .then(function(querySnapshot) {
+                    if(querySnapshot.docs.length){
+                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Error getting documents: ", error);
+                });                
             }
         }
     }
 
-    if(!boardData || loadingBoardData || !currentUser ||  currentUserLoading ){
-        return (<>
-            <Button
-                    id="SidebarLeftTrigger"
-                    className="grey right"
-                    floating
-                    icon={<Icon>exit_to_app</Icon>}
-                    node="button"
-                    waves="light"
-                    onClick={() => auth().signOut()}
-                    tooltip="Log out"
-                    tooltipOptions={{position:'left'}}
-                /> 
-            <Row>
-                <h6 className="center-align">Loading board data</h6>
-            </Row>
-            <Row style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-            <Col s={2} offset="s5" style={{width: "unset", margin: "auto"}}>
-                <Preloader 
-                    active
-                    color="blue"
-                    flashing
-                />
-            </Col>
-            </Row>
-        </>);
-    }
+//     if(boardId === null){
+// 
+//     }
+// 
+//     
+//         
+    
     
 
     return ( <>
         <div id="boardContainer">   
-            <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>
+            { currentUser &&  !currentUserLoading && <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>}
             <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />
 
             <div id="left"></div>
             <div id="center">
-                {(boardId !== null && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
+                {(boardId !== null && currentUser && !currentUserLoading && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
                     <Button
                         className="red right boardButtonRight"
                         floating
@@ -410,9 +403,9 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
-                    {/* <li> */}
-                    {/* <AddUsersButton /> */}
-                    {/* </li> */}
+                    <li>
+                    <AddUsersButton />
+                    </li>
                 </ul>
             
               
@@ -420,8 +413,9 @@ export default function Board() {
                     className="col s12 z-depth-2 "
                     onMouseDown={onClick}
                     >
+                    { boardId !== null && (!boardData || loadingBoardData || !currentUser ||  currentUserLoading ) && <LoadingData/>}
                     {(boardId === null)?
-                    (<h4 className="center-align"> You don't have any board yet! <br/> Create one on the left side menu </h4>)
+                    (<h4 className="center-align"> No board selected! <br/> Chose or create one on the left side menu under the team tab </h4>)
                     :
                     ( users && !loadingBoardData && boardData && boardData.messages 
                         && boardData.messages.map(msg => <BoardMessage
@@ -441,6 +435,6 @@ export default function Board() {
             </div>
             <div id="right"></div>
         </div>
-        
+
     </>)
 }
