@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { auth } from "../services/firebase";
 import { createUserInDb } from "../helpers/userManagement";
 
 import { getQueryData } from "../helpers/db"
 import { db } from "../services/firebase";
 
-import { Button, TextInput, Icon, Row, Col, Preloader} from 'react-materialize';
 
+import { Button, TextInput, Icon, Row, Col, Preloader} from 'react-materialize';
+import firebase from "firebase";
 
 
 import '../css/registration.css';
@@ -96,6 +97,38 @@ export default function CompleteRegistration(props)  {
       setState(errorState);
     }
 
+
+    useEffect(()=>{
+        var storedEmail = window.localStorage.getItem('emailForSignIn');
+        if(storedEmail !== null && storedEmail !== '' ){
+            email.current = storedEmail;
+            verifyRegistration();            
+        }
+    });
+    
+
+    async function swapUserIdInArray( collectionId, arrayId, oldUserId, newUserId){
+        let querySnapshot = await db.collection(collectionId).where(arrayId, "array-contains", oldUserId).get(); 
+        for(let i = 0; i < querySnapshot.docs.length; i++){
+            let docQuery = db.collection(collectionId).doc(querySnapshot.docs[i].id);
+            await docQuery.update({
+                [arrayId]: firebase.firestore.FieldValue.arrayUnion(newUserId)
+            });
+            await docQuery.update({
+                [arrayId]: firebase.firestore.FieldValue.arrayRemove(oldUserId)
+            });
+        }
+    }
+
+    async function swapUserId( oldUserId, newUserId){
+    
+        await swapUserIdInArray("institution", "members", oldUserId, newUserId);
+        await swapUserIdInArray("teams", "members", oldUserId, newUserId);
+        await swapUserIdInArray("workshops", "instructors", oldUserId, newUserId);
+        await swapUserIdInArray("workshops", "students", oldUserId, newUserId);
+        
+    }
+
     async function verifyRegistration() {
         
         if(state === requestingEmail){
@@ -105,36 +138,30 @@ export default function CompleteRegistration(props)  {
             // requestingEmail.current = false;
             
             if(email.current){
-            setState(completingRegistration);        
+
+            setState(completingRegistration);
                 if (auth().isSignInWithEmailLink(window.location.href)) {    
                     auth().signInWithEmailLink(email.current, window.location.href).then(async(result)=>{
-                        console.log(result);
+                        // console.log(result);
                         if (result) {
                             
-                            // window.localStorage.removeItem('emailForSignIn');
-                            // setState(completingRegistration);
-                            
-                            console.log("result.additionalUserInfo ", result.additionalUserInfo);
-                            console.log("email ", email.current);                   
-                            let query = db.collection('unauthenticatedUsers').doc(email.current);
-                            let user = await getQueryData(query);
-                            if(user !== null){
-                                console.log("user is not null");
-                                console.log("uid: ", result.user.uid);
-                                console.log("name: ", user.name);
-                                console.log("type: ", user.type);
-                                console.log("institution: ", user.institutionId);
-                                console.log("workshopId: ", user.workshopId);
 
-                                await createUserInDb(result.user.uid, {name: user.name}, user.type, user.institutionId, user.workshopId);  
-                                await query.delete();
-                            }else{
-                                console.log("user is null");
-                                await createUserInDb(result.user.uid, null, null, "", "");  
-                            }
-                            setState(registrationComplete); 
-                    // <Redirect to="/board" />
-                            window.location.replace('https://space-messengers.web.app/board');
+                             window.localStorage.removeItem('emailForSignIn');
+                                // result.user.uid
+                                let user = await getQueryData(db.collection("users").doc(result.user.uid));
+                                if(!user){
+                                    let querySnapshot = await db.collection("users").where("email", "==",  email.current).get();
+                                    
+                                    if(querySnapshot.docs.length > 0){
+                                        await db.collection("users").doc(result.user.uid).set( querySnapshot.docs[0].data(), { merge: false });
+                                        await swapUserId( querySnapshot.docs[0].id, result.user.uid);
+                                        await db.collection("users").doc(querySnapshot.docs[0].id).delete();
+                                    }
+
+                                }
+
+                                setState(registrationComplete); 
+                                window.location.replace('https://space-messengers.web.app/board');
                         }else{
                             setState(failState);
                         }

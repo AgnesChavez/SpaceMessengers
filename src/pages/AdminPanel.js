@@ -429,14 +429,24 @@ return (<>
     </>);
 }
 
-export function Sidebar(props) {
+
+const selectedType ={
+    team: "team",
+    user: "user",
+    workshop: "workshop",
+    school: "school",
+    board: 'board',
+}
+
+export function AdminPanel(props) {
+
+
 
 
     const tabsRef = useRef(null);
     const sidenavRef = useRef(null);
-
-    let isNotStudent = (props.usr.type !==  userTypes().student);
-
+    const [selectedBoard, setSelectedBoard] = useState(null);
+    const [teams, teamsLoading] = useCollectionData; 
     
     useEffect(()=>{
         let el = document.getElementById('SidebarLeft');
@@ -446,9 +456,7 @@ export function Sidebar(props) {
             }
             if(!sidenavRef.current){
                 sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
-                // sidenavRef.current.open();
-                // sidenavRef.current.isOpen = true;
-                // console.log("initing sidenav");
+
             }
         }
           return () => {
@@ -459,43 +467,33 @@ export function Sidebar(props) {
     });
 
     
-    let user = {
-        image:  (props.usr.photoURL  || auth().currentUser.photoURL),
-        name: (props.usr.displayName || auth().currentUser.displayName)
-    };
     
+    
+    if(props.usr.type !==  userTypes().admin){
+        return (<h4 className="center-align"> You are not allowed to be here! </h4>);
+    }
 
-    
-    let teamTabLabel = "Team" + (isNotStudent?"s":"");
     return (<>
-    <div id="SidebarLeftContainer" style={{transform: "translateX("+(props.isOpen?0:-300)+"px)"}}>
+    <div id="SidebarLeftContainer">
 
         <ul id="SidebarLeft" className="sidenav sidenav-fixed black white-text" >
-    
-            <SidebarCurrentUser className="white-text"  user={user} userType={props.usr.type}/>
             <div className="row">
                 <div className="col s12">
                     <ul className="tabs tabs-fixed-width black white-text depth-1">
-                        <li className="tab"><a className="active" href="#teamTab">{teamTabLabel}</a></li>
+                        <li className="tab"><a className="active" href="#teamTab">Teams</a></li>
                         <li className="tab"><a href="#schoolsTab">Schools</a></li>
                     </ul>
             
                     <div id="teamTab" className="col s12">
-                        { isNotStudent? 
-                            <SidebarTeamCollection 
-                                user={props.usr} 
-                                workshopId={props.usr.currentWorkshop}
-                                boardSelectHandle={props.boardSelectHandle}
-                                />
-                            :
-                            <SidebarCurrentTeam 
-                                user={props.usr} 
-                                boardSelectHandle={props.boardSelectHandle} /> 
-                        }
+                    <ul className="collapsible SidebarTeamCollection">
+                        { !teamsLoading && teams && teams.map(team => <SidebarTeamLi key={team.id} team={team} user={props.user} boardSelectHandle={props.boardSelectHandle}/> )}
+                    </ul> 
+
+
                     </div>
                     <div id="schoolsTab" className="col s12">
                         <SidebarWorkshopCollection user={props.usr} />
-                    </div>
+                    </div> 
                 </div>
             </div>        
         </ul>
@@ -505,16 +503,8 @@ export function Sidebar(props) {
     <ModalAddBoard/>
     
     
-    { isNotStudent && <ModalCreateWorkshop/> }
+    <ModalCreateWorkshop/> 
 
-
-  <Modal
-    actions={[
-      <Button flat modal="close" node="button" waves="green">Close</Button>
-    ]}
-    header="User Profile"
-    id="profileModal"
-  >
     <UserProfile  ></UserProfile>
   </Modal>
 

@@ -65,7 +65,7 @@ class App extends Component {
   componentDidMount() {
     
     auth().onAuthStateChanged(user => {
-      if (user) {
+      if ( user ) {
         this.setState({
           authenticated: true,
           loading: false

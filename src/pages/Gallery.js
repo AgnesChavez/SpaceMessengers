@@ -48,6 +48,7 @@ export default  function Gallery(props) {
 	let [imagesRefs, setImagesRefs] = useState(null);
 	let [refsLoaded, setRefsLoaded] = useState(false);
 	
+	let originalBg  = useRef(null);
 	
 
 	useEffect(()=>{
@@ -58,9 +59,19 @@ export default  function Gallery(props) {
 			}).catch((error)=> {
   				console.log("Loading gallery failed with error:", error);
 			});
-			document.querySelector('body').style.backgroundColor = "black";
-			document.querySelector('body').style.backgroundImage = "unset";
+			if(originalBg.current === null){
+				originalBg.current = document.querySelector('body').style.backgroundImage;
+				document.querySelector('body').style.backgroundColor = "black";
+				document.querySelector('body').style.backgroundImage = "unset";	
+			}
+			
 		}
+		return (()=>{
+			if(originalBg.current){
+				document.querySelector('body').style.backgroundColor = "unset";
+				document.querySelector('body').style.backgroundImage = originalBg.current;		
+			}
+		})
 	});
 
 

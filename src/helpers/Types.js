@@ -43,7 +43,7 @@ export function TeamData(name, workshopId) {
 }
 
 
-export function UserData(uid, data, type, institutionId) {
+export function UserData(uid, data, type, institutionId, workshopId) {
   // console.log("UserData: ", uid, data, type, institutionId);
   let u ={
     id: uid,
@@ -57,12 +57,15 @@ export function UserData(uid, data, type, institutionId) {
     boards: [],
     currentBoard: null,
     currentTeam: null,
-    currentWorkshop: null,
+    currentWorkshop: workshopId,
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
   if(data.name) u.displayName = data.name;
   if(data.email) u.email = data.email;
-  if(data.team) u.team = data.team;
+  if(data.team){
+    u.team = data.team; 
+    u.currentTeam = data.team;
+  }
 
   return u;
 

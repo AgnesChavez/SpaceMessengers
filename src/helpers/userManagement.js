@@ -10,6 +10,28 @@ import { getQueryData, setDataInDb, addDataToDb } from "./db"
 import { createTeam, addUserToTeam, addUserToWorkshop } from './factory'
 
 // export function createNewUser(_email, _name, _type=userTypes().student) {
+export async function sendLogInEmail(email){
+    var actionCodeSettings = {
+        // URL you want to redirect back to. The domain (www.example.com) for this
+        // URL must be in the authorized domains list in the Firebase Console.
+        url: 'https://space-messengers.web.app/completeRegistration',
+        // This must be true.
+        handleCodeInApp: true,
+    };
+
+    
+
+    auth().sendSignInLinkToEmail(email, actionCodeSettings)
+        .then(function() {
+            // console.log("Succesfully added user");
+        })
+        .catch(function(error) {
+            console.log("Failed sending authentiaction: error: ", error );
+            // Some error occurred, you can inspect the code: error.code
+        });
+}
+
+
 export async function createNewUser(_email, _name, _type, _institutionId, _workshopId) {
 
     var actionCodeSettings = {
