@@ -101,7 +101,7 @@ class App extends Component {
             <PublicRoute
               path="/login"
               authenticated={this.state.authenticated}
-              component={this.state.authenticated?Board:Login}
+              component={Login}
             />
             
           </Switch>
