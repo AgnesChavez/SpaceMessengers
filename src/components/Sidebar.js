@@ -481,16 +481,18 @@ export function Sidebar(props) {
                     </ul>
             
                     <div id="teamTab" className="col s12">
-                        { isNotStudent? 
+                        { isNotStudent && 
                             <SidebarTeamCollection 
                                 user={props.usr} 
                                 workshopId={props.usr.currentWorkshop}
                                 boardSelectHandle={props.boardSelectHandle}
                                 />
-                            :
-                            <SidebarCurrentTeam 
+                            }
+                        {!isNotStudent && props.usr.currentTeam && <SidebarCurrentTeam 
                                 user={props.usr} 
-                                boardSelectHandle={props.boardSelectHandle} /> 
+                                boardSelectHandle={props.boardSelectHandle} />}
+                        {!isNotStudent && !props.usr.currentTeam && 
+                                <p>You are not assigned to any team. Ask your facilitator to add you to one.</p>
                         }
                     </div>
                     <div id="schoolsTab" className="col s12">

@@ -53,22 +53,22 @@ function toggleSideElement(side, open){
     }
 }
 
-
-function AddUsersButton(props){
-    return <Button
-                id="AddUsers"
-                className="cyan boardButtonLeft"
-                floating
-                icon={<Icon>person_add</Icon>}
-                node="button"
-                waves="light"
-                onClick={()=>
-                    createUserInDb(null, {name: "Roy Macdonald", email:"macdonald.roy@protonmail.com"}, userTypes().instructor, null, "XIWfFl9mm0GxYZb7svG6")
-                    }
-                tooltip="Add users"
-                tooltipOptions={{position:'right'}}
-            /> 
-}
+// 
+// function AddUsersButton(props){
+//     return <Button
+//                 id="AddUsers"
+//                 className="cyan boardButtonLeft"
+//                 floating
+//                 icon={<Icon>person_add</Icon>}
+//                 node="button"
+//                 waves="light"
+//                 onClick={()=>
+//                     createUserInDb(null, {name: "Roy Macdonald", email:"macdonald.roy@protonmail.com"}, userTypes().instructor, null, "XIWfFl9mm0GxYZb7svG6")
+//                     }
+//                 tooltip="Add users"
+//                 tooltipOptions={{position:'right'}}
+//             /> 
+// }
  
 
 
@@ -403,9 +403,9 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
-                    <li>
-                    <AddUsersButton />
-                    </li>
+                    {/* <li> */}
+                    {/* <AddUsersButton /> */}
+                    {/* </li> */}
                 </ul>
             
               
