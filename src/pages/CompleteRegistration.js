@@ -154,6 +154,7 @@ export default function CompleteRegistration(props)  {
                                     
                                     if(querySnapshot.docs.length > 0){
                                         await db.collection("users").doc(result.user.uid).set( querySnapshot.docs[0].data(), { merge: false });
+                                        await db.collection("users").doc(result.user.uid).update({id: result.user.uid});
                                         await swapUserId( querySnapshot.docs[0].id, result.user.uid);
                                         await db.collection("users").doc(querySnapshot.docs[0].id).delete();
                                     }
