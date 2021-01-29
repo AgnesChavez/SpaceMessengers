@@ -1,18 +1,19 @@
 import React from "react";
-import { TextInput, Row, Modal, Button  } from 'react-materialize';
+import { TextInput, Row, Modal, Button } from 'react-materialize';
+
+import { CenteredPreloader } from '../components/CenteredPreloader'
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
 import { createBoard, createTeam, addUserToTeam } from '../helpers/factory'
 
-import { SelectUser } from './SelectUser'
+import { SelectUser, SelectSchool, SelectUserTypeButtons } from './Selectors'
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
-// import { getWorkshopStudents } from "../helpers/userManagement";
+import { userTypes } from "../helpers/Types"
 
-// import {useAsync} from 'react-use';
-
+import { createUserInDb } from "../helpers/userManagement"
 
 
 function openModal(id, onOpenStart=null){
@@ -166,20 +167,10 @@ export function ModalCreateTeam(props){
 				/>
 			</Row>
 
-
-		
-			{/* {/* <div style={{display: "flex"}}> */}
-			{ selectedUsers.map(u => <SelectUser  selectorId = {i++} key={i} value={u}  onChange={onChange} usersArray={props.currentWorkshop.students} />)}
+			{ selectedUsers.map(u => <SelectUser  selectorId = {i++} key={i} value={u}  onChange={onChange} usersArray={props.currentWorkshop.students.concat(props.currentWorkshop.instructors)} />)}
 			
 			
 			<SelectUser selectorId = {selectedUsers.length} value={""} onChange={onChange} usersArray={props.currentWorkshop.students} />
-
-			{/* Modal content */}
-{/*  */}
-{/* 			<ul> */}
-{/* 				{props.users.map(usr=> <li key={usr}>{usr}</li>)} */}
-{/* 			</ul> */}
-
 
         </Modal>
 }
@@ -235,7 +226,79 @@ export function ModalAddUserToTeam(props){
 }
 
 
+export function ModalCreateUser(props){
 
+	const school = useRef(null);
+	const type = useRef(userTypes().student);
+	const name = useRef("");
+	const email = useRef("");
+
+	const [creating, setCreating ] = useState(false);
+
+	function onSchoolChange(e) {
+		school.current = e.target.value;
+		console.log(e.target.value);
+	}
+	function onUserTypeChange(e) {
+		type.current = e.target.value;
+		console.log(e.target.value);
+	}
+
+	async function create(){
+		setCreating(true);		
+		await createUserInDb(null, {name: name.current, email: email.current}, type.current, school.current, props.currentWorkshop.id) ;
+		window.M.toast({html: "Successfully created user", displayLength: 2500});
+		closeModal("ModalCreateUser");
+	}
+
+	return (<>
+
+		<Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalCreateUser"
+  		  	node="button"
+  		>
+     	Create User
+  		</Button>
+		<Modal
+    		actions={[    
+    			<Button className="teal"  node="button" waves="light" onClick={create} >Create</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Create a new user"
+    		id="ModalCreateUser"
+    		root={document.getElementById('modalRoot')}
+  		>	
+  			
+  			{creating?
+  				<CenteredPreloader title="Creating uset"/>:
+  			<form>
+  				<TextInput
+				  	id="ModalCreateUserName"
+				  	label="Name"
+				  	validate
+				  	placeholder="Name"
+				  	onChange={(e)=> name.current = e.target.value}
+				/>
+  				<TextInput
+				  	email
+				  	id="ModalCreateUserEmail"
+				  	label="Email"
+				  	validate
+				  	placeholder="Email"
+				  	onChange={(e)=> email.current = e.target.value}
+				/>
+  				<p>Select the user's school</p>
+				<SelectSchool currentWorkshop={props.currentWorkshop} selectorId={"ModalCreateUserSelectSchool"} onChange={onSchoolChange}/>
+				<p>Select the user's type</p>
+				<SelectUserTypeButtons selectorId={"ModalCreateUserSelectUserType"} onChange={onUserTypeChange}/>
+			</form>
+		}
+        </Modal>
+        </>)
+}
 
 
 
