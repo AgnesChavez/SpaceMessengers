@@ -301,57 +301,15 @@ export default function Board() {
                 currentUserRef.update({currentTeam: currentUser.team});
             }else{
                 updateCurrentUser("teams", 'members', "currentTeam", null);
-                // db.collection("teams").where("members", "array-contains", currentUser.id).get()
-                // .then(function(querySnapshot) {
-                //     if(querySnapshot.docs.length){
-                //         console.log("currentUser.team 1");
-                //         currentUserRef.update({currentTeam: querySnapshot.docs[0].id});
-                //     }
-                // })
-                // .catch(function(error) {
-                //     console.log("Error getting documents: ", error);
-                // });
             }
         }
         if(currentUser.currentWorkshop === null){
             if(currentUser.type === userTypes().admin){
                 updateCurrentUser("workshops", null, "currentWorkshop","created");
-                // db.collection("workshops").orderBy("created", "desc").limit(1).get()
-                // .then(function(querySnapshot) {
-                //     if(querySnapshot.docs.length){
-                //         console.log("currentUser.currentWorkshop");
-                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                //     }
-                // })
-                // .catch(function(error) {
-                //     console.log("Error getting documents: ", error);
-                // });
             }else if(currentUser.type === userTypes().instructor){
                 updateCurrentUser("workshops", 'instructors', "currentWorkshop","created");
-
-                // db.collection("workshops").where('instructors', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
-                // .then(function(querySnapshot) {
-                //     if(querySnapshot.docs.length){
-                //         console.log("currentUser.instructors");
-                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                //     }
-                // })
-                // .catch(function(error) {
-                //     console.log("Error getting documents: ", error);
-                // });
-
             }else if(currentUser.type === userTypes().student){
                 updateCurrentUser("workshops", 'students', "currentWorkshop","created");
-                // db.collection("workshops").where('students', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
-                // .then(function(querySnapshot) {
-                //     if(querySnapshot.docs.length){
-                //         console.log("currentUser.students");
-                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                //     }
-                // })
-                // .catch(function(error) {
-                //     console.log("Error getting documents: ", error);
-                // });                
             }
         }
     }
