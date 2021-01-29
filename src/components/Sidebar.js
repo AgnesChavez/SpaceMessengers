@@ -25,7 +25,14 @@ import '../css/board.css';
 
 import Renameable from './Renameable'
 
-import { ModalCreateWorkshop, CreateWorkshopModalButton,  ModalAddBoard, openAddBoardModal, ModalCreateTeam, CreateTeamModalButton, ModalAddUserToTeam } from './Modals'
+import {ModalCreateWorkshop,
+        CreateWorkshopModalButton,
+        ModalAddBoard,
+        openAddBoardModal,
+        ModalCreateTeam,
+        CreateTeamModalButton,
+        ModalAddUserToTeam,
+        ModalCreateUser } from './Modals'
 
 import { removeUserFromTeam } from '../helpers/factory'
 
@@ -328,8 +335,9 @@ function initCollapsibles(elementSelector, isAccordion = false)
     
 }
 function SelectWorkshop(props){
-    if(props.workshops.length === 0) return null;
+    if(props.workshops.length === 0) return "";
     return (<>
+        <div>
         <form>
             <label>Select Workshop</label>
             <select className="browser-default"  onChange={(evt)=> setCurrentWorkshop(props.userId, evt.target.value)}>
@@ -339,6 +347,7 @@ function SelectWorkshop(props){
                 {/* <option value="B">B</option> */}
             </select>
         </form>
+        </div>
     </>)
 }
 
@@ -377,11 +386,15 @@ function SidebarWorkshopCollection(props){
         <>
             { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
 
+            { currentWorkshop && (props.user.type === userTypes().admin) && <ModalCreateUser currentWorkshop={currentWorkshop}/> }
+
+
             { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
 
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
+            
 
         </>)
 }
@@ -445,7 +458,7 @@ export function Sidebar(props) {
                 tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
             }
             if(!sidenavRef.current){
-                sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left"  });
+                sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left", preventScrolling: false  });
                 // sidenavRef.current.open();
                 // sidenavRef.current.isOpen = true;
                 // console.log("initing sidenav");
