@@ -187,7 +187,7 @@ export default function CompleteRegistration(props)  {
         <div className="container black-text">
             <div className="card-panel white registration-card">
                 <div className='row'>
-                    <h4 className="center-align" >Complete your registration to Space Messengers</h4>
+                    <h4 className="center-align" >Logging you into Space Messengers...</h4>
                     <DrawError error={error.current} state={state} />
                     <RequestEmail handleSubmit={handleSubmit} emailInputRef={emailInputRef} state={state} />
                     <Verifying state={state}/>
