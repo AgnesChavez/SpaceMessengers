@@ -272,6 +272,7 @@ export default function Board() {
         setBoardIdState(bid);
         if(bid &&currentUser && !currentUserLoading){
             if(currentUser.currentBoard !== bid){
+                console.log("setBoardId");
                 currentUserRef.update({currentBoard: bid});
             }
         }
@@ -294,11 +295,13 @@ export default function Board() {
         }
         if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
             if(currentUser.team){
+                console.log("currentUser.team 0");
                 currentUserRef.update({currentTeam: currentUser.team});
             }else{
                 db.collection("teams").where("members", "array-contains", currentUser.id).get()
                 .then(function(querySnapshot) {
                     if(querySnapshot.docs.length){
+                        console.log("currentUser.team 1");
                         currentUserRef.update({currentTeam: querySnapshot.docs[0].id});
                     }
                 })
@@ -312,6 +315,7 @@ export default function Board() {
                 db.collection("workshops").orderBy("created", "desc").limit(1).get()
                 .then(function(querySnapshot) {
                     if(querySnapshot.docs.length){
+                        console.log("currentUser.currentWorkshop");
                         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
                     }
                 })
@@ -322,6 +326,7 @@ export default function Board() {
                 db.collection("workshops").where('instructors', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
                 .then(function(querySnapshot) {
                     if(querySnapshot.docs.length){
+                        console.log("currentUser.instructors");
                         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
                     }
                 })
@@ -333,6 +338,7 @@ export default function Board() {
                 db.collection("workshops").where('students', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
                 .then(function(querySnapshot) {
                     if(querySnapshot.docs.length){
+                        console.log("currentUser.students");
                         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
                     }
                 })
@@ -343,14 +349,7 @@ export default function Board() {
         }
     }
 
-//     if(boardId === null){
-// 
-//     }
-// 
-//     
-//         
-    
-    
+        
 
     return ( <>
         <div id="boardContainer">   
@@ -359,7 +358,7 @@ export default function Board() {
 
             <div id="left"></div>
             <div id="center">
-                {(boardId !== null && currentUser && !currentUserLoading && (currentUser.type !== userTypes().student || usersMap.hasOwnProperty(currentUser.id)))?
+                {(boardId !== null && currentUser && !currentUserLoading )?
                     <Button
                         className="red right boardButtonRight"
                         floating

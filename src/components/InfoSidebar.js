@@ -66,7 +66,7 @@ export function InfoSidebar(props){
 
     return (<>
         <div id="InfoSidebarContainer" style={{transform: "translateX("+(props.isOpen?0:300)+"px)"}}>
-        <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text" >}
+        <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text" >
 
     <div id="TabsContainer" className="fullheight">
 
