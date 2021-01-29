@@ -1,7 +1,7 @@
 
 import React,  { useEffect, useState, useRef} from "react";
 
-import CenteredPreloader from '../components/CenteredPreloader'
+import { CenteredPreloader } from '../components/CenteredPreloader'
 
 import { useDownloadURL } from 'react-firebase-hooks/storage';
 
@@ -48,7 +48,7 @@ export default  function Gallery(props) {
 	let [imagesRefs, setImagesRefs] = useState(null);
 	let [refsLoaded, setRefsLoaded] = useState(false);
 	
-	let originalBg  = useRef(null);
+	// let originalBg  = useRef(null);
 	
 
 	useEffect(()=>{
@@ -59,24 +59,24 @@ export default  function Gallery(props) {
 			}).catch((error)=> {
   				console.log("Loading gallery failed with error:", error);
 			});
-			if(originalBg.current === null){
-				originalBg.current = document.querySelector('body').style.backgroundImage;
-				document.querySelector('body').style.backgroundColor = "black";
-				document.querySelector('body').style.backgroundImage = "unset";	
-			}
+			// if(originalBg.current === null){
+			// 	originalBg.current = document.querySelector('body').style.backgroundImage;
+			// 	document.querySelector('body').style.backgroundColor = "black";
+			// 	document.querySelector('body').style.backgroundImage = "unset";	
+			// }
 			
 		}
-		return (()=>{
-			if(originalBg.current){
-				document.querySelector('body').style.backgroundColor = "unset";
-				document.querySelector('body').style.backgroundImage = originalBg.current;		
-			}
-		})
+		// return (()=>{
+			// if(originalBg.current){
+			// 	document.querySelector('body').style.backgroundColor = "unset";
+			// 	document.querySelector('body').style.backgroundImage = originalBg.current;		
+			// }
+		// })
 	});
 
 
 	return <>
-	
+		<div id="galleryContainer"> 
 		<div id="gallery"> 
   <Link to={"/board"} >
 	<Button
@@ -102,5 +102,6 @@ export default  function Gallery(props) {
 			}
 			</div>
 		</div>
+	</div>
 	</>
 }
