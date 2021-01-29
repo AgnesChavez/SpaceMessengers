@@ -290,12 +290,12 @@ export default class UserProfile extends Component {
                         }
                         { this.userProp("Bio",  this.state.dbUser , "bio", true, this.handleChangeDbUser)}
                         { this.userProp("Location",  this.state.dbUser, "location", true, this.handleChangeDbUser)}
-                        { this.userProp("Type",  this.state.dbUser, "type", false, null)}
+                        {/* { this.userProp("Type",  this.state.dbUser, "type", false, null)} */}
                         
                         { this.userProp("Email",  this.state.user, "email", false, null)}
-                        { this.userProp("User Id", this.state.user, "uid", false, null)}
+                        {/* { this.userProp("User Id", this.state.user, "uid", false, null)} */}
 
-                        <label htmlFor="types">Select user type:</label>
+                        {/* <label htmlFor="types">Select user type:</label> */}
 
                         {/* <select style={{display:"unset"}} name="types" id="types" onChange={this.setUserType}> */}
                         {/*   <option value={userTypes().student}>Student</option> */}
