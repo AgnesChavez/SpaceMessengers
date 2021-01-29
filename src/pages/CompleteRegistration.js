@@ -176,7 +176,7 @@ export default function CompleteRegistration(props)  {
     async function handleSubmit(event) {
         event.preventDefault();
         if(emailInputRef.current){
-            email.current = emailInputRef.current.value;
+            email.current = emailInputRef.current.value.trim().toLowerCase();
             verifyRegistration();
         }else{
             console.log("invalid emailInputRef", emailInputRef.current);
