@@ -183,7 +183,7 @@ export default function Login(props)  {
         event.preventDefault();
         if((state === requestingEmail || state ===  invalidEmail ) && emailInputRef.current){
             error.current = null;
-                email.current = emailInputRef.current.value;
+                email.current = emailInputRef.current.value.trim().toLowerCase();
             try {
                 setState(verifyingLogin);
 

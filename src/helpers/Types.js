@@ -61,7 +61,7 @@ export function UserData(uid, data, type, institutionId, workshopId) {
     created: firebase.firestore.FieldValue.serverTimestamp(),
   };
   if(data.name) u.displayName = data.name;
-  if(data.email) u.email = data.email;
+  if(data.email) u.email = data.email.trim().toLowerCase();
   if(data.team){
     u.team = data.team; 
     u.currentTeam = data.team;
