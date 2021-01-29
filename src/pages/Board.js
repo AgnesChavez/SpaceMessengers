@@ -23,7 +23,7 @@ import {  addBoardToUser } from '../helpers/factory'
 // import {  makeDefaultBoard } from '../helpers/factory' 
 // import {  createSchool } from '../helpers/factory'
 // import {  createUser } from '../helpers/factory'
-import { createUserInDb } from '../helpers/userManagement'
+// import { createUserInDb } from '../helpers/userManagement'
 
 
 import { UploadImgButton } from '../helpers/imgStorage'
@@ -52,24 +52,6 @@ function toggleSideElement(side, open){
         console.log('side element with id "'+ side + '" does not exist');
     }
 }
-
-// 
-// function AddUsersButton(props){
-//     return <Button
-//                 id="AddUsers"
-//                 className="cyan boardButtonLeft"
-//                 floating
-//                 icon={<Icon>person_add</Icon>}
-//                 node="button"
-//                 waves="light"
-//                 onClick={()=>
-//                     createUserInDb(null, {name: "Roy Macdonald", email:"macdonald.roy@protonmail.com"}, userTypes().instructor, null, "XIWfFl9mm0GxYZb7svG6")
-//                     }
-//                 tooltip="Add users"
-//                 tooltipOptions={{position:'right'}}
-//             /> 
-// }
- 
 
 
 
@@ -280,6 +262,26 @@ export default function Board() {
    
 
     
+    function updateCurrentUser(collection, arrayName, propName, orderBy){
+        let ref = db.collection(collection);
+        if(arrayName){
+            ref.where(arrayName, "array-contains", currentUser.id);
+        }
+        if(orderBy){
+            ref.orderBy(orderBy, "desc")
+        }
+        ref.limit(1).get()
+        .then(function(querySnapshot) {
+            if(querySnapshot.docs.length){
+                console.log("currentUser.instructors");
+                currentUserRef.update({[propName]: querySnapshot.docs[0].id});
+            }
+        })
+        .catch(function(error) {
+            console.log("Error getting documents: ", error);
+        });
+    }
+
     if(currentUser && !currentUserLoading){
         if(boardId === null || boardId === 'default'){
             if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
@@ -298,53 +300,58 @@ export default function Board() {
                 console.log("currentUser.team 0");
                 currentUserRef.update({currentTeam: currentUser.team});
             }else{
-                db.collection("teams").where("members", "array-contains", currentUser.id).get()
-                .then(function(querySnapshot) {
-                    if(querySnapshot.docs.length){
-                        console.log("currentUser.team 1");
-                        currentUserRef.update({currentTeam: querySnapshot.docs[0].id});
-                    }
-                })
-                .catch(function(error) {
-                    console.log("Error getting documents: ", error);
-                });
+                updateCurrentUser("teams", 'members', "currentTeam", null);
+                // db.collection("teams").where("members", "array-contains", currentUser.id).get()
+                // .then(function(querySnapshot) {
+                //     if(querySnapshot.docs.length){
+                //         console.log("currentUser.team 1");
+                //         currentUserRef.update({currentTeam: querySnapshot.docs[0].id});
+                //     }
+                // })
+                // .catch(function(error) {
+                //     console.log("Error getting documents: ", error);
+                // });
             }
         }
         if(currentUser.currentWorkshop === null){
             if(currentUser.type === userTypes().admin){
-                db.collection("workshops").orderBy("created", "desc").limit(1).get()
-                .then(function(querySnapshot) {
-                    if(querySnapshot.docs.length){
-                        console.log("currentUser.currentWorkshop");
-                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                    }
-                })
-                .catch(function(error) {
-                    console.log("Error getting documents: ", error);
-                });
+                updateCurrentUser("workshops", null, "currentWorkshop","created");
+                // db.collection("workshops").orderBy("created", "desc").limit(1).get()
+                // .then(function(querySnapshot) {
+                //     if(querySnapshot.docs.length){
+                //         console.log("currentUser.currentWorkshop");
+                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                //     }
+                // })
+                // .catch(function(error) {
+                //     console.log("Error getting documents: ", error);
+                // });
             }else if(currentUser.type === userTypes().instructor){
-                db.collection("workshops").where('instructors', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
-                .then(function(querySnapshot) {
-                    if(querySnapshot.docs.length){
-                        console.log("currentUser.instructors");
-                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                    }
-                })
-                .catch(function(error) {
-                    console.log("Error getting documents: ", error);
-                });
+                updateCurrentUser("workshops", 'instructors', "currentWorkshop","created");
+
+                // db.collection("workshops").where('instructors', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
+                // .then(function(querySnapshot) {
+                //     if(querySnapshot.docs.length){
+                //         console.log("currentUser.instructors");
+                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                //     }
+                // })
+                // .catch(function(error) {
+                //     console.log("Error getting documents: ", error);
+                // });
 
             }else if(currentUser.type === userTypes().student){
-                db.collection("workshops").where('students', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
-                .then(function(querySnapshot) {
-                    if(querySnapshot.docs.length){
-                        console.log("currentUser.students");
-                        currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
-                    }
-                })
-                .catch(function(error) {
-                    console.log("Error getting documents: ", error);
-                });                
+                updateCurrentUser("workshops", 'students', "currentWorkshop","created");
+                // db.collection("workshops").where('students', "array-contains", currentUser.id).orderBy("created", "desc").limit(1).get()
+                // .then(function(querySnapshot) {
+                //     if(querySnapshot.docs.length){
+                //         console.log("currentUser.students");
+                //         currentUserRef.update({currentWorkshop: querySnapshot.docs[0].id});
+                //     }
+                // })
+                // .catch(function(error) {
+                //     console.log("Error getting documents: ", error);
+                // });                
             }
         }
     }
@@ -402,9 +409,6 @@ export default function Board() {
                     <li>
                         <UploadImgButton/>
                     </li>
-                    {/* <li> */}
-                    {/* <AddUsersButton /> */}
-                    {/* </li> */}
                 </ul>
             
               
