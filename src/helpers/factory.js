@@ -128,6 +128,21 @@ export async function removeUserFromTeam(userId, teamId){
 }
 
 
+export async function removeTeam(teamId){
+	let team = await getQueryData(db.collection("teams").doc(teamId));
+	if(team){
+		let success = removeDoc("teams", teamId);
+		if(success){
+			let boards = await db.collection('boards').where('teamId', '==', teamId).get();
+			boards.forEach( b => removeBoard(b.id));
+
+			return true;
+		}
+	}
+	return false;
+}
+
+
 const MAKE_DUMMY_USERS = true;
 
 export async  function createUser( userData, type, institutionId, workshopId)
@@ -200,6 +215,15 @@ export function removeUserFromWorkshop(userId, workshopId, userType){
     }
 }    
 
+export async function removeDoc(collectionId, docId){
+	try{
+		await db.collection(collectionId).doc(docId).delete();		
+		return true;
+	}catch(error){
+		console.log("Unable to remove Document " + collectionId +"."+ docId );
+		return false;
+	}
+}
 
 
 
