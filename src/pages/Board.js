@@ -296,12 +296,7 @@ export default function Board() {
             }
         }
         if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
-            if(currentUser.team){
-                console.log("currentUser.team 0");
-                currentUserRef.update({currentTeam: currentUser.team});
-            }else{
-                updateCurrentUser("teams", 'members', "currentTeam", null);
-            }
+              updateCurrentUser("teams", 'members', "currentTeam", null);
         }
         if(currentUser.currentWorkshop === null){
             if(currentUser.type === userTypes().admin){
