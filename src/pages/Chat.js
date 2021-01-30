@@ -53,21 +53,18 @@ export default function Chat(props) {
 
 
     const getUser = (uid) =>{
-        // console.log("getUser " + uid, props.getUser);
         return props.getUser(uid);
     }
 
-    // console.log("messages  isComment: " + props.isComment, messages, "props.getUser", props.getUser);
-    // console.log("loadingMessages ", loadingMessages ,
-    // "props.getUser ", props.getUser ,
-    // "messages ", messages
+
     return (<>
         <div className="chatContainer"
             style={props.isComment?({backgroundColor: props.bgColor}):{}}
         >
         <div className={props.containerClass}>
         <ul>
-            {!loadingMessages && props.getUser && messages && messages.slice(0).reverse().map(msg => <ChatMessage key={msg.id} message={msg} user={getUser(msg.uid)} isComment={props.isComment} />)}
+            {!loadingMessages && props.getUser && messages && messages.slice(0).reverse().map(msg => 
+                <RenderMessage key={msg.id} user={getUser(msg.uid)} isComment={props.isComment} message={msg} />)}
         </ul>
         <span ref={dummy}></span>
         </div>
@@ -102,11 +99,11 @@ function RenderMessage( props){
         }
     }
 
-    const messageClass = (!props.isComment && props.uid === auth().currentUser.uid)?"ownChatMessage":"";
+    const messageClass = (!props.isComment && props.message.uid === auth().currentUser.uid)?"ownChatMessage":"";
 
 return (<>
 
-    <li id={"chatmessage-"+props.id}
+    <li id={"chatmessage-"+props.message.id}
                 className= {"z-depth-0  " + (props.isComment? "messageComment":"card chatMessage ") + messageClass}
                 style={style}
             >
@@ -117,15 +114,9 @@ return (<>
                 <span className="black-text">{props.user?props.user.displayName:""}</span> 
             </div>
             <div className="messageCard-content white-text">
-                {props.content}
+                {props.message.content}
             </div>
     </li>    
   </>);
 }
 
-function ChatMessage(props) {
-    // console.log("ChatMessage: ", props );
-    return <RenderMessage user={props.user} isComment={props.isComment} {...props.message} /> ;
-    // return (props.isComment?<RenderComment user={props.user} {...props.message} />:
-    //                         <RenderMessage user={props.user} {...props.message} />);
-}
