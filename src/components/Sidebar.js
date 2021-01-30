@@ -33,7 +33,9 @@ import {ModalCreateWorkshop,
         CreateTeamModalButton,
         ModalAddUserToTeam,
         ModalCreateUser,
-        ModalRemoveUser } from './Modals'
+        ModalRemoveUser,
+        ModalRemoveTeam,
+        ModalRemoveTeamButton } from './Modals'
 
 import { removeUserFromTeam } from '../helpers/factory'
 
@@ -314,7 +316,7 @@ function SidebarTeamCollection(props){
             </ul> 
 
             <CreateTeamModalButton/>
-
+            <ModalRemoveTeamButton/>
         </>
     );
 }
@@ -394,6 +396,7 @@ function SidebarWorkshopCollection(props){
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
 
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
+            { currentWorkshop && (props.user.type !== userTypes().student) && <ModalRemoveTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
             
 
