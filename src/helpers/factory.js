@@ -1,7 +1,7 @@
 
 import { db } from "../services/firebase";
 
-import {  getQueryData, addDataToDb, addToArray, setDataInDb } from './db'
+import {  getQueryData, addDataToDb, addToArray, setDataInDb, removeFromArray } from './db'
 
 import firebase from 'firebase/app';
 
@@ -77,16 +77,37 @@ export async function removeBoard(boardId){
         });
 }
 
+function doIfUserExists(userId, func){
+	
+	let userRef = db.collection('users').doc(userId);
+
+	userRef.get().then(function(doc) {
+    if (doc.exists) {
+    	func(userRef, doc);
+        // console.log("Document data:", doc.data());
+    } else {
+        // doc.data() will be undefined in this case
+        // console.log("No such document!");
+    }
+	}).catch(function(error) {
+    	console.log("Error getting user:", error);
+	});
+
+}
+
+
 export function addBoardToUser(boardId, userId){
-	db.collection('users').doc(userId).update({
-                        boards: firebase.firestore.FieldValue.arrayUnion(boardId)
-                    });
+
+	doIfUserExists(userId, (userRef, userData) =>{
+		userRef.update({boards: firebase.firestore.FieldValue.arrayUnion(boardId)});}
+		);
+	
 }
 
 export function removeBoardFromUser(boardId, userId){
-	db.collection('users').doc(userId).update({
-                        boards: firebase.firestore.FieldValue.arrayRemove(boardId)
-                    });
+	doIfUserExists(userId, (userRef, userData)=>{
+		userRef.update({boards: firebase.firestore.FieldValue.arrayRemove(boardId)});}
+		);
 }
 
 export async function addUserToTeam(userId, teamId){
@@ -167,6 +188,17 @@ export function addUserToWorkshop(userId, workshopId, userType){
         addToArray("workshops", workshopId, "students", userId);    
     }
 }
+
+export function removeUserFromWorkshop(userId, workshopId, userType){
+
+    if(userType === userTypes().instructor){
+        removeFromArray("workshops", workshopId, "instructors", userId);    
+    }
+
+    if(userType === userTypes().student){
+        removeFromArray("workshops", workshopId, "students", userId);    
+    }
+}    
 
 
 
