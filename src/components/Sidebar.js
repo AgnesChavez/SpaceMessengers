@@ -32,7 +32,8 @@ import {ModalCreateWorkshop,
         ModalCreateTeam,
         CreateTeamModalButton,
         ModalAddUserToTeam,
-        ModalCreateUser } from './Modals'
+        ModalCreateUser,
+        ModalRemoveUser } from './Modals'
 
 import { removeUserFromTeam } from '../helpers/factory'
 
@@ -117,7 +118,7 @@ function RenderUsers(props)
                         e.preventDefault();
                         e.stopPropagation();
                         addUserTo(props.newUserDestination)
-                        console.log(props.name+ " button clicked");
+                        // console.log(props.name+ " button clicked");
                     }}
                 >
                     <i className=" tiny material-icons">add_circle_outline</i>
@@ -356,12 +357,12 @@ function setCurrentWorkshop(userId, currentWorkshopId){
 }
 
 function SidebarWorkshopCollection(props){
-    const [workshops] = useCollectionData(getWorkshopQueryForUser(props.user)); 
+    const [workshops, workshopsLoading] = useCollectionData(getWorkshopQueryForUser(props.user)); 
     
     // useEffect(() => initCollapsibles(".SidebarWorkshopCollection"));
 
     
-    if(props.user.type === userTypes().student && ( !workshops || ( workshops && workshops.length === 0 ))) 
+    if(props.user.type === userTypes().student && !workshopsLoading && ( !workshops || ( workshops && workshops.length === 0 ))) 
         return (<h6>You are not part of any workshop!</h6> );
     
     let currentWorkshop = null; 
@@ -387,7 +388,7 @@ function SidebarWorkshopCollection(props){
             { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
 
             { currentWorkshop && (props.user.type === userTypes().admin) && <ModalCreateUser currentWorkshop={currentWorkshop}/> }
-
+            { currentWorkshop && (props.user.type === userTypes().admin) && <ModalRemoveUser currentWorkshop={currentWorkshop}/> }
 
             { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
@@ -458,7 +459,7 @@ export function Sidebar(props) {
                 tabsRef.current = window.M.Tabs.init(el.querySelector(".tabs"), null);
             }
             if(!sidenavRef.current){
-                sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left", preventScrolling: false  });
+                sidenavRef.current = window.M.Sidenav.init(el, {  draggable: true, edge: "left", preventScrolling: true  });
                 // sidenavRef.current.open();
                 // sidenavRef.current.isOpen = true;
                 // console.log("initing sidenav");
