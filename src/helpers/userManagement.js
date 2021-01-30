@@ -5,9 +5,9 @@ import firebase from "firebase";
 
 import { UserData, userTypes } from "./Types"
 
-import { getQueryData, setDataInDb, addDataToDb } from "./db"
+import { getQueryData, setDataInDb, addDataToDb, removeFromArray } from "./db"
 
-import { createTeam, addUserToTeam, addUserToWorkshop } from './factory'
+import { createTeam, addUserToTeam, addUserToWorkshop,removeUserFromWorkshop } from './factory'
 
 // export function createNewUser(_email, _name, _type=userTypes().student) {
 export async function sendLogInEmail(email){
@@ -106,6 +106,30 @@ export async function createUserInDb(uid, userData, type, institutionId, worksho
     return userId;
 }
 
+export async function removeUser(userId) {
+    let user = await getUserFromDb(userId);
+    if(user){
+        if(user.type !== userTypes().admin){
+            let workshops = await db.collection("workshops")
+                .where((user.type === userTypes().instructor)?"instructors":"students", "array-contains", userId).get();
+            workshops.forEach(ws=> removeUserFromWorkshop(userId, ws.id, user.type));
+        
+            let teams = await db.collection("teams").where("members", "array-contains", userId).get();
+            teams.forEach(team=> removeFromArray("teams", team.id, "members", userId));
+        
+            let schools = await db.collection("institution").where("members", "array-contains", userId).get();
+            schools.forEach(school=> removeFromArray("institution", school.id, "members", userId));
+        }
+        try{
+            await db.collection("users").doc("userId").delete();
+            return true;
+        }catch(error) {
+            console.error("Error removing user: ", error);
+            return false;
+        }
+    }
+    return false;
+}
 
 
 
@@ -147,8 +171,6 @@ export async function checkCurrentUserDbData(){
     if(needsUpdate){
         query.update(dataToUpdate);
     }
-
-
 
 }
 
