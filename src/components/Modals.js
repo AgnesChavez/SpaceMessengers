@@ -5,9 +5,9 @@ import { CenteredPreloader } from '../components/CenteredPreloader'
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
-import { createBoard, createTeam, addUserToTeam } from '../helpers/factory'
+import { createBoard, createTeam, removeTeam, addUserToTeam } from '../helpers/factory'
 
-import { SelectUser, SelectSchool, SelectUserTypeButtons } from './Selectors'
+import { SelectUser, SelectSchool, SelectUserTypeButtons, SelectTeam } from './Selectors'
 
 import { useState, useRef } from "react";
 
@@ -311,9 +311,14 @@ export function ModalRemoveUser(props){
 	}
 
 	async function remove(){
-		setRemoving(true);		
-		let success = await removeUser(selectedUser.current);
-		let toastMsg = (success?"Successfully removed user":"Failed to remove user")
+		let toastMsg = "";
+		if(selectedUser.current){
+			setRemoving(true);		
+			let success = await removeUser(selectedUser.current);
+			 toastMsg = (success?"Successfully removed user":"Failed to remove user")
+		}else{
+			toastMsg = "No user was removed."
+		}
 		window.M.toast({html: toastMsg, displayLength: 2500});
 		closeModal("ModalRemoveUser");
 	}
@@ -329,7 +334,7 @@ export function ModalRemoveUser(props){
   		</Button>
 		<Modal
     		actions={[    	
-    			<Button className="teal"  node="button" waves="light" onClick={remove} >Remove</Button>,
+    			<Button className="red"  node="button" waves="light" onClick={remove} >Remove</Button>,
       			<Button flat modal="close" node="button" waves="red">Cancel</Button>
     		]}
     		className="black-text"
@@ -347,6 +352,65 @@ export function ModalRemoveUser(props){
         </Modal>
         </>)
 }
+export function ModalRemoveTeamButton(props){
+		
+	return <Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalRemoveTeam"
+  		  	node="button"
+  		>
+     	Remove Team
+  		</Button>
+}
+
+export function ModalRemoveTeam(props){
+
+	const selectedTeam = useRef(null);
+	const [removing, setRemoving] = useState(false);
+	function onChange(e, selectorId){
+		if(!e.target.value)return;
+		selectedTeam.current = e.target.value;
+		console.log("selectedTeam.current: ", selectedTeam.current);
+	}
+
+	async function remove(){
+		let toastMsg = "";
+		if(selectedTeam.current){
+			setRemoving(true);
+			let success = await removeTeam(selectedTeam.current);
+			toastMsg = (success?"Successfully removed team":"Failed to remove team")
+		}else{
+			toastMsg = "No team was removed";
+		}
+		window.M.toast({html: toastMsg, displayLength: 2500});
+		closeModal("ModalRemoveTeam");
+	}
+
+	return (<>
+		<Modal
+    		actions={[    	
+    			<Button className="red"  node="button" waves="light" onClick={remove} >Remove</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Remove team"
+    		id="ModalRemoveTeam"
+    		root={document.getElementById('modalRoot')}
+  		>			
+  			{removing?
+  				<CenteredPreloader title="Creating user"/>:
+  				<>
+				<p>Select team to remove:</p>
+				<SelectTeam selectorId = {"ModalRemoveTeamSelector"} value={""} onChange={onChange} currentWorkshop={props.currentWorkshop} />
+				</>
+			}
+        </Modal>
+        </>)
+}
+
+
+
 
 
 
