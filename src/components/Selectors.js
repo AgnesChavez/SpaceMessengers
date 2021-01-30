@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useDocumentData } from 'react-firebase-hooks/firestore';
+import { useDocumentData, useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { db } from "../services/firebase";
 
@@ -19,6 +19,21 @@ function RenderOption(props)
   return null;
 }
 
+function RenderTeamOption(props)
+{
+  let [team, teamLoading] = useDocumentData(db.collection('teams').doc(props.teamId));
+
+  if(team && ! teamLoading){
+      return (
+        <>
+            <option key={team.id} value={team.id}> {team.name} </option>
+        </>);  
+  }
+  return null;
+}
+
+
+
 export function SelectUser(props){
 
   if(props.usersArray){
@@ -34,6 +49,31 @@ return <form>
             </select>
         </form>
 }
+
+export function SelectTeam(props){
+  let [teams, teamsLoading] = useCollectionData(db.collection('teams').where("workshopId", "==", props.currentWorkshop.id ));
+  if(props.usersArray){
+    props.usersArray.sort();
+  }
+
+if(teamsLoading){
+  return <p>Loading teams</p>
+}
+if(!teamsLoading && (!teams || (teams && teams.length === 0))){
+  return <p>No teams available</p>
+}
+
+return <form>
+        <label>Select team</label>
+            <select defaultValue={props.value} onChange={(e)=>props.onChange(e, props.selectorId)} className="browser-default"  >
+                <option value="" disabled >Select a team</option>
+                
+                {!teamsLoading && teams && teams.map(team => <RenderTeamOption key={team.id} teamId={team.id} /> )} 
+            </select>
+        </form>
+}
+
+
 
 
 function RadioGroupItem(props){
