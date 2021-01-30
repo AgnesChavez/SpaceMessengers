@@ -13,7 +13,7 @@ import { useState, useRef } from "react";
 
 import { userTypes } from "../helpers/Types"
 
-import { createUserInDb } from "../helpers/userManagement"
+import { createUserInDb, removeUser } from "../helpers/userManagement"
 
 
 function openModal(id, onOpenStart=null){
@@ -273,7 +273,7 @@ export function ModalCreateUser(props){
   		>	
   			
   			{creating?
-  				<CenteredPreloader title="Creating uset"/>:
+  				<CenteredPreloader title="Creating user"/>:
   			<form>
   				<TextInput
 				  	id="ModalCreateUserName"
@@ -299,6 +299,55 @@ export function ModalCreateUser(props){
         </Modal>
         </>)
 }
+
+function ModalRemoveUser(props){
+
+	const selectedUser = useRef(null);
+	const [removing, setRemoving] = useState(false);
+	function onChange(e, selectorId){
+		if(!e.target.value)return;
+		selectedUser.current = e.target.value;
+		console.log("selectedUser.current: ", selectedUser.current);
+	}
+
+	async function remove(){
+		setRemoving(true);		
+		let success = await removeUser(selectedUser.current);
+		let toastMsg = (success?"Successfully removed user":"Failed to remove user")
+		window.M.toast({html: toastMsg, displayLength: 2500});
+		closeModal("ModalRemoveUser");
+	}
+
+	return (<>
+		<Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalRemoveUser"
+  		  	node="button"
+  		>
+     	Remove User
+  		</Button>
+		<Modal
+    		actions={[    	
+    			<Button className="teal"  node="button" waves="light" onClick={remove} >Remove</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Remove user"
+    		id="ModalRemoveUser"
+    		root={document.getElementById('modalRoot')}
+  		>			
+  			{removing?
+  				<CenteredPreloader title="Creating user"/>:
+  				<>
+				<p>Select user to remove:</p>
+				<SelectUser selectorId = {"ModalRemoveUserSelector"} value={""} onChange={onChange} usersArray={props.currentWorkshop.students.concat(props.currentWorkshop.instructors)} />
+				</>
+			}
+        </Modal>
+        </>)
+}
+
 
 
 
