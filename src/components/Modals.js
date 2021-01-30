@@ -300,7 +300,7 @@ export function ModalCreateUser(props){
         </>)
 }
 
-function ModalRemoveUser(props){
+export function ModalRemoveUser(props){
 
 	const selectedUser = useRef(null);
 	const [removing, setRemoving] = useState(false);
