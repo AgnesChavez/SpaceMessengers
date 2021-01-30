@@ -234,8 +234,8 @@ export default class UserProfile extends Component {
             try {
                 let snapshot = await storageRef.child('usersAvatar/' + uid + '.' + ext).put(evt.target.files[0]);
     
-                console.log('Uploaded', snapshot.totalBytes, 'bytes.');
-                console.log('File metadata:', snapshot.metadata);
+                // console.log('Uploaded', snapshzzot.totalBytes, 'bytes.');
+                // console.log('File metadata:', snapshot.metadata);
                 // Let's get a download URL for the file.
                 let url = await snapshot.ref.getDownloadURL();
     
