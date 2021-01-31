@@ -288,7 +288,7 @@ function SidebarTeamLi(props){
                 // hoverColor= {}
                 onTextClick={null}
                 onRename={(newName)=> db.collection('teams').doc(props.team.id).update({name:newName})}
-                isDisabled={props.user === userTypes().student}
+                isDisabled={props.user.type === userTypes().student}
                 />
             {/*  } */}
             <div className="collapsible-body">
