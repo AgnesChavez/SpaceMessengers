@@ -24,44 +24,48 @@ export default function Renameable(props){
 	const tooltipRef = useRef(null);
 
 	function disableEdit(e){
-		if(isEditing && !isButtonPressed.current){
+		if(!props.isDisabled &&  isEditing && !isButtonPressed.current){
 			// console.log("disableEdit");
 			setIsEditing(false);
 		}
 	}
 	
 	function buttonPressed(e){
-		console.log("buttonPressed");
-		if(isEditing){
-			if(isFunction(props.onRename)){
-				props.onRename(textInputRef.current.value);
+		// console.log("buttonPressed");
+		if(!props.isDisabled){
+			if(isEditing){
+				if(isFunction(props.onRename)){
+					props.onRename(textInputRef.current.value);
+				}
+			}else{
+				//This is ugly. Wish there was a better solution
+				setTimeout(function(){ 
+					if(textInputRef.current)textInputRef.current.focus();
+				}, 200);
 			}
-		}else{
-			//This is ugly. Wish there was a better solution
-			setTimeout(function(){ 
-				if(textInputRef.current)textInputRef.current.focus();
-			}, 200);
+			isButtonPressed.current = false;
+			setIsEditing(!isEditing);
 		}
-		isButtonPressed.current = false;
-		setIsEditing(!isEditing);
 	}
 
-	useEffect(()=>{        
-        if(buttonRef.current){
-            if(!tooltipRef.current){
-                tooltipRef.current = window.M.Tooltip.init(buttonRef.current, null);
-            }
-        }
-        return () => {
-            
-            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
-        };
+	useEffect(()=>{
+		if(!props.isDisabled){
+        	if(buttonRef.current){
+        	    if(!tooltipRef.current){
+        	        tooltipRef.current = window.M.Tooltip.init(buttonRef.current, null);
+        	    }
+        	}
+        	return () => {
+        	    
+        	    if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+        	};
+    	}
     });
 
 
 
-	function showButton(){if(!isEditing && buttonRef.current) buttonRef.current.style.visibility = ''}
-	function hideButton(){if(!isEditing && buttonRef.current) buttonRef.current.style.visibility = 'hidden'}
+	function showButton(){if(!props.isDisabled && !isEditing && buttonRef.current) buttonRef.current.style.visibility = ''}
+	function hideButton(){if(!props.isDisabled && !isEditing && buttonRef.current) buttonRef.current.style.visibility = 'hidden'}
 
 	function onHover(target, isOver){
 		if(props.isCurrent){
@@ -81,7 +85,7 @@ export default function Renameable(props){
 				>
 				{/* <TextInput  */}
 				
-				<input id="textInput"
+				{!props.isDisabled && <input id="textInput"
 					type='text'
 					defaultValue={props.text}
 					ref={textInputRef}
@@ -89,7 +93,7 @@ export default function Renameable(props){
 					onBlur={disableEdit}
 					onFocus={()=> console.log("on focus")}
 					style={{display: isEditing?"":"none"}}
-				/>
+				/>}
 				<button ref={textRef}
 					style={{color: "white",
 							display: isEditing?"none":"",
@@ -102,7 +106,7 @@ export default function Renameable(props){
 					>
 					{props.text}
 				</button>
- 
+ 				{!props.isDisabled &&
                 <button ref={buttonRef}
                     className="InlineTinyButton btn tooltipped"
                     onClick={buttonPressed}
@@ -112,7 +116,7 @@ export default function Renameable(props){
                     data-tooltip="Change name"
                     >
                     <i className=" tiny material-icons">{isEditing?"done":"edit"}</i>
-                </button>
+                </button>}
             </div>
     	</>);
 	// }
