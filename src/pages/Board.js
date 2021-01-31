@@ -238,7 +238,7 @@ export default function Board() {
                 }
                 prevUsers.current = users;
             }
-            if( usersMap.current !=null)
+            if( usersMap.current !== null)
             {
                 if(usersMap.current.hasOwnProperty(uid)){
                     return usersMap.current[uid];      
@@ -318,19 +318,11 @@ export default function Board() {
 
             <div id="left"></div>
             <div id="center">
-                {(boardId !== null && currentUser && !currentUserLoading )?
-                    <Button
-                        className="red right boardButtonRight"
-                        floating
-                        icon={<Icon>add</Icon>}
-                        node="button"
-                        waves="light"
-                        onClick={addMessage}
-                        tooltip="Click to add a new message"
-                        tooltipOptions={{position:'left'}}
-                    />  
-                    :
-                ""}
+                { boardId !== null &&
+                currentUser && !currentUserLoading &&
+                boardData && !loadingBoardData &&
+                  <AddMessageButton currentUser={currentUser} boardData={boardData} addMessage={addMessage}/>
+                }
                 <ul className="left leftButtonsContainer">
                     <li>
                         <Button
@@ -393,4 +385,23 @@ export default function Board() {
         </div>
 
     </>)
+}
+
+function AddMessageButton(props){
+    let isStudent = props.currentUser.type === userTypes().student;
+    const [teamData, loadingTeamData] = useDocumentData(db.collection("teams").doc(props.boardData.teamId));
+if(!isStudent || (isStudent && teamData && !loadingTeamData && teamData.members.includes(props.currentUser.id))){
+    return <Button
+        className="red right boardButtonRight"
+        floating
+        icon={<Icon>add</Icon>}
+        node="button"
+        waves="light"
+        onClick={props.addMessage}
+        tooltip="Click to add a new message"
+        tooltipOptions={{position:'left'}}
+    />
+}else{
+    return "";
+}
 }

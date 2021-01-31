@@ -349,6 +349,11 @@ header {
     line-height: unset;
 }
 
+
+.InlineTinyButton .material-icons{
+    margin-right: unset !important;
+}
+
 .collapsible-header {
     background-color: transparent;
     padding: 0px;
@@ -423,6 +428,19 @@ body,
     max-width: 1400px;
 
 
+}
+
+.BoardsCollectionLi{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.BoardsCollectionLi .Renambeable{ 
+    flex: 2;
+}
+
+.BoardsCollectionLi .InlineTinyButton{ 
+    /*flex: 1;*/
 }
 
 
