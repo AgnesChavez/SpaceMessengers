@@ -77,7 +77,11 @@ export default  function Gallery(props) {
 
 	return <>
 		<div id="galleryContainer"> 
+			    <header>
+      <h4>Space Messengers Gallery</h4>
+    </header>
 		<div id="gallery"> 
+
   <Link to={"/board"} >
 	<Button
   	
