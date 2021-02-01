@@ -193,7 +193,11 @@ header {
 }
 
 
-
+.SidebarUser button{
+    background-color: transparent !important;
+    border: none;
+    cursor: pointer;
+}
 
 #SidebarCurrentUser {
     padding: 10px;
