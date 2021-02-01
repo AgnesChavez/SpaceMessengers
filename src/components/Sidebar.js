@@ -1,6 +1,6 @@
-import React, {useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-
+import { ModalOtherUserProfile } from "../components/OthersProfile"
 
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
@@ -12,6 +12,9 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 
 
 // import { getUserFromDb } from "../helpers/userManagement";
+
+import { openModal } from "../components/Modals";
+
 
 import { userTypes } from "../helpers/Types"
 
@@ -70,8 +73,12 @@ export function Sidebar(props) {
 
     let isNotStudent = (props.usr.type !==  userTypes().student);
 
+    const [otherUserId, setOtherUserId] = useState(null);
+
     
     useEffect(()=>{
+        if(otherUserId) openModal("ModalOtherUserProfile", null, ()=>setOtherUserId(null));
+
         let el = document.getElementById('SidebarLeft');
         if(el){
             if(!tabsRef.current){
@@ -93,6 +100,9 @@ export function Sidebar(props) {
         name: (props.usr.displayName || auth().currentUser.displayName)
     };
     
+    function handleSetOtherUserId(userId){
+        setOtherUserId(userId);
+    }
 
     
     
@@ -114,10 +124,14 @@ export function Sidebar(props) {
                             user={props.usr} 
                             workshopId={props.usr.currentWorkshop}
                             boardSelectHandle={props.boardSelectHandle}
+                            setOtherUserId={handleSetOtherUserId}
                         />                        
                     </div>
                     <div id="schoolsTab" className="col s12">
-                        <SidebarWorkshopCollection user={props.usr} />
+                        <SidebarWorkshopCollection 
+                            user={props.usr}  
+                            setOtherUserId={setOtherUserId}
+                        />
                     </div>
                 </div>
             </div>        
@@ -140,6 +154,8 @@ export function Sidebar(props) {
   >
     <UserProfile  ></UserProfile>
   </Modal>
+
+  {otherUserId && <ModalOtherUserProfile userId = {otherUserId}/> }
 
     </>)
 }

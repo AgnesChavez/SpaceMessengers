@@ -6,6 +6,7 @@ import React, {useState, useEffect, useRef } from "react";
 import { db } from "../services/firebase";
 // 
 // import 'firebase/firestore';
+import { RenderSidebarUser } from '../components/RenderUser';
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
@@ -52,20 +53,10 @@ function SidebarBoardsCollection(props){
    
    let [removingBoard, setRemovingBoard] = useState(false);
    let allowEditing = (props.isMember ===true || props.user.type !== userTypes().student);
-    // const tooltipRef = useRef(null);
-    // useEffect(() => {
-    //     if(!tooltipRef.current){
-    //         tooltipRef.current = window.M.Tooltip.init(document.querySelector('#AddBoardButton'), null);
-    //     }
-    //     return ()=>{
-    //         if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
-    //     }
-    // });
-    
 
     return (
         <>
-            <li>
+            <li key={props.team.id}>
                 <div className="collapsible-header">
                 <span>Boards</span>
                    {allowEditing &&
@@ -77,10 +68,10 @@ function SidebarBoardsCollection(props){
                }
                 </div>
                 <ul className="collapsible-body">
-                    {!boardsLoading && boards && boards.map(board => { return <li>
+                    {!boardsLoading && boards && boards.map(board => { return <li key={board.id} >
                         <div className="BoardsCollectionLi">
                             <Renameable 
-                                key={board.id} 
+                                
                                 text={board.name} 
                                 hoverColor= {board.color}
                                 isCurrent={board.id === props.user.currentBoard}
@@ -122,7 +113,9 @@ export function SidebarTeamCollection(props){
                         team={team}
                         user={props.user}
                         boardSelectHandle={props.boardSelectHandle}
-                        isMember={myTeams.includes(team.id)}/> )}
+                        isMember={myTeams.includes(team.id)}
+                        setOtherUserId={props.setOtherUserId}
+                        /> )}
             </ul> 
 
             {props.user !== userTypes().student && <CreateTeamModalButton/>}
@@ -130,7 +123,6 @@ export function SidebarTeamCollection(props){
         </>
     );
 }
-
 
 
 //----------------------------------------------------------------------------
@@ -143,10 +135,13 @@ function SidebarUser(props)
       return (
         <>
             <li key={usr.id} className="SidebarUser">
-                <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/>
-                <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
-                    {usr.displayName}
-                </span>
+                <RenderSidebarUser usr={usr} setOtherUserId={props.setOtherUserId}/>
+                {/* <button  onClick={()=>props.setOtherUserId(usr.id)}> */}
+                {/* <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/> */}
+                {/* <span className='name' style={('color' in usr)?{color: usr.color}:{}}> */}
+                {/*     {usr.displayName} */}
+                {/* </span> */}
+                {/* </button> */}
                 {(props.isNotStudent && props.isRemoving) &&
                     <RemoveButton onRemove={()=>{ 
                                    if(props.newUserDestination.collection === 'teams'){
@@ -183,6 +178,7 @@ function RenderUsers(props)
 {
     let isNotStudent = props.currentUser.type !== userTypes().student;
     let [removingUser, setRemovingUser] = useState(false);
+    
     return (<>
         <li>
             <div className="sidebarName collapsible-header"> 
@@ -204,6 +200,7 @@ function RenderUsers(props)
                     uid={i} 
                     isNotStudent={isNotStudent}
                     isRemoving={removingUser}
+                    setOtherUserId={props.setOtherUserId}
                 />)}
             </ul>
             </div>
@@ -286,13 +283,19 @@ function SidebarTeamLi(props){
                 textClassName="collapsible-header"
                 text={props.team.name} 
                 // hoverColor= {}
-                onTextClick={null}
+                
                 onRename={(newName)=> db.collection('teams').doc(props.team.id).update({name:newName})}
                 isDisabled={props.user.type === userTypes().student}
                 />
             {/*  } */}
             <div className="collapsible-body">
-                <SidebarTeam user={props.user} team={props.team} boardSelectHandle={props.boardSelectHandle} isMember={props.isMember}/>
+                <SidebarTeam 
+                    user={props.user} 
+                    team={props.team} 
+                    boardSelectHandle={props.boardSelectHandle} 
+                    isMember={props.isMember}
+                    setOtherUserId={props.setOtherUserId}
+                />
             </div>
         </li>
     </>
@@ -305,9 +308,23 @@ function SidebarTeam(props){
     useEffect(() => initCollapsibles(".SidebarTeam"));
     return (<>
             <ul className="collapsible SidebarTeam">
-                <RenderUsers name="Members" users={props.team.members} currentUser={props.user} newUserDestination={{dest:props.team, collection:'teams', field: 'members'}}></RenderUsers>
-                <SidebarBoardsCollection user={props.user} team={props.team} boardSelectHandle={props.boardSelectHandle} isMember={props.isMember}/>
+                <RenderUsers 
+                    name="Members" 
+                    users={props.team.members} 
+                    currentUser={props.user} 
+                    newUserDestination={{dest:props.team, collection:'teams', field: 'members'}}
+                    setOtherUserId={props.setOtherUserId}
+                />
+                <SidebarBoardsCollection 
+                    user={props.user} 
+                    team={props.team} 
+                    boardSelectHandle={props.boardSelectHandle} 
+                    isMember={props.isMember}
+                />
             </ul>
     </>
     );
 }
+
+
+

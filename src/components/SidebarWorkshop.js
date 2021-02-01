@@ -5,8 +5,9 @@ import { db } from "../services/firebase";
 // import 'firebase/firestore';
 
 // import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import { RenderSidebarUser } from '../components/RenderUser';
 
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 // import { getUserFromDb } from "../helpers/userManagement";
 
@@ -42,30 +43,32 @@ import {
 
 function SidebarStudent(props)
 {
-  let [usr, usrLoading] = useDocumentData(db.collection('users').doc(props.uid));
+    let [usr, usrLoading] = useDocumentData(db.collection('users').doc(props.uid));
 
   // let usr = getUserFromDb(props.uid);
-  if(usr && ! usrLoading){
+    if(usr && ! usrLoading){
 
-    let schoolColor = "transparent";
+        let schoolColor = "transparent";
+        if(usr.institutionId === props.school1.id){
+            schoolColor = props.school1.color;
+        }else 
+        if(usr.institutionId === props.school2.id){
+            schoolColor = props.school2.color;
+        }
 
-    if(usr.institutionId === props.school1.id){
-        schoolColor = props.school1.color;
-    }else 
-    if(usr.institutionId === props.school2.id){
-        schoolColor = props.school2.color;
-    }
-
-      return (<>
+        return (<>
             <li key={usr.id} className="SidebarUser" style={{borderRight: schoolColor+ "solid 4px"}}>
-                <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/>
-                <span className='name' style={('color' in usr)?{color: usr.color}:{}}>
-                    {usr.displayName}
-                </span>
+                <RenderSidebarUser usr={usr} setOtherUserId={props.setOtherUserId}/>
+                {/* <button  onClick={()=>props.setOtherUserId(usr.id)}> */}
+                {/* <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/> */}
+                {/* <span className='name' style={('color' in usr)?{color: usr.color}:{}}> */}
+                {/*     {usr.displayName} */}
+                {/* </span> */}
+                {/* </button> */}
             </li> 
         </>);  
-  }
-  return null;
+    }
+    return null;
 }
 
 
@@ -95,7 +98,7 @@ function SidebarWorkshop(props){
 
             <div className='row'>
                 <ul className="SidebarWorkshopStudents col s12">
-                    {props.workshop.students && props.workshop.students.map( i => <SidebarStudent key={i} uid={i} school1={school1} school2={school2}  />)}    
+                    {props.workshop.students && props.workshop.students.map( i => <SidebarStudent key={i} uid={i} school1={school1} school2={school2}  setOtherUserId={props.setOtherUserId}/>)}    
                 </ul>
             </div>    
         </div>
@@ -103,8 +106,8 @@ function SidebarWorkshop(props){
 }
 
 
-function getWorkshopQueryForUser(usr)
-{
+function getWorkshopQueryForUser(usr){
+
   let ws = db.collection("workshops");
 
   if(usr.type === userTypes().student){
@@ -164,7 +167,7 @@ export function SidebarWorkshopCollection(props){
 
     return (
         <>
-            { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} /> }
+            { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} setOtherUserId={props.setOtherUserId}/> }
 
             { currentWorkshop && (props.user.type === userTypes().admin) && <ModalCreateUser currentWorkshop={currentWorkshop}/> }
             { currentWorkshop && (props.user.type === userTypes().admin) && <ModalRemoveUser currentWorkshop={currentWorkshop}/> }
@@ -176,6 +179,5 @@ export function SidebarWorkshopCollection(props){
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalRemoveTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
             
-
-        </>)
+    </>)
 }
