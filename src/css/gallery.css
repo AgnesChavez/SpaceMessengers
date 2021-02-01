@@ -4,7 +4,7 @@
 }
 */
 #gallery{
-	padding: 70px 30px  30px 30px;
+	padding: 110px 30px  30px 30px;
 	
     /*height: 100% !important;*/
 }
@@ -13,6 +13,8 @@
     margin-top: 10px;
     justify-content: flex-start;
     display: flex;
+    flex-wrap: wrap;
+    position: relative;
 }
 
 .gridImg img{
@@ -22,6 +24,7 @@
 
 .gridImg{
 	max-width: 200px;
+    min-width: 200px;
     position: relative;
     background-color: #101010;
     /*cursor: pointer;*/
@@ -29,10 +32,10 @@
     margin:4px;
     border: 1px solid rgba(200,200,200,0.1);
     overflow: hidden;
-   flex-grow: 0;
+    flex-grow: 0;
    
 }
-#galleryContainer{
+#galleryBg{
     background-color: black ;
     width:100%;
     min-width:100%;
@@ -41,4 +44,12 @@
     position: fixed;
     top:0px;
     left:0px;
+}
+
+#GalleryHeader{
+    z-index: 99;
+    background-color: black ;   
+    height: 110px;
+    width: 100%;
+
 }
