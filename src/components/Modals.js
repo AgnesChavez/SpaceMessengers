@@ -16,14 +16,22 @@ import { userTypes } from "../helpers/Types"
 import { createUserInDb, removeUser } from "../helpers/userManagement"
 
 
-function openModal(id, onOpenStart=null){
-    var elems = document.querySelector('#' + id);
-    let modal = window.M.Modal.init(elems, {
-    	onOpenStart: onOpenStart,
-        onCloseEnd: ()=>window.M.Modal.getInstance(document.getElementById(id)).destroy()
-    });
 
-    modal.open();
+export function openModal(id, onOpenStart=null, onCloseEnd=null){
+    // var elems = document.querySelector('#' + id);
+    var elem = document.getElementById(id)
+    if(elem){
+    	let modal = window.M.Modal.getInstance(elem) 
+    	if(modal && modal.isOpen) return;
+    	window.M.Modal.init(elem, {
+    		onOpenStart: onOpenStart,
+    	    onCloseEnd: ()=>{
+    	    	window.M.Modal.getInstance(document.getElementById(id)).destroy();
+    	    	if(onCloseEnd) onCloseEnd();
+    	    }
+    	}).open();
+    	
+	}
 }
 
 function closeModal(id){
@@ -408,7 +416,6 @@ export function ModalRemoveTeam(props){
         </Modal>
         </>)
 }
-
 
 
 
