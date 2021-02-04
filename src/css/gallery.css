@@ -3,13 +3,38 @@
     background-color: black !important;
 }
 */
-#gallery{
+.gallery{
 	padding: 110px 30px  30px 30px;
 	
     /*height: 100% !important;*/
 }
 
-#GalleryImgs{
+.gallery h5{
+    position: relative;
+}
+
+.subGallery{
+    border-top:1px solid white;
+    position: relative;
+}
+
+.subGalleryHeader{
+    display:flex;
+    justify-content: space-between;
+     align-items: center;
+}
+
+.subGalleryButtons{
+   display:flex;
+    justify-content: space-between;
+     align-items: center;
+}
+
+.subGalleryButtons button{
+    margin-left: 1rem;
+}
+
+.galleryImgs{
     margin-top: 10px;
     justify-content: flex-start;
     display: flex;
