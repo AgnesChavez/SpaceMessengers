@@ -47,21 +47,22 @@ function LoadAndShowImage(props){
       		{loading && <CenteredPreloader title={"Loading images"}/>}
       		{!loading && value && 
 
+				<>
 			<MediaBox
   				options={{
   				  	inDuration: 200,
   				  	outDuration: 200
   				}}
 				>
-				<>
 			  	<img
 			    	alt=""
 			    	src={value}
 			    	className=" materialboxed galleryImg"
 			  	/>
+			</MediaBox>
 			  	{props.deleting === true && 
 			  		<Button
-    				className="red"
+    				className="red right"
     				node="button"
     				small
     				tooltip="Delete this image"
@@ -71,7 +72,7 @@ function LoadAndShowImage(props){
   					onClick={()=>props.deleteCallback(props.img, props.index)}
     			/>}
     			</>
-			</MediaBox>}			
+			}			
     	</div>
     </>);
 }
