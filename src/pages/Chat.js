@@ -13,13 +13,43 @@ import { Icon } from 'react-materialize';
 import '../css/chat.css';
 
 
+const weekInMillis = 1000 * 60 * 60 * 24 * 7;
+
 export default function Chat(props) {
     const dummy = useRef();
     const messagesRef = db.collection(props.collection);
-    
+    // const isQuerySet = useRef(false);    
     // const {group, setGroup] = useState(props.group);
+    // let query = null; 
+    let query =messagesRef;
 
-    const query = messagesRef.where("group", "==", props.group).orderBy('created', 'desc').limit(15);
+    // if(!isQuerySet.current){
+        // if(!props.isComment ){
+        //     let aWeekAgo = firebase.firestore.Timestamp.fromDate(new Date(Date.now() - weekInMillis));
+        //     //console.log(aWeekAgo.toDate().toISOString(), firebase.firestore.Timestamp.now().toDate().toISOString());
+        //     console.log("a");
+        //     
+        //     query = query.where('created', '>', aWeekAgo);
+        // }
+    if(!props.isComment ){
+
+        let aWeekAgo = Date.now() - weekInMillis;
+
+        let toCheckDate = firebase.firestore.Timestamp.fromDate(new Date(aWeekAgo));
+
+
+        if(props.readChats && (props.group in props.readChats)){
+            if( props.readChats[props.group].toMillis() > aWeekAgo){
+                toCheckDate = props.readChats[props.group];
+            }
+        }
+        query = query.where('created', '>', toCheckDate);
+        // console.log("a");
+    }
+        query = query.where("group", "==", props.group).limit(15);
+
+        // isQuerySet.current = true;
+    // }
 
     const [messages, loadingMessages] = useCollectionData(query);
 
@@ -56,18 +86,30 @@ export default function Chat(props) {
         return props.getUser(uid);
     }
 
+    function setTimeStampForCurrentUser(){
+        db.collection("readChat").doc(auth().currentUser.uid).set({
+            [props.group]:  firebase.firestore.Timestamp.now()
+        }, { merge: true });
+    }
+
+
+
+// 
+//     if(messages && !loadingMessages){
+//         messages.forEach(msg=> console.log(msg.created.toDate().toISOString())) ;       
+//     }
 
     return (<>
         <div className="chatContainer"
             style={props.isComment?({backgroundColor: props.bgColor}):{}}
         >
-        <div className={props.containerClass}>
-        <ul>
-            {!loadingMessages && props.getUser && messages && messages.slice(0).reverse().map(msg => 
-                <RenderMessage key={msg.id} user={getUser(msg.uid)} isComment={props.isComment} message={msg} />)}
-        </ul>
-        <span ref={dummy}></span>
-        </div>
+            <div className={props.containerClass}>
+                <ul>
+                    {!loadingMessages && props.getUser && messages && messages.slice(0).reverse().map(msg => 
+                        <RenderMessage key={msg.id} user={getUser(msg.uid)} isComment={props.isComment} message={msg} />)}
+                </ul>
+                <span ref={dummy}></span>
+            </div>
             <form className="valign-wrapper chatInputContainer" >
                 <input  className="chatInput"
                     value={formValue}
@@ -81,6 +123,11 @@ export default function Chat(props) {
                     <Icon>send</Icon>
                 </button>
             </form>
+            { !props.isComment && <button
+            className="btn btn-flat tiny"
+            onClick={setTimeStampForCurrentUser}
+            >Clear Chat
+            </button> }
         </div>
     </>)
 }
