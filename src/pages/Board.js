@@ -104,6 +104,9 @@ export default function Board() {
 
     const [boardData, loadingBoardData] = useDocumentData(db.collection("boards").doc(boardId));
 
+    // console.log("boardId ", boardId);
+    // console.log("auth().currentUser.uid ", auth().currentUser.uid);
+
     const currentUserRef = db.collection('users').doc(auth().currentUser.uid);
 
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
@@ -254,7 +257,7 @@ export default function Board() {
         setBoardIdState(bid);
         if(bid &&currentUser && !currentUserLoading){
             if(currentUser.currentBoard !== bid){
-                console.log("setBoardId");
+                // console.log("setBoardId");
                 currentUserRef.update({currentBoard: bid});
             }
         }
@@ -273,7 +276,7 @@ export default function Board() {
         ref.limit(1).get()
         .then(function(querySnapshot) {
             if(querySnapshot.docs.length){
-                console.log("currentUser.instructors");
+                // console.log("currentUser.instructors");
                 currentUserRef.update({[propName]: querySnapshot.docs[0].id});
             }
         })
@@ -313,14 +316,14 @@ export default function Board() {
 
     return ( <>
         <div id="boardContainer">   
-            { currentUser &&  !currentUserLoading && <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>}
+            { currentUser &&  !currentUserLoading && currentUser.currentWorkshop && <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>}
             <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />
 
             <div id="left"></div>
             <div id="center">
                 { boardId !== null &&
                 currentUser && !currentUserLoading &&
-                boardData && !loadingBoardData &&
+                boardData && !loadingBoardData && boardData.teamId &&
                   <AddMessageButton currentUser={currentUser} boardData={boardData} addMessage={addMessage}/>
                 }
                 <ul className="left leftButtonsContainer">
@@ -389,8 +392,11 @@ export default function Board() {
 
 function AddMessageButton(props){
     let isStudent = props.currentUser.type === userTypes().student;
+    // console.log("AddMessageButton: ", props.boardData);
+
     const [teamData, loadingTeamData] = useDocumentData(db.collection("teams").doc(props.boardData.teamId));
-if(!isStudent || (isStudent && teamData && !loadingTeamData && teamData.members.includes(props.currentUser.id))){
+    
+    if(!isStudent || (isStudent && teamData && !loadingTeamData && teamData.members.includes(props.currentUser.id))){
     return <Button
         className="red right boardButtonRight"
         floating

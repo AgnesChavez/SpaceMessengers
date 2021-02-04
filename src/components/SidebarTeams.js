@@ -47,6 +47,21 @@ function initCollapsibles(elementSelector, isAccordion = false)
     
 }
 
+function SidebarBoardName(props){
+    return (<>
+    <Renameable                         
+        text={props.board.name}
+        hoverColor= {props.board.color}
+        isCurrent={props.board.id === props.user.currentBoard}
+        onTextClick={()=> props.boardSelectHandle(props.board.id)}
+        onRename={(newName)=> db.collection('boards').doc(props.board.id).update({name:newName})}
+        isDisabled={!props.allowEditing || props.removingBoard}
+        />
+        {props.removingBoard && <RemoveButton onRemove={()=> removeBoard(props.board.id)}/>}
+        </>);
+}
+
+
 function SidebarBoardsCollection(props){
     const [boards, boardsLoading] = useCollectionData(
         db.collection("boards").where("teamId", "==", props.team.id));
@@ -70,16 +85,12 @@ function SidebarBoardsCollection(props){
                 <ul className="collapsible-body">
                     {!boardsLoading && boards && boards.map(board => { return <li key={board.id} >
                         <div className="BoardsCollectionLi">
-                            <Renameable 
-                                
-                                text={board.name} 
-                                hoverColor= {board.color}
-                                isCurrent={board.id === props.user.currentBoard}
-                                onTextClick={()=> props.boardSelectHandle(board.id)}
-                                onRename={(newName)=> db.collection('boards').doc(board.id).update({name:newName})}
-                                isDisabled={!allowEditing || removingBoard}
-                                />
-                                {removingBoard && <RemoveButton onRemove={()=> removeBoard(board.id)}/>}
+                            <SidebarBoardName
+                                board={board}
+                                user={props.user}
+                                boardSelectHandle={props.boardSelectHandle}
+                                allowEditing={allowEditing}
+                                removingBoard={removingBoard}/>
                             </div>
                         </li>
                         }
@@ -90,14 +101,41 @@ function SidebarBoardsCollection(props){
     );
 }
 
+function SidebarBoardsOnlyCollection(props){
+    const [boards, boardsLoading] = useCollectionData(
+        db.collection("boards").where("teamId", "==", props.team.id));
+   
+   let allowEditing = (props.isMember ===true || props.user.type !== userTypes().student);
+
+    return (
+        <>
+            {!boardsLoading && boards && boards.map(board => { return <li key={board.id} >
+                <div className="BoardsCollectionLi">
+                    <SidebarBoardName
+                        board={board}
+                        user={props.user}
+                        boardSelectHandle={props.boardSelectHandle}
+                        allowEditing={allowEditing}
+                        removingBoard={false}/>
+                    </div>
+                </li>
+            }
+        )}
+
+        </>
+    );
+}
+
+
+
 //----------------------------------------------------------------------------
 export function SidebarTeamCollection(props){
     
-    let teamsQuery = db.collection("teams").where("workshopId", "==", props.workshopId);
-
-    const [teams, teamsLoading] = useCollectionData(teamsQuery);
-
-    const [myTeams, myTeamsLoading] = useCollectionData(teamsQuery.where("members", "array-contains", props.user.id));
+//     let teamsQuery = db.collection("teams").where("workshopId", "==", props.workshopId);
+// 
+//     const [teams, teamsLoading] = useCollectionData(teamsQuery);
+// 
+//     const [myTeams, myTeamsLoading] = useCollectionData(teamsQuery.where("members", "array-contains", props.user.id));
 
 
     useEffect(() => initCollapsibles(".SidebarTeamCollection", true));
@@ -105,15 +143,12 @@ export function SidebarTeamCollection(props){
     return (
         <>
             <ul className="collapsible SidebarTeamCollection">
-                {  !teamsLoading &&
-                    teams &&
-                   !myTeamsLoading &&
-                    myTeams &&
-                    teams.map(team => <SidebarTeamLi key={team.id} 
+                {props.teams && props.myTeams &&
+                    props.teams.map(team => <SidebarTeamLi key={team.id} 
                         team={team}
                         user={props.user}
                         boardSelectHandle={props.boardSelectHandle}
-                        isMember={myTeams.includes(team.id)}
+                        isMember={props.myTeams.includes(team.id)}
                         setOtherUserId={props.setOtherUserId}
                         /> )}
             </ul> 
@@ -123,6 +158,28 @@ export function SidebarTeamCollection(props){
         </>
     );
 }
+
+
+
+//----------------------------------------------------------------------------
+export function SidebarAllBoards(props){
+    
+    return (
+        <>
+            <ul className="SidebarAllBoards">
+                {props.teams && props.myTeams &&
+                    props.teams.map(team => <SidebarBoardsOnlyCollection key={team.id} 
+                        team={team}
+                        user={props.user}
+                        boardSelectHandle={props.boardSelectHandle}
+                        isMember={props.myTeams.includes(team.id)}
+                        /> )}
+            </ul>
+        </>
+    );
+}
+
+
 
 
 //----------------------------------------------------------------------------

@@ -43,7 +43,7 @@ import {ModalCreateWorkshop,
 import { removeUserFromTeam } from '../helpers/factory'
 
       
-import { SidebarTeamCollection  } from "./SidebarTeams"
+import { SidebarTeamCollection, SidebarAllBoards  } from "./SidebarTeams"
 import { SidebarWorkshopCollection } from "./SidebarWorkshop"
 
 
@@ -75,7 +75,13 @@ export function Sidebar(props) {
 
     const [otherUserId, setOtherUserId] = useState(null);
 
-    
+    let teamsQuery = db.collection("teams").where("workshopId", "==", props.usr.currentWorkshop);
+
+    const [teams, teamsLoading] = useCollectionData(teamsQuery);
+
+    const [myTeams, myTeamsLoading] = useCollectionData(teamsQuery.where("members", "array-contains", props.usr.id));
+
+
     useEffect(()=>{
         if(otherUserId) openModal("ModalOtherUserProfile", null, ()=>setOtherUserId(null));
 
@@ -104,8 +110,6 @@ export function Sidebar(props) {
         setOtherUserId(userId);
     }
 
-    
-    
     return (<>
     <div id="SidebarLeftContainer" style={{transform: "translateX("+(props.isOpen?0:-300)+"px)"}}>
 
@@ -115,17 +119,33 @@ export function Sidebar(props) {
             <div className="row">
                 <div className="col s12">
                     <ul className="tabs tabs-fixed-width black white-text depth-1">
+                        <li className="tab"><a href="#boardsTab">Boards</a></li>
                         <li className="tab"><a className="active" href="#teamTab">Teams</a></li>
                         <li className="tab"><a href="#schoolsTab">Schools</a></li>
                     </ul>
             
+                    
+                    <div id="boardsTab" className="col s12">
+                        {teams && !teamsLoading &&
+                         myTeams && !myTeamsLoading &&
+                        <SidebarAllBoards
+                            user={props.usr} 
+                            
+                            boardSelectHandle={props.boardSelectHandle}
+                            teams={teams}
+                            myTeams={myTeams}
+                        />}          
+                    </div>
                     <div id="teamTab" className="col s12">
+                        {teams && !teamsLoading &&
+                         myTeams && !myTeamsLoading &&
                         <SidebarTeamCollection 
                             user={props.usr} 
-                            workshopId={props.usr.currentWorkshop}
                             boardSelectHandle={props.boardSelectHandle}
                             setOtherUserId={handleSetOtherUserId}
-                        />                        
+                            teams={teams}
+                            myTeams={myTeams}
+                        />}                        
                     </div>
                     <div id="schoolsTab" className="col s12">
                         <SidebarWorkshopCollection 
