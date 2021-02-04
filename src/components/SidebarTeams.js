@@ -57,6 +57,7 @@ function SidebarBoardName(props){
         onRename={(newName)=> db.collection('boards').doc(props.board.id).update({name:newName})}
         isDisabled={!props.allowEditing || props.removingBoard}
         />
+        {props.team && props.team.name && <span className="grey-text">{props.team.name}</span>}
         {props.removingBoard && <RemoveButton onRemove={()=> removeBoard(props.board.id)}/>}
         </>);
 }
@@ -114,6 +115,7 @@ function SidebarBoardsOnlyCollection(props){
                     <SidebarBoardName
                         board={board}
                         user={props.user}
+                        team={props.team}
                         boardSelectHandle={props.boardSelectHandle}
                         allowEditing={allowEditing}
                         removingBoard={false}/>
