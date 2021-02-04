@@ -17,11 +17,12 @@ const weekInMillis = 1000 * 60 * 60 * 24 * 7;
 
 export default function Chat(props) {
     const dummy = useRef();
+    const aWeekAgo = useRef(null);
     const messagesRef = db.collection(props.collection);
     // const isQuerySet = useRef(false);    
     // const {group, setGroup] = useState(props.group);
     // let query = null; 
-    let query =messagesRef;
+    let query =null;
 
     // if(!isQuerySet.current){
         // if(!props.isComment ){
@@ -33,20 +34,35 @@ export default function Chat(props) {
         // }
     if(!props.isComment ){
 
-        let aWeekAgo = Date.now() - weekInMillis;
-
-        let toCheckDate = firebase.firestore.Timestamp.fromDate(new Date(aWeekAgo));
-
+        if(aWeekAgo.current===null){
+            aWeekAgo.current = Date.now() - weekInMillis;    
+        }
+        
+        
+        let millis = aWeekAgo.current;
 
         if(props.readChats && (props.group in props.readChats)){
-            if( props.readChats[props.group].toMillis() > aWeekAgo){
-                toCheckDate = props.readChats[props.group];
+            
+            
+            if( props.readChats[props.group].toMillis() > aWeekAgo.current){
+                // console.log("read chat found " + props.readChats[props.group].toMillis() + "  " + aWeekAgo.current);
+                millis = props.readChats[props.group].toMillis();
             }
         }
-        query = query.where('created', '>', toCheckDate);
+        
+        let toCheckDate = firebase.firestore.Timestamp.fromDate(new Date(millis));
+
+        // console.log("toCheckDate", toCheckDate);
+        // query = messagesRef.where("group", "==", props.group).orderBy('created', "desc");
+        // .where('created', '>', toCheckDate).limit(15);
+        query = messagesRef.where("group", "==", props.group).where('created', '>', toCheckDate).orderBy('created', "desc").limit(15);
+        // query = messagesRef.where('created', '>', toCheckDate).where("group", "==", props.group);
+        // query = messagesRef.where("group", "==", props.group).where('created', '>', toCheckDate);
         // console.log("a");
+    }else{
+        query = messagesRef.where("group", "==", props.group).limit(15);
     }
-        query = query.where("group", "==", props.group).limit(15);
+        
 
         // isQuerySet.current = true;
     // }
@@ -87,6 +103,7 @@ export default function Chat(props) {
     }
 
     function setTimeStampForCurrentUser(){
+        console.log("setTimeStampForCurrentUser: "+ props.group);
         db.collection("readChat").doc(auth().currentUser.uid).set({
             [props.group]:  firebase.firestore.Timestamp.now()
         }, { merge: true });
