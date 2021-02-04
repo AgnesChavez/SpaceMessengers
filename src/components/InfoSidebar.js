@@ -1,4 +1,8 @@
 import React, { useEffect, useRef } from "react";
+import { CenteredPreloader } from '../components/CenteredPreloader'
+import { useDocumentData } from 'react-firebase-hooks/firestore';
+import { auth } from "../services/firebase";
+import { db } from "../services/firebase";
 
 // import { Button, Tabs, Tab, SideNav } from 'react-materialize';
 
@@ -11,6 +15,8 @@ export function InfoSidebar(props){
 
     const tabsRef = useRef(null);
     const sidenavRef = useRef(null);
+
+    const [readChats, loadingReadChats] =  useDocumentData(db.collection("readChat").doc(auth().currentUser.uid));
 
     useEffect(()=>{
         let el = document.getElementById('InfoSidebar');
@@ -30,6 +36,9 @@ export function InfoSidebar(props){
 
     if(!props.boardId  ) return "";
     
+
+
+
     return (<>
     <div id="InfoSidebarContainer" style={{transform: "translateX("+(props.isOpen?0:300)+"px)"}}>
         <ul id="InfoSidebar" className="sidenav sidenav-fixed black white-text" >
@@ -40,12 +49,15 @@ export function InfoSidebar(props){
                     <li className="tab"><a href="#commentsTab">Comments</a></li>
                 </ul>
                 <div id="chatTab" className="col s12">
+                    {loadingReadChats?
+                       <CenteredPreloader title={"Loading messages"}/> :
                     <Chat collection="chats"
                         group={props.boardId} 
                         containerClass="sidebar-chat"
                         isComment={false}
                         getUser={props.getUser}
-                    />
+                        readChats={readChats}
+                    />}
                 </div>
                 <div id="commentsTab" className="col s12">
                     {props.selected?
