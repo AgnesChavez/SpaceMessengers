@@ -9,6 +9,7 @@
     "firebase": "^8.1.2",
     "jquery": "^3.5.1",
     "materialize-css": "^1.0.0-rc.2",
+    "papaparse": "^5.3.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-draggable": "^4.4.3",
