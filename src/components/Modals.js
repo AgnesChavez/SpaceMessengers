@@ -3,6 +3,8 @@ import { TextInput, Row, Modal, Button } from 'react-materialize';
 
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
+import { downloadMessages } from '../components/downloadMessages'
+
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
 import { createBoard, createTeam, removeTeam, addUserToTeam } from '../helpers/factory'
@@ -420,7 +422,30 @@ export function ModalRemoveTeam(props){
 }
 
 
+export function DownloadMessagesButton(props){
+return (<>
 
+		<Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalDownloadMessages"
+  		  	node="button"
+  		  	onClick={()=>downloadMessages(props.currentWorkshopId, ()=>closeModal("ModalDownloadMessages"))}
+  		>
+     	Download Messages
+  		</Button>
+		<Modal
+			actions={[  ]}
+			options={{dismissible: false}}
+    		className="black-text"
+    		header="Downloading messages"
+    		id="ModalDownloadMessages"
+    		root={document.getElementById('modalRoot')}
+  		>	
+  			<CenteredPreloader title="Gathering data..."/>
+        </Modal>
+        </>)
+}
 
 
 

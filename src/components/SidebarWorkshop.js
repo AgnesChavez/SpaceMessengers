@@ -2,8 +2,8 @@
 
 import { db } from "../services/firebase";
 
-// import 'firebase/firestore';
 
+// import 'firebase/firestore';
 // import { useAuthState } from 'react-firebase-hooks/auth';
 import { RenderSidebarUser } from '../components/RenderUser';
 
@@ -15,7 +15,7 @@ import { userTypes } from "../helpers/Types"
 
 // import { Link } from 'react-router-dom';
 
-// import { Button, Modal } from 'react-materialize';
+import { Button } from 'react-materialize';
 
 // import UserProfile from "./UserProfile";
 
@@ -24,6 +24,7 @@ import '../css/board.css';
 // import Renameable from './Renameable'
 
 import {
+    DownloadMessagesButton,
     // ModalCreateWorkshop,
         CreateWorkshopModalButton,
         // ModalAddBoard,
@@ -178,6 +179,9 @@ export function SidebarWorkshopCollection(props){
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalRemoveTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
+
+            { currentWorkshop && (props.user.type === userTypes().admin) && <DownloadMessagesButton currentWorkshopId={currentWorkshop.id}/> }
             
+
     </>)
 }
