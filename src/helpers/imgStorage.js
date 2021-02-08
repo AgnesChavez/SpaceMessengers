@@ -6,25 +6,21 @@ import firebase from "firebase";
 
 import { Modal } from 'react-materialize';
 
-
-
-
 var uploadTasks = {};
 
-export function UploadImgButton(props) {
+
+export function FileUploadButton(props){
+
     const tooltipRef = useRef(null);
-    
-    const [numUploads, setNumUploads] = useState(0);
-
-
+    const divRef= useRef(null);
     useEffect(() => {
         // console.log("UploadImgButton constructor");
-        if(!tooltipRef.current){
-            let btnEl = document.querySelector('#UploadImageInput .input-field .btn');
+        if(!tooltipRef.current && divRef.current){
+            let btnEl = divRef.current.querySelector('.input-field .btn');
             if(btnEl){
                 btnEl.classList.add('btn-floating');
-                btnEl.dataset.tooltip = "Upload image to your gallery"
-                btnEl.dataset.position = "right"
+                btnEl.dataset.tooltip = props.tootip;
+                btnEl.dataset.position = props.tooltipPosition;
                 tooltipRef.current = window.M.Tooltip.init(btnEl, null);
             }
         }
@@ -33,6 +29,48 @@ export function UploadImgButton(props) {
             if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
         }
     });
+
+    return(<>
+        <div ref={divRef} id={props.id}>
+            <TextInput
+                label=<i className="material-icons">file_upload</i>
+                type="file"                
+                onChange={(evt)=>{
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    if (evt.target.files && evt.target.files.length) {
+                      props.callback(evt.target.files[0]);
+                    }
+                }}
+            />
+        </div>
+    </>);
+}
+
+
+
+export function UploadImgButton(props) {
+    // const tooltipRef = useRef(null);
+    
+    const [numUploads, setNumUploads] = useState(0);
+
+
+    // useEffect(() => {
+    //     // console.log("UploadImgButton constructor");
+    //     if(!tooltipRef.current){
+    //         let btnEl = document.querySelector('#UploadImageInput .input-field .btn');
+    //         if(btnEl){
+    //             btnEl.classList.add('btn-floating');
+    //             btnEl.dataset.tooltip = "Upload image to your gallery"
+    //             btnEl.dataset.position = "right"
+    //             tooltipRef.current = window.M.Tooltip.init(btnEl, null);
+    //         }
+    //     }
+    //     return ()=>{
+    //         // console.log("UploadImgButton destructor");
+    //         if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+    //     }
+    // });
 
 
     function uploadImg(file, userId){
@@ -57,22 +95,31 @@ export function UploadImgButton(props) {
     }
     return(<>
 
-        <div id="UploadImageInput">
-            <TextInput
-                id="UploadImageTextInput"
-                label=<i className="material-icons">file_upload</i>
-                type="file"
-                
-                onChange={(evt)=>{
-                    evt.stopPropagation();
-                    evt.preventDefault();
-                    if (evt.target.files && evt.target.files.length) {
-                      // console.log(evt.target.files[0]);
-                        uploadImg( evt.target.files[0], auth().currentUser.uid);
-                    }
-                }}
-            />
-            </div>    
+        {/* <div id="UploadImageInput"> */}
+        {/*     <TextInput */}
+        {/*         id="UploadImageTextInput" */}
+        {/*         label=<i className="material-icons">file_upload</i> */}
+        {/*         type="file" */}
+        {/*          */}
+        {/*         onChange={(evt)=>{ */}
+        {/*             evt.stopPropagation(); */}
+        {/*             evt.preventDefault(); */}
+        {/*             if (evt.target.files && evt.target.files.length) { */}
+        {/*               // console.log(evt.target.files[0]); */}
+        {/*                 uploadImg( evt.target.files[0], auth().currentUser.uid); */}
+        {/*             } */}
+        {/*         }} */}
+        {/*     /> */}
+        {/* </div>     */}
+
+
+        <FileUploadButton
+        id="UploadImageInput"
+        tootip="Upload image to your gallery"
+        tooltipPosition="right"
+        callback={(file)=>uploadImg(file, auth().currentUser.uid)}
+    />
+
 
     {(Object.keys(uploadTasks).length > 0)?
     <Modal
@@ -98,7 +145,12 @@ export function UploadImgButton(props) {
         >
         <div className="uploadsContent">
         <p>Uploads</p>
-        {Object.entries(uploadTasks).map( task=> <FileUploader key={task[0]} taskId={task[0]} file={task[1].file} task={task[1].task} onComplete={onComplete}/>) }
+        {Object.entries(uploadTasks).map( task=> <FileUploader 
+            key={task[0]} 
+            taskId={task[0]} 
+            file={task[1].file} 
+            task={task[1].task} 
+            onComplete={onComplete}/>) }
         </div>
         </Modal>
         :""}
