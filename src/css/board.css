@@ -55,6 +55,10 @@ body {
     height: 100% !important;
 }
 
+#SidebarLeft .tab a{
+    padding: 0 17px;
+}
+
 .SidebarBoard:hover {
     cursor: pointer;
     color: #FFFFFF !important;
