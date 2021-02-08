@@ -28,7 +28,9 @@ export function openModal(id, onOpenStart=null, onCloseEnd=null){
     	    onCloseEnd: ()=>{
     	    	window.M.Modal.getInstance(document.getElementById(id)).destroy();
     	    	if(onCloseEnd) onCloseEnd();
-    	    }
+    	    },
+    	    startingTop:'2%',
+    	    endingTop:'2%',
     	}).open();
     	
 	}
@@ -85,11 +87,11 @@ export function ModalCreateWorkshop(){
 	return (<>
         <div id="modalCreateWorkshop" className="modal">
             <div className="modal-content black-text">
-				<Workshop onCreateDone={()=> closeModal("modalCreateWorkshop")}/>
+				<Workshop 
+					onCreateDone={()=> closeModal("modalCreateWorkshop")}
+					onCancel={()=> closeModal("modalCreateWorkshop")}
+				/>
 	        </div>
-	        <div className="modal-footer">
-                <button className="modal-close waves-effect waves-red btn-flat">Cancel</button>
-            </div>
         </div>
     </>);
 
