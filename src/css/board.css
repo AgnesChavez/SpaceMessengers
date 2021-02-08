@@ -448,6 +448,10 @@ body,
 }
 
 
+.modal{
+    max-height: 94% !important;
+}
+
 #UploadsModal {
     background-color: black !important;
 
@@ -481,4 +485,28 @@ body,
 #UploadsModal .uploadsContent {
     width: 50%;
     float: right;
+}
+
+.WorkshopButtons{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.WorkshopButtons .btn{
+    margin-left: 1rem;
+}
+
+.SelectCSV .input-field{
+    padding-left: 0px;
+}
+
+.SelectCSV .file-path-wrapper{
+    display:none;
+}
+.SelectCSV .file-field .btn{
+    height: 36px !important;
+    line-height: 36px !important;
+}
+.SelectCSV .CSVInstructions{
+    font-size: 12px;
 }

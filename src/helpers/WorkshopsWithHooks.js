@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { Button, Row, Col, TextInput, Preloader } from 'react-materialize';
 
-import { WorkshopData } from "../helpers/Types";
+import { WorkshopData, userTypes } from "../helpers/Types";
 
 import { addDataToDb } from "../helpers/db";
 
-import { createSchool, deleteUser } from '../helpers/factory'
+import { createSchool } from '../helpers/factory'
 
+
+import PapaParse from 'papaparse';
 
 function EmptyUserEmail(useTeam){
 	let u = {name: "", email:""};
@@ -23,14 +27,6 @@ function handleChange(event, data){
 
 
 function NameEmail(props){
-	// return (
-	// 		<>
-	// 		<TextInput label="Name" name="name" value={props.data.name} onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
-	// 		<TextInput label="Email" name="email" value={props.data.email} onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
-	// 		{props.useTeam && <TextInput label="Team name" name="team" value={props.data.team} onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
-	// 		</>
-		// )
-
 	return (
 			<>
 			<TextInput label="Name" name="name" value={props.data.name} onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
@@ -54,7 +50,10 @@ function AddMembers(props){
 						 
 					</Col>
 				</Row>
-				<Button node="button" waves="light" onClick={()=>props.setData([...props.data, EmptyUserEmail(props.useTeam)])} >{props.buttonLabel}</Button> 
+				<Button 
+					node="button" 
+					waves="light" 
+					onClick={()=>props.setData([...props.data, EmptyUserEmail(props.useTeam)])} >{props.buttonLabel}</Button> 
 			</Col>
 		</Row>
 	</>)
@@ -64,7 +63,6 @@ function AddMembers(props){
 
 async function makeSchool(wsId, institution, location, instructors, students, setSending){
 
-	// console.log("makeSchool", students);
 	setSending(true);
 	createSchool(institution, location, wsId, instructors, students);
 	setSending(false);
@@ -75,24 +73,97 @@ async function makeSchool(wsId, institution, location, instructors, students, se
 
 function School(props){
 
-		
+	const [dummy, setDummy] = useState(false);
+
+	useEffect(()=>{
+		console.log("school "+props.id);
+	})
+
+	function parseCSV(file){
+		PapaParse.parse(file, {
+			header: true,
+			complete: function(results) {
+			console.log(results);
+			if(results.errors.length === 0){
+				let students = props.students;
+				let instructors = props.instructors;
+				results.data.forEach(d=>{
+					if(d.type === userTypes().student){
+						students.push(d);
+					}else if(d.type === userTypes().instructor){
+						instructors.push(d);
+					}else{
+						console.log("invalid type", d);
+					}
+				});
+				props.setStudents(students);	
+				props.setInstructors(instructors);
+				setDummy(true);
+			}else{
+				console.log("CSV parse failed", results.errors);
+			}
+		}
+		});
+	}
+
 
     return (<>
-		<TextInput id={"inst"+props.id} label= {"School name"} s={12} m={6} onChange={ evt => {props.setInstitution(evt.target.value) }}/>
-		<TextInput id={"instLoc"+props.id} label= {"School Location"} s={12} m={6} onChange={ evt => {props.setLocation(evt.target.value) }}/>
-		<AddMembers name="Instructors" data={props.instructors} setData={props.setInstructors} buttonLabel="Add Instructor" />
-		<AddMembers name="Students" data={props.students} setData={props.setStudents} buttonLabel="Add Student" useTeam/>
-	</>);
+		<Row>
+			<TextInput id={"inst"+props.id} label= {"School name"} s={12} m={6} onChange={ evt => {props.setInstitution(evt.target.value) }}/>
+			<TextInput id={"instLoc"+props.id} label= {"School Location"} s={12} m={6} onChange={ evt => {props.setLocation(evt.target.value) }}/>
+			<AddMembers name="Instructors" data={props.instructors} setData={props.setInstructors} buttonLabel="Add Instructor" />
+			<AddMembers name="Students" data={props.students} setData={props.setStudents} buttonLabel="Add Student" useTeam/>
+		</Row>
 
+		<Row className="SelectCSV">
+			<h6>Import from CSV file</h6>
+			
+			<div className="CSVInstructions">Import a CSV file with the names, emails and user types.<br/>
+			<Link to={"https://docs.google.com/spreadsheets/d/1_XLRJP8KGdE8KsZuoDnyFGyENwyxKK2Vj2JQP05cFJI/edit?usp=sharing"}> CSV Template </Link>
+			<span><br/>Copy the template and modify.<br/>Once ready choose </span><span style={{fontFamily: "monospace"}}>File > Download > Coma Separated Values (.csv, current page)</span>
+			<br/>Instructors don't need to be assigned to a team.
+			<br/>Upload a different CSV file for each school.
+			</div>
+			<TextInput
+				label='Select CSV file'
+                icon=<i className="material-icons">file_upload</i>
+                type="file"                
+                onChange={(evt)=>{
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    if (evt.target.files && evt.target.files.length) {
+                      parseCSV(evt.target.files[0]);
+                    }
+	        	}}
+    		></TextInput>
+    	</Row>		
+	</>);
+}
+
+function WorkshopButtons(props){
+
+	return 	<div className="WorkshopButtons">
+ 				<Button
+ 					className="white black-text"
+ 					node="button"
+ 					waves="light"
+ 					onClick={props.onCancel}
+				>Cancel
+				</Button> 
+ 				<Button 
+ 					className=""
+ 					node="button"
+ 					waves="light" 
+ 					onClick={props.okCallback}
+				>{props.label}
+				</Button> 
+			</div>
 }
 
 export function Workshop (props){
 
     		
     	const [name, setName ] = useState("");
-    	// const [institution, setInstitution ] = useState( "" );
-     //    const [instructors, setInstructors ] = useState( []);
-     //    const [students, setStudents ] = useState( []);
         const [sending, setSending] = useState(false);
 
 
@@ -109,7 +180,8 @@ export function Workshop (props){
 		
 		const [location1, setLocation1 ] = useState('');
         const [location2, setLocation2 ] = useState( '');
-        
+		
+
     	const tabsRef = useRef(null);
 
 
@@ -160,82 +232,6 @@ async function create(onCreateDone){
     	selectTab('schoolsTab2');
     }
     
-// function NewStudent(name, email, team){
-// 	return {name, email, team}
-// }
-// 
-// 
-// async function prefillData(){
-// 
-// 
-// 
-// 
-// await deleteUser("19v4YUArtSbef8qxwozJ");
-// await deleteUser("1DL91LxgwlXHJTqHn76k");
-// await deleteUser("1QXlX8F7FOiZOXg4tXwc");
-// await deleteUser("4M1P7OAfUIcaYUqHjazt");
-// await deleteUser("7AukVbcU2ZQLrQcvHpMI");
-// await deleteUser("7v3uYZ3hRxFWKfBa5TH0");
-// await deleteUser("Bd8D7WS1uFUqIPZor6sz");
-// await deleteUser("BuOeicg84vvpnaWVHrbB");
-// await deleteUser("E3ndmB4X0GGlxcr1zg0J");
-// await deleteUser("EMEm9QjqR4QmjgydY538");
-// await deleteUser("IcIspSPxA3qaItkmCnEf");
-// await deleteUser("JVfCXmP7y69emrtuxGf8");
-// await deleteUser("L7HT0FuoTfCfjwVHO2Lt");
-// await deleteUser("Pp6Gqy3klnFEgws1IAPS");
-// await deleteUser("Qcj7WTbGipRu274Oswgu");
-// await deleteUser("SgYzeYnk4z7gJVGJsMVz");
-// await deleteUser("W4Dv4I0h5AUAPRgekzDj");
-// await deleteUser("WuFBzYk6OhTtb7uwBZAy");
-// await deleteUser("bqaN3ceZ0STUPTTge5Bw");
-// await deleteUser("qoWmGkv2J1hI5mA7eZ13");
-// await deleteUser("sWkJee6QpaQlsDqwTdW2");
-// await deleteUser("tmbeNXAoGs94HCVzGzGr");
-// await deleteUser("uNZNWF9IpoBcpgFE03CJ");
-// await deleteUser("xBMLZQCQuKaShjslH23z");
-// await deleteUser("xxUGidHuDmhrqnohrjYL");
-// 
-// 
-// 	setStudents1(
-// [NewStudent("Josephine Dicks" ,"jdicks@tisataos.org", "A"),
-// 
-// NewStudent("Sol Valadez-Little" ,"sol@tisataos.org", "B"),
-// NewStudent("Tori Thomas" ,"torit@tisataos.org", "B"),
-// NewStudent("Hayden Greywolf" ,"milagro@tisataos.org", "B"),
-// 
-// NewStudent("Oliver LaMure" ,"olamure@tisataos.org", "C"),
-// NewStudent("Elsie Clayton" ,"elsie@tisataos.org", "C"),
-// NewStudent("Avery Bel" ,"abell@tisataos.org", "C"),
-// 
-// NewStudent("Amelia Martinez" ,"amelia@tisataos.org", "D"),
-// NewStudent("Joaquin Robles" ,"jrobles@tisataos.org", "D"),
-// 
-// NewStudent("Brytin Ryan" ,"brytin@tisataos.org", "E"),
-// NewStudent("Mikhalo Romero" ,"mikhalor@tisataos.org", "E"),
-// NewStudent("Brooklyn Maestas" ,"brooklynm@tisataos.org", "E"),
-// 
-// NewStudent("Hudson Jones-Carroll" ,"hudson@tisataos.org", "F"),
-// NewStudent("Jazelle Chavira" ,"jazelle@tisataos.org", "F"),
-// NewStudent("Miko Cox" ,"miko@tisataos.org", "A", "F"),
-// 
-// NewStudent("Santiago Archuleta" ,"santiago@tisataos.org", "G"),
-// NewStudent("Julian Alvardo" ,"julianalvardo@tisataos.org", "G"),
-// 
-// NewStudent("Rosetta Ryan" ,"rosetta@tisataos.org", "H"),
-// 
-// NewStudent("Noah Joseph" ,"noah@tisataos.org", "I"),
-// NewStudent("Nevaeh Valerio" ,"nevaeh@tisataos.org", "I"),
-// NewStudent("Mateo Love" ,"mateo@tisataos.org", "I"),
-// 
-// NewStudent("Estevan Martinez" ,"estevan@tisataos.org", "J"),
-// 
-// NewStudent("Christy Alvarado" ,"christy@tisataos.org", "K"),
-// 
-// NewStudent("Madeleine Sooy" ,"msooy@tisataos.org", "L"),
-// NewStudent("Youssef Weinman" ,"youssefweinman@tisataos.org", "L")]);
-// }
-
 
 	if(sending || school1Sending || school2Sending ){
 		return (<>
@@ -262,47 +258,49 @@ async function create(onCreateDone){
   	<Col s={12}>
     	<Row id='CreateWorkshop' className="z-depth-2 black-text" style={{padding: 12+'px'}}>
     		<Col s={12}>
-     		<h5>Creating new workshop</h5>
+     			<h5>Creating new workshop</h5>
      		
-      		<TextInput id="workshop_name" label="Workshop name" s={12} onChange={ evt => {setName(evt.target.value)}}/>
+      			<TextInput id="workshop_name" label="Workshop name" s={12} onChange={ evt => {setName(evt.target.value)}}/>
 
 
-            <ul id="CreateWorkshopTabs" className="tabs tabs-fixed-width white black-text depth-1">
-                <li className="tab"><a className="active" href="#schoolsTab1">School 1</a></li>
-                <li className="tab"><a href="#schoolsTab2">School 2</a></li>
-            </ul>
+            	<ul id="CreateWorkshopTabs" className="tabs tabs-fixed-width white black-text depth-1">
+            	    <li className="tab"><a className="active" href="#schoolsTab1">School 1</a></li>
+            	    <li className="tab"><a href="#schoolsTab2">School 2</a></li>
+            	</ul>
             
-            <div id="schoolsTab1" className="col s12"> 
-            	<School id={1}
-            		
-            		setInstitution={setInstitution1}
-					instructors={instructors1}
-					setInstructors={setInstructors1}
-					students={students1}
-					setStudents={setStudents1}
-					setLocation={setLocation1}
-				/>
-				<Button className="right" node="button" waves="light"  onClick={()=>next()}>Next</Button> 
-			</div>
-			<div id="schoolsTab2" className="col s12">
-				<School id={2} 
-					
-					setInstitution={setInstitution2}
-					instructors={instructors2}
-					setInstructors={setInstructors2}
-					students={students2}
-					setStudents={setStudents2}
-					setLocation={setLocation2}
- 				/>
- 				<Button className="right" node="button" waves="light"  onClick={()=>create(props.onCreateDone)}>Create</Button> 
- 			</div>
+            	<div id="schoolsTab1" className="col s12"> 
+            		<School id={1}
+            			
+            			setInstitution={setInstitution1}
+						instructors={instructors1}
+						setInstructors={setInstructors1}
+						students={students1}
+						setStudents={setStudents1}
+						setLocation={setLocation1}
+					/>
+					<WorkshopButtons 
+ 						label={"Next"}
+ 						onCancel={props.onCancel}
+						okCallback={()=>next()}
+					/>
+				</div>
+				<div id="schoolsTab2" className="col s12">
+					<School id={2} 
+						
+						setInstitution={setInstitution2}
+						instructors={instructors2}
+						setInstructors={setInstructors2}
+						students={students2}
+						setStudents={setStudents2}
+						setLocation={setLocation2}
+ 					/>
+ 					<WorkshopButtons 
+ 						label={"Create"}
+ 						onCancel={props.onCancel}
+						okCallback={()=>create(props.onCreateDone)}
+					/>
 
-		{/* <Button className="right red" node="button" waves="light"  onClick={()=>prefillData()}>Prefill Data</Button>  */}
-
-
-
-
-			
+ 				</div>			
 			</Col>
 		</Row>
 	</Col>
