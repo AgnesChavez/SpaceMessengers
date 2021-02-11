@@ -75,15 +75,15 @@ function School(props){
 
 	const [dummy, setDummy] = useState(false);
 
-	useEffect(()=>{
-		console.log("school "+props.id);
-	})
+	// useEffect(()=>{
+	// 	console.log("school "+props.id);
+	// })
 
 	function parseCSV(file){
 		PapaParse.parse(file, {
 			header: true,
 			complete: function(results) {
-			console.log(results);
+			// console.log(results);
 			if(results.errors.length === 0){
 				let students = props.students;
 				let instructors = props.instructors;
