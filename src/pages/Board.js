@@ -20,13 +20,16 @@ import { userTypes } from '../helpers/Types'
 import { InfoSidebar } from '../components/InfoSidebar'
 
 import {  addBoardToUser } from '../helpers/factory'
+
+import { getQueryData } from '../helpers/db'
+
 // import {  makeDefaultBoard } from '../helpers/factory' 
 // import {  createSchool } from '../helpers/factory'
 // import {  createUser } from '../helpers/factory'
 // import { createUserInDb } from '../helpers/userManagement'
 
 
-import { UploadImgButton } from '../helpers/imgStorage'
+import { UploadImgButton, deleteImg } from '../helpers/imgStorage'
 
 import { addToArray, removeFromArray } from '../helpers/db'
 
@@ -111,22 +114,24 @@ export default function Board() {
 
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
 
-    
 
-    const addMessage = async (e) => {
-        e.preventDefault();
-
+    async function createMessage(isImage=false, imgData=null){
         const { uid } = auth().currentUser;
 
-
         let center = document.getElementById('center');
-
 
         let x = center.scrollLeft + (center.clientWidth - 210)/2;
         let y = center.scrollTop + (center.clientHeight - 88)/2;
 
-
         let newMessage = BoardMessageData(uid, boardId, x, y);
+
+        if(isImage === true && imgData !== null){
+            newMessage.isImage=true;
+            newMessage.imgURL=imgData.downloadURL;
+            newMessage.content=imgData.caption;
+            newMessage.uploadPath = imgData.uploadPath;
+        }
+
         let msgRef = await messagesRef.add(newMessage);
 
         newMessage.id = msgRef.id;
@@ -137,11 +142,26 @@ export default function Board() {
             id: msgRef.id
         });
         addToArray('boards', boardId, 'messages',msgRef.id);
+    }
+    
 
+    const addMessage = (e) => {
+        e.preventDefault();
+
+        createMessage();
     }
 
-    const deleteMessage = (messageId) => {
+    const deleteMessage = async (messageId) => {
         if(!messageId) return;
+
+        
+
+        let msgData = await getQueryData(messagesRef.doc(messageId));
+        if(msgData !== null && msgData.isImage === true && msgData.uploadPath ){
+            deleteImg(msgData.uploadPath);
+        }
+        
+
 
         messagesRef.doc(messageId).delete().then(function() {
             if(messageId === selected.id){
@@ -355,7 +375,7 @@ export default function Board() {
                         </Link>
                     </li>
                     <li>
-                        <UploadImgButton/>
+                        <UploadImgButton uploadSuccess={(data)=> createMessage(true, data)}/>
                     </li>
                 </ul>
             
@@ -386,7 +406,6 @@ export default function Board() {
             </div>
             <div id="right"></div>
         </div>
-
     </>)
 }
 
