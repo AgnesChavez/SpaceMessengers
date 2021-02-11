@@ -38,7 +38,7 @@ export function openModal(id, onOpenStart=null, onCloseEnd=null){
 	}
 }
 
-function closeModal(id){
+export function closeModal(id){
 	let el = document.getElementById(id);
 	if(el){
 		let m = window.M.Modal.getInstance(el);
