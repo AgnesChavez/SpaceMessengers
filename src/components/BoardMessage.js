@@ -16,6 +16,18 @@ import { db } from "../services/firebase";
 
 import '../css/board.css';
 
+
+
+function MessageImage(props){
+    return  <img
+            alt={props.message.content}
+            src={props.message.imgURL}
+            className="materialboxed messageImage"
+        />
+}
+
+
+
 // props:
 // messageId
 // onStopHandler
@@ -75,15 +87,10 @@ export function BoardMessage(props)
                 <span style={{color: ('color' in user)?user.color:"white"}}>{user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
-                    {/* <span className="new badge red messageBadge  z-depth-2" data-badge-caption=""  */}
-                    {/*     style={{position: "absolute", */}
-                    {/*             right: "0px", */}
-                    {/*             minWidth:"22px", */}
-                    {/*             borderRadius:"11px", */}
-                    {/*             transform: "translateY(-11px)" */}
-                    {/*             }} */}
-                    {/*     >3</span> */}
+                    {message.isImage?<MessageImage id={props.messageId} message={message} active={canEdit()}/>
+                    :""}
                     <MessageEditor id={props.messageId}  message={message} active={canEdit()}/>
+
                     {canEdit()?
                     <Button
                         className="red small halfway-fab"
