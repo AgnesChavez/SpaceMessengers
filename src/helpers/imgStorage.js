@@ -1,12 +1,23 @@
 import React, { useState,  useRef, useEffect } from "react";
 
-import { TextInput } from 'react-materialize';
+
 import { auth, storageRef } from "../services/firebase";
 import firebase from "firebase";
 
-import { Modal } from 'react-materialize';
+import { TextInput, Button, Modal } from 'react-materialize';
+
+import { openModal, closeModal } from '../components/Modals';
 
 var uploadTasks = {};
+
+
+export function deleteImg(imgPath){
+    storageRef.child(imgPath).delete().then(() => {
+  
+    }).catch((error) => {
+        console.log("error deleting file", error);
+    });
+}
 
 
 export function FileUploadButton(props){
@@ -53,72 +64,111 @@ export function UploadImgButton(props) {
     // const tooltipRef = useRef(null);
     
     const [numUploads, setNumUploads] = useState(0);
-
-
-    // useEffect(() => {
-    //     // console.log("UploadImgButton constructor");
-    //     if(!tooltipRef.current){
-    //         let btnEl = document.querySelector('#UploadImageInput .input-field .btn');
-    //         if(btnEl){
-    //             btnEl.classList.add('btn-floating');
-    //             btnEl.dataset.tooltip = "Upload image to your gallery"
-    //             btnEl.dataset.position = "right"
-    //             tooltipRef.current = window.M.Tooltip.init(btnEl, null);
-    //         }
-    //     }
-    //     return ()=>{
-    //         // console.log("UploadImgButton destructor");
-    //         if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
-    //     }
-    // });
-
+    const [fileToUpload, setFileToUpload] = useState(null);
+    const imgNeedToBeRead = useRef(false);
 
     function uploadImg(file, userId){
         let fileId = fileToString(file);
         if(!(fileId in uploadTasks) || uploadTasks[fileId] ===null){
             let uploadPath = 'images/'+ userId + '/' + file.name;
             
-            uploadTasks[fileId] = {task:storageRef.child(uploadPath).put(file), file};
+            uploadTasks[fileId] = {
+                task:storageRef.child(uploadPath).put(file), 
+                storageChild: storageRef.child(uploadPath), 
+                uploadPath,
+                file,
+                caption: document.getElementById('TextInputModalUploadImageToBoard').value
+            };
             setNumUploads(numUploads + 1);
-            
+            closeModal('ModalUploadImageToBoard');
         }
     }
 
 
-    function onComplete(key, message){
+    async function onComplete(key, message, downloadURL=""){
         if(key in uploadTasks){
             window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
 
+            let caption = uploadTasks[key].caption;
+            let uploadPath = uploadTasks[key].uploadPath;
+            // let url = await uploadTasks[key].storageChild.getDownloadURL();
             delete uploadTasks[key];
-            setNumUploads(numUploads - 1);       
+            setNumUploads(numUploads - 1);    
+
+            if(downloadURL!==null && downloadURL !== ""){
+                // console.log("downloadURL: " + downloadURL);
+                // console.log("url: " + url);
+                
+                props.uploadSuccess({downloadURL, caption, uploadPath});
+            }
         }
     }
+
+
+    function loadImg() {
+        if (fileToUpload && imgNeedToBeRead.current === true) {
+            // console.log("loadImg");
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                // console.log("loadImg onLoad");
+                let img = document.getElementById('ImgModalUploadImageToBoard');
+                img.setAttribute('src', e.target.result);
+                let modal = document.getElementById("ModalUploadImageToBoard");
+                let footer = modal.querySelector('.modal-footer');
+                let content = modal.querySelector('.modal-content');
+                img.style.maxHeight=(modal.clientHeight - 200 - footer.clientHeight)+'px';
+                img.style.maxWidth=content.clientWidth + 'px';
+            }
+            reader.readAsDataURL(fileToUpload);
+            imgNeedToBeRead.current=false;
+        }
+    }
+
+    function fileUploadButtonCallback(file){
+        imgNeedToBeRead.current=true;
+        setFileToUpload(file);
+        openModal("ModalUploadImageToBoard");
+    }
+
+    useEffect(() => {
+        loadImg();
+    });
+
+    // uploadImg(file, auth().currentUser.uid)}
     return(<>
-
-        {/* <div id="UploadImageInput"> */}
-        {/*     <TextInput */}
-        {/*         id="UploadImageTextInput" */}
-        {/*         label=<i className="material-icons">file_upload</i> */}
-        {/*         type="file" */}
-        {/*          */}
-        {/*         onChange={(evt)=>{ */}
-        {/*             evt.stopPropagation(); */}
-        {/*             evt.preventDefault(); */}
-        {/*             if (evt.target.files && evt.target.files.length) { */}
-        {/*               // console.log(evt.target.files[0]); */}
-        {/*                 uploadImg( evt.target.files[0], auth().currentUser.uid); */}
-        {/*             } */}
-        {/*         }} */}
-        {/*     /> */}
-        {/* </div>     */}
-
 
         <FileUploadButton
         id="UploadImageInput"
-        tootip="Upload image to your gallery"
+        tootip="Upload image to this board"
         tooltipPosition="right"
-        callback={(file)=>uploadImg(file, auth().currentUser.uid)}
+        callback={(file)=>fileUploadButtonCallback(file)} 
     />
+
+    <Modal
+            actions={[      
+                <Button 
+                    node="button" 
+                    waves="light" 
+                    onClick={()=>uploadImg(fileToUpload, auth().currentUser.uid)}
+                >
+                Upload
+                </Button>,
+                <Button flat modal="close" node="button" waves="red">Cancel</Button>
+            ]}
+            className="black-text"
+            header="Upload image to board"
+            id="ModalUploadImageToBoard"
+            root={document.getElementById('modalRoot')}
+        > 
+        <>
+
+            <img id="ImgModalUploadImageToBoard" src="#" alt="to upload preview" />
+            <TextInput
+                id="TextInputModalUploadImageToBoard"
+                label="Image Caption"
+            />
+        </>
+    </Modal>
 
 
     {(Object.keys(uploadTasks).length > 0)?
@@ -149,7 +199,8 @@ export function UploadImgButton(props) {
             key={task[0]} 
             taskId={task[0]} 
             file={task[1].file} 
-            task={task[1].task} 
+            task={task[1].task}
+            storageChild={task[1].storageChild}
             onComplete={onComplete}/>) }
         </div>
         </Modal>
@@ -181,6 +232,32 @@ function FileUploader(props){
     const taskListener = useRef(null);
 
     const [progress, setProgress] = useState(0);
+
+ // Upload completed successfully, now we can get the download URL
+    async function uploadSucceded(){
+
+        let downloadURL = await props.storageChild.getDownloadURL();
+        console.log('File available at', downloadURL);
+        props.onComplete(props.taskId, "Succesfully uploaded file: ", downloadURL);
+        
+//          file.makePublic(function(err, apiResponse) {
+//         });
+
+// 
+//         console.log("uploadSucceded task",props.task);
+//         try{
+//             let metadata = await props.task.snapshot.ref.getMetadata();
+//             // console.log("metadata",metadata)
+//             let url = await storageRef.child(metadata.fullPath).getDownloadURL();
+//             
+//             props.onComplete(props.taskId, "Succesfully uploaded file: ", url); 
+//             
+//         }catch(error) {
+//             console.error('failed getting file download url', error);
+//             props.onComplete(props.taskId, "Failed to uploaded file: " + error);
+//         }
+
+    }
 
     useEffect(()=>{
         if(taskListener.current === null){
@@ -222,17 +299,14 @@ function FileUploader(props){
                 //     }
                 },
                 () => {
-                    // Upload completed successfully, now we can get the download URL
-                    props.task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                        // console.log('File available at', downloadURL);
-                        props.onComplete(props.taskId, "Succesfully uploaded file: ");
-                    });
+                   uploadSucceded();
                 });
             }
             return ()=>{
-                // console.log("destroy listener");
+                console.log("destroy listener");
                 if(taskListener.current!==null) taskListener.current();
-                    props.onComplete(props.taskId, "Succesfully uploaded file: ");
+                    uploadSucceded();
+                    // props.onComplete(props.taskId, "Succesfully uploaded file: ");
             }
         }
     );
