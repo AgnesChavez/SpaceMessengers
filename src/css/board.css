@@ -514,3 +514,14 @@ body,
 .SelectCSV .CSVInstructions{
     font-size: 12px;
 }
+
+.messageImage{
+    width: 200px;
+    max-width:200px;
+}
+
+
+#ImgModalUploadImageToBoard{
+    min-height: 200px;
+    min-width: 200px;
+}
