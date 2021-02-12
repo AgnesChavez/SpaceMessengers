@@ -4,6 +4,7 @@ import React,  { useEffect, useState, useRef} from "react";
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useDownloadURL } from 'react-firebase-hooks/storage';
 
 import { auth, storageRef, db } from "../services/firebase";
 
@@ -44,10 +45,14 @@ function deleteImg(img){
 }
 
 
+
+
 function LoadAndShowImage(props){
-	
+	const [downloadUrl, loading] = useDownloadURL(storageRef.child(props.img.imagePath));	
   	return (<>
     	<div id={props.img.id} className="gridImg">
+    		{ loading && <CenteredPreloader  title={"Loading image"}/> }
+    		{downloadUrl && !loading &&
 			<MediaBox
   				options={{
   				  	inDuration: 200,
@@ -56,12 +61,12 @@ function LoadAndShowImage(props){
   				caption={props.img.caption}
 				>
 			  	<img
-			    	alt=""
-			    	src={props.img.downloadURL}
+			    	alt={props.img.caption}
+			    	src={downloadUrl}
 			    	className=" materialboxed galleryImg"
 			  	/>
-			</MediaBox>
-			  	{props.deleting === true && 
+			</MediaBox>}
+			  	{downloadUrl && !loading && props.deleting === true && 
 			  		<Button
     				className="red right"
     				node="button"
@@ -128,7 +133,7 @@ function RenderGallery(props){
 	let query = db.collection("images").where("workshopId", "==", props.user.currentWorkshop);
 
 	if(props.showUserGallery === true){
-		query.where("uid", "==", props.user.id);
+		query = query.where("uid", "==", props.user.id);
 	}
 	
 
