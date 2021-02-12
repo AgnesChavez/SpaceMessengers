@@ -155,8 +155,8 @@ export function SidebarTeamCollection(props){
                         /> )}
             </ul> 
 
-            {props.user !== userTypes().student && <CreateTeamModalButton/>}
-            {props.user !== userTypes().student && <ModalRemoveTeamButton/>}
+            {props.user.type !== userTypes().student && <CreateTeamModalButton/>}
+            {props.user.type !== userTypes().student && <ModalRemoveTeamButton/>}
         </>
     );
 }
