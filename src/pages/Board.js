@@ -29,7 +29,7 @@ import { getQueryData } from '../helpers/db'
 // import { createUserInDb } from '../helpers/userManagement'
 
 
-import { UploadImgButton, deleteImg } from '../helpers/imgStorage'
+import { UploadImgButton } from '../helpers/imgStorage'
 
 import { addToArray, removeFromArray } from '../helpers/db'
 
@@ -115,7 +115,7 @@ export default function Board() {
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
 
 
-    async function createMessage(isImage=false, imgData=null){
+    async function createMessage(){
         const { uid } = auth().currentUser;
 
         let center = document.getElementById('center');
@@ -125,12 +125,12 @@ export default function Board() {
 
         let newMessage = BoardMessageData(uid, boardId, x, y);
 
-        if(isImage === true && imgData !== null){
-            newMessage.isImage=true;
-            newMessage.imgURL=imgData.downloadURL;
-            newMessage.content=imgData.caption;
-            newMessage.uploadPath = imgData.uploadPath;
-        }
+        // if(isImage === true && imgData !== null){
+        //     newMessage.isImage=true;
+        //     newMessage.imgURL=imgData.downloadURL;
+        //     newMessage.content=imgData.caption;
+        //     newMessage.uploadPath = imgData.uploadPath;
+        // }
 
         let msgRef = await messagesRef.add(newMessage);
 
@@ -156,10 +156,10 @@ export default function Board() {
 
         
 
-        let msgData = await getQueryData(messagesRef.doc(messageId));
-        if(msgData !== null && msgData.isImage === true && msgData.uploadPath ){
-            deleteImg(msgData.uploadPath);
-        }
+        // let msgData = await getQueryData(messagesRef.doc(messageId));
+        // if(msgData !== null && msgData.isImage === true && msgData.uploadPath ){
+        //     deleteImg(msgData.uploadPath);
+        // }
         
 
 
@@ -375,7 +375,7 @@ export default function Board() {
                         </Link>
                     </li>
                     <li>
-                        <UploadImgButton uploadSuccess={(data)=> createMessage(true, data)}/>
+                        {currentUser && currentUser.currentWorkshop && <UploadImgButton workshopId={currentUser.currentWorkshop}/> }
                     </li>
                 </ul>
             
