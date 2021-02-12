@@ -8,16 +8,20 @@ import { TextInput, Button, Modal } from 'react-materialize';
 
 import { openModal, closeModal } from '../components/Modals';
 
+import { addDataToDb } from '../helpers/db';
+
+import { ImageData } from '../helpers/Types';
+
 var uploadTasks = {};
 
 
-export function deleteImg(imgPath){
-    storageRef.child(imgPath).delete().then(() => {
-  
-    }).catch((error) => {
-        console.log("error deleting file", error);
-    });
-}
+// export function deleteImg(imgPath){
+//     storageRef.child(imgPath).delete().then(() => {
+//   
+//     }).catch((error) => {
+//         console.log("error deleting file", error);
+//     });
+// }
 
 
 export function FileUploadButton(props){
@@ -99,10 +103,19 @@ export function UploadImgButton(props) {
                 // console.log("downloadURL: " + downloadURL);
                 // console.log("url: " + url);
                 
-                props.uploadSuccess({downloadURL, caption, uploadPath});
+                // props.uploadSuccess({downloadURL, caption, uploadPath});
+
+                const { uid } = auth().currentUser;
+
+                let newImage = ImageData(uid, props.workshopId, downloadURL, caption, uploadPath);
+        
+                addDataToDb("images" ,newImage, true, "id");
+
             }
         }
     }
+
+
 
 
     function loadImg() {
@@ -139,7 +152,7 @@ export function UploadImgButton(props) {
 
         <FileUploadButton
         id="UploadImageInput"
-        tootip="Upload image to this board"
+        tootip="Upload image to your gallery"
         tooltipPosition="right"
         callback={(file)=>fileUploadButtonCallback(file)} 
     />
@@ -156,7 +169,7 @@ export function UploadImgButton(props) {
                 <Button flat modal="close" node="button" waves="red">Cancel</Button>
             ]}
             className="black-text"
-            header="Upload image to board"
+            header="Upload image to your gallery"
             id="ModalUploadImageToBoard"
             root={document.getElementById('modalRoot')}
         > 
@@ -237,7 +250,7 @@ function FileUploader(props){
     async function uploadSucceded(){
 
         let downloadURL = await props.storageChild.getDownloadURL();
-        console.log('File available at', downloadURL);
+        // console.log('File available at', downloadURL);
         props.onComplete(props.taskId, "Succesfully uploaded file: ", downloadURL);
         
 //          file.makePublic(function(err, apiResponse) {
