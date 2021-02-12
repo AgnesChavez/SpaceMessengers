@@ -111,3 +111,12 @@ export function BoardMessageData(uid, boardId, x, y) {
     comments:{}
   };
 }
+export function ImageData(uid, workshopId, downloadURL, caption, imagePath) {
+  return {
+    created: firebase.firestore.FieldValue.serverTimestamp(),
+    id: null,
+    uid, workshopId, downloadURL, caption, imagePath
+  };
+}
+
+
