@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 
 import Draggable from 'react-draggable';
 
@@ -16,17 +16,37 @@ import { db } from "../services/firebase";
 
 import '../css/board.css';
 
+// 
+// 
+// 
+// function MessageImage(props){
+// 
+//     const boxed = useRef(null);
+//     
+// 
+//     useEffect(() => {
+// 
+//     });
+// 
+// 
+//     return  <img
+//             id={"image"+props.message.id}
+//             alt={props.message.content}
+//             src={props.message.imgURL}
+//             data-caption={props.message.content}
+//             className="materialboxed messageImage"
+//             
+//         />
+// }
 
-
-function MessageImage(props){
-    return  <img
-            alt={props.message.content}
-            src={props.message.imgURL}
-            className="materialboxed messageImage"
-        />
-}
-
-
+// onClickCapture={(e)=>{
+//                 e.preventDefault();
+//                 e.stopPropagation();
+//                 let img = document.getElementById("image"+props.message.id);
+//                 if(img !== null){
+//                      window.M.Materialbox.getInstance(img).open();
+//                 }
+//             }}
 
 // props:
 // messageId
@@ -87,8 +107,7 @@ export function BoardMessage(props)
                 <span style={{color: ('color' in user)?user.color:"white"}}>{user.displayName}</span>
             </div>
                 <div className="messageCard-content white-text">
-                    {message.isImage?<MessageImage id={props.messageId} message={message} active={canEdit()}/>
-                    :""}
+              
                     <MessageEditor id={props.messageId}  message={message} active={canEdit()}/>
 
                     {canEdit()?
