@@ -3,7 +3,7 @@ import React,  { useEffect, useState, useRef} from "react";
 
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
-import { useDownloadURL } from 'react-firebase-hooks/storage';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { auth, storageRef, db } from "../services/firebase";
 
@@ -17,7 +17,7 @@ import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { userTypes } from "../helpers/Types"
 
-import { UploadImgButton } from '../helpers/imgStorage'
+
 
 function getWidth() {
   	return Math.max(
@@ -29,34 +29,35 @@ function getWidth() {
 	);
 }
 
-function deleteImg(imgRef){
-	storageRef.child(imgRef.fullPath).delete().then(() => {
+function deleteImg(img){
+	storageRef.child(img.imagePath).delete().then(() => {
   
 	}).catch((error) => {
   		console.log("error deleting file", error);
+	}); 
+
+	db.collection("images").doc(img.id).delete().then(function() {
+             
+    }).catch(function(error) {
+            console.error("Error removing document: ", error);
 	});
 }
 
 
 function LoadAndShowImage(props){
 	
-	const [value, loading] = useDownloadURL(props.img);
-  	
   	return (<>
-    	<div id={props.img.name} className="gridImg">
-      		{loading && <CenteredPreloader title={"Loading images"}/>}
-      		{!loading && value && 
-
-				<>
+    	<div id={props.img.id} className="gridImg">
 			<MediaBox
   				options={{
   				  	inDuration: 200,
   				  	outDuration: 200
   				}}
+  				caption={props.img.caption}
 				>
 			  	<img
 			    	alt=""
-			    	src={value}
+			    	src={props.img.downloadURL}
 			    	className=" materialboxed galleryImg"
 			  	/>
 			</MediaBox>
@@ -71,21 +72,19 @@ function LoadAndShowImage(props){
   					icon={<Icon>delete</Icon>}
   					onClick={()=>props.deleteCallback(props.img, props.index)}
     			/>}
-    			</>
-			}			
     	</div>
     </>);
 }
 
 function ShowColumn(props){
-console.log("Col refs:", props.imagesRefs);
-console.log("Col index:", props.index);
+// console.log("Col refs:", props.imagesRefs);
+// console.log("Col index:", props.index);
 	return <div className="GalleryColumn" style={{flex: props.pctWidth+"%", maxWidth: props.pctWidth+"%" }}>
   
 		{props.index && 
-		 props.index.map(i => (i < props.imagesRefs.length)? <LoadAndShowImage
-			 					key={props.imagesRefs[i].fullPath}
-			 					img={props.imagesRefs[i]}
+		 props.index.map(i => (i < props.images.length)? <LoadAndShowImage
+			 					key={props.images[i].id}
+			 					img={props.images[i]}
 			 					deleting={props.deleting}
 			 					deleteCallback={props.deleteCallback}
 			 					index={i}
@@ -97,6 +96,7 @@ console.log("Col index:", props.index);
 export default  function Gallery(props) {
 
 	let [user, loadingUser ] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
+
 
     return (<>
     	<header id="GalleryHeader">
@@ -124,49 +124,30 @@ export default  function Gallery(props) {
 }
 
 function RenderGallery(props){
-	let galleryPath = 'images';
+
+	let query = db.collection("images").where("workshopId", "==", props.user.currentWorkshop);
+
 	if(props.showUserGallery === true){
-		galleryPath += '/'+ auth().currentUser.uid;	
+		query.where("uid", "==", props.user.id);
 	}
 	
 
-	let listRef = storageRef.child(galleryPath);
+	const [images, imagesLoading] = useCollectionData(query); 
 	
-	let [imagesRefs, setImagesRefs] = useState(null);
-	let [refsLoaded, setRefsLoaded] = useState(false);
 	let [deleting, setDeleting] = useState(false);
 	let [indices, setIndices] = useState([]);
-
+	// let nextPageToken = useRef(null);
+	// let currentPageToken = useRef(null);
 	// let originalBg  = useRef(null);
 	let [pctWidth, setPctWidth] = useState(20);
+	let needsCalculateSize = useRef(true);
 	
 
-	async function getImages(){
-		try{
-			let all = await listRef.listAll();
-
-			if(props.showUserGallery === true){
-				setImagesRefs(all.items);
-			}else{
-				let allItems = [];
-				for(let i = 0; i < all.prefixes.length; i++){
-					let folder = await all.prefixes[i].listAll();
-					if(folder.items.length > 0 ){
-						// console.log(folder.items);
-						allItems = allItems.concat(folder.items);
-						// console.log(allItems);
-      					// allItems.push(...folder.items);
-					}
-		    	}
-		    	setImagesRefs(allItems);
-			}
-			setRefsLoaded(true);
-			calculateSize();
-				
-		}catch(error) {
-  			console.log("Loading gallery failed with error:", error);
-		}
+	if(needsCalculateSize.current === true && images && !imagesLoading){
+		calculateSize();
 	}
+
+
 
 	function calculateSize(){
 		let imgWidth = 200;
@@ -174,9 +155,9 @@ function RenderGallery(props){
 		let numColumns = Math.floor((getWidth()-galleryPadding)/imgWidth);
 		let imgsPerCol =2;
 		let modulo = 0;
-		if(refsLoaded && imagesRefs && imagesRefs.length > 0){
-			imgsPerCol = Math.floor(imagesRefs.length/numColumns);
-			modulo = imagesRefs.length % numColumns;
+		if(images && images.length > 0){
+			imgsPerCol = Math.floor(images.length/numColumns);
+			modulo = images.length % numColumns;
 		}
 
 		let newIndices = [];
@@ -190,32 +171,22 @@ function RenderGallery(props){
 				index.push(i);
 			}
 			newIndices.push(index);
-			// indices
-			// numImgsPerCol.push({num, startAt});
+
 			startAt += num;
 		}
 
-	// console.log("indices", indices);
 		setIndices(newIndices)
 		setPctWidth(100.0 / numColumns);
 
-
-		console.log("calculateSize. imgs: ", imagesRefs, "  indices: ", indices);
+		needsCalculateSize.current = false;
+		// console.log("calculateSize. imgs: ", imagesRefs, "  indices: ", indices);
 
 	}
 
+
+
 	useEffect(()=>{
 		window.addEventListener("resize", calculateSize);
-
-		if(!refsLoaded){
-			getImages();
-			// if(originalBg.current === null){
-			// 	originalBg.current = document.querySelector('body').style.backgroundImage;
-			// 	document.querySelector('body').style.backgroundColor = "black";
-			// 	document.querySelector('body').style.backgroundImage = "unset";	
-			// }
-			
-		}
 		return (()=>{
 			window.removeEventListener("resize", calculateSize);
 		})
@@ -223,16 +194,14 @@ function RenderGallery(props){
 	});
 
 	function deleteCallback(img, index){
-		deleteImg(img);	
+		needsCalculateSize.current = true;
+		deleteImg(img);
 
-		let tempImgs = imagesRefs;
-		tempImgs.splice(index, 1);
-		setImagesRefs(tempImgs);
-
-		// let tempIndices = indices;
-		// tempIndices.splice(index, 1);
-		// setIndices(tempIndices);
-		calculateSize();
+		// let tempImgs = imagesRefs;
+		// tempImgs.splice(index, 1);
+		// setImagesRefs(tempImgs);
+		// calculateSize();
+		
 		setDeleting(false);
 	}
 	
@@ -247,39 +216,37 @@ function RenderGallery(props){
 	return <>
 		<div id={ idPrefix+"gallery"} className="subGallery"> 
 			<div className="subGalleryHeader">
-			<h5>{title}</h5>
-			
-			
-			{((props.showUserGallery === true || props.user.type !== userTypes().student) )? 
+				<h5>{title}</h5>
+				{((props.showUserGallery === true || props.user.type !== userTypes().student) )? 
 				
-				<Button
-    				className="grey darken-3  white-text text-darken-4 "
-    				node="button"
-    				
-    				tooltip={(deleting === false)?"Delete images":"Cancel"}
-    				waves="light"
-    				floating
-  					icon={<Icon>{(deleting === false)?"delete":"cancel"}</Icon>}
-  					onClick={()=>setDeleting(!deleting)}
-    			/>:""
-    		}
+					<Button
+    					className="grey darken-3  white-text text-darken-4 "
+    					node="button"
+    					tooltip={(deleting === false)?"Delete images":"Cancel"}
+    					waves="light"
+    					floating
+  						icon={<Icon>{(deleting === false)?"delete":"cancel"}</Icon>}
+  						onClick={()=>setDeleting(!deleting)}
+    				/>:""
+    			}
 			</div>
-			
-
 			<div id= {idPrefix+"GalleryImgs"} className="galleryImgs">
-				{(imagesRefs!==null && imagesRefs.length >0 && indices.length > 0) ?
+				{ imagesLoading && <CenteredPreloader  title={"Loading gallery"}/> }
+				{(!imagesLoading && images && images.length >0 && indices.length > 0) ?
 
 				indices.map(index => <ShowColumn  
 					pctWidth={pctWidth} 
 					key={index} 
 					index={index} 
-					imagesRefs={imagesRefs} 
+					images={images} 
 					deleting={deleting}
 				 	deleteCallback={deleteCallback}
+				 	user={props.user}
 				 	/>)
 				:
 				<p> Empty gallery! </p>}
 			</div>
+
 		</div>
 	</>
 }
