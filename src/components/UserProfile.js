@@ -5,7 +5,7 @@ import { db } from "../services/firebase";
 import { storageRef } from "../services/firebase";
 // import { getUserFromDb } from "../helpers/auth";
 // import { createNewUser } from "../helpers/userManagement";
-import { userTypes } from "../helpers/Types";
+// import { userTypes } from "../helpers/Types";
 // import { WorkshopData } from "../helpers/Types";
 
 

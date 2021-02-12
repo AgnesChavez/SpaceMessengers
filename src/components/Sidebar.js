@@ -8,7 +8,7 @@ import { db } from "../services/firebase";
 import 'firebase/firestore';
 
 // import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 
 // import { getUserFromDb } from "../helpers/userManagement";
@@ -26,21 +26,10 @@ import UserProfile from "./UserProfile";
 
 import '../css/board.css';
 
-import Renameable from './Renameable'
 
 import {ModalCreateWorkshop,
-        CreateWorkshopModalButton,
-        ModalAddBoard,
-        openAddBoardModal,
-        ModalCreateTeam,
-        CreateTeamModalButton,
-        ModalAddUserToTeam,
-        ModalCreateUser,
-        ModalRemoveUser,
-        ModalRemoveTeam,
-        ModalRemoveTeamButton } from './Modals'
-
-import { removeUserFromTeam } from '../helpers/factory'
+        ModalAddBoard
+         } from './Modals'
 
       
 import { SidebarTeamCollection, SidebarAllBoards  } from "./SidebarTeams"
