@@ -14,9 +14,11 @@
   },
   "main": "src/index.js",
   "dependencies": {
+    "child-process-promise": "^2.2.1",
     "express": "^4.17.1",
     "firebase-admin": "^9.4.2",
     "firebase-functions": "^3.13.0",
+    "mkdirp": "^0.5.5",
     "random-avatar-generator": "^2.0.0"
   },
   "devDependencies": {
