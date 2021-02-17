@@ -135,7 +135,7 @@ function createMediaBox(imgId, src, thumbSrc){
 	var elem = document.getElementById(imgId);
 	if(elem){
 		elem.src = src;
-    	var box = window.M.Materialbox.init(elem, {onCloseStart: ()=> elem.src = thumbSrc});
+    	var box = window.M.Materialbox.init(elem, {onCloseStart: ()=> { if(thumbSrc) elem.src = thumbSrc }});
     	box.open();
 	}else{
 		console.log("createMediaBox failed: imageId " + imgId + " does not exist");
@@ -173,7 +173,7 @@ function ShowImg(props){
 			<img 
 				id={thisId}
 				alt={props.img.caption}
-				src={ props.img.thumbURL}
+				src={ props.img.thumbURL ||  props.img.downloadURL}
 				data-caption={props.img.caption}
 				className=" materialboxed galleryImg"
 				onClick={(e)=>
