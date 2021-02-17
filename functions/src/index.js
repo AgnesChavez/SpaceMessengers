@@ -34,21 +34,6 @@ const FieldValue = admin.firestore.FieldValue;
 
 
 
-app.get('/api/listImages', async (req, res) => {
-
-    let querySnapshot = await db.collection("images").get();
-    let docs = [];
-
-    querySnapshot.forEach(d=>{docs.push(d.data())})
-
-    return res.status(200).json(docs);
-});
-
-
-
-
-
-
 app.get('/api/checkEmail', async (req, res) => {
 
     let querySnapshot = await db.collection("users").where("email", "==", req.query.email).get();
@@ -56,79 +41,87 @@ app.get('/api/checkEmail', async (req, res) => {
 });
 
 
-app.get('/api/makeAllThumbs', async (req, res) => {
+// app.get('/api/listImages', async (req, res) => {
+// 
+//     let querySnapshot = await db.collection("images").get();
+//     let docs = [];
+// 
+//     querySnapshot.forEach(d=>{docs.push(d.data())})
+// 
+//     return res.status(200).json(docs);
+// });
+// 
 
-    let querySnapshot = await db.collection("images").get();
-    
 
-    
-    const results = [];
-    for(let i = 0; i < querySnapshot.docs.length; i++){
-    	let d = querySnapshot.docs[i];
+// app.get('/api/makeAllThumbs', async (req, res) => {
+// 
+//     let querySnapshot = await db.collection("images").get();
+//     
+// 
+//     
+//     const results = [];
+//     for(let i = 0; i < querySnapshot.docs.length; i++){
+//     	let d = querySnapshot.docs[i];
+// 
+// 		results.push(makeThumb(d.data().imagePath, d.id));
+// 
+//     	// paths.push({success, imagePath: d.data().imagePath, id: d.id});
+//     }
+// 
+//     let paths = await Promise.all(results);
+// 
+//     return res.status(200).json(paths);
+// });
 
-		results.push(makeThumb(d.data().imagePath, d.id));
+// app.get('/api/numImages', async (req, res) => {
+// 	let querySnapshot = await db.collection("images").get();
+// 	return res.status(200).json({numImages: querySnapshot.docs.length});
+// });
 
-    	// paths.push({success, imagePath: d.data().imagePath, id: d.id});
-    }
+// app.get('/api/noThumbs', async (req, res) => {
+// 
+//     let querySnapshot = await db.collection("images").get();
+//     
+// 
+//     let noThumbs = [];
+//     for(let i = 0; i < querySnapshot.docs.length; i++){
+//     	if(!querySnapshot.docs[i].data().thumbURL){
+//     		noThumbs.push(querySnapshot.docs[i].id);
+//     	}
+//     }
+//     return res.status(200).json(noThumbs);
+//     
+// });
 
-    let paths = await Promise.all(results);
+// app.get('/api/makeThumb', async (req, res) => {
+// 
+//     let querySnapshot = await db.collection("images").get();
+//     let success = false;
+//     let index = req.query.index;
+//     if(index < querySnapshot.docs.length){
+//     	
+//     	let d = querySnapshot.docs[index];
+// 		success = await makeThumb(d.data().imagePath, d.id);
+// 		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
+//     }
+//     return res.status(200).json({fail: true});
+//     
+// });
 
-    return res.status(200).json(paths);
-});
-
-app.get('/api/numImages', async (req, res) => {
-	let querySnapshot = await db.collection("images").get();
-	return res.status(200).json({numImages: querySnapshot.docs.length});
-});
-
-app.get('/api/noThumbs', async (req, res) => {
-
-    let querySnapshot = await db.collection("images").get();
-    
-
-    let noThumbs = [];
-    for(let i = 0; i < querySnapshot.docs.length; i++){
-    	if(!querySnapshot.docs[i].data().thumbURL){
-    		noThumbs.push(querySnapshot.docs[i].id);
-    	}
-    }
-    return res.status(200).json(noThumbs);
-    
-});
-
-app.get('/api/makeThumb', async (req, res) => {
-
-    let querySnapshot = await db.collection("images").get();
-    let success = false;
-    let index = req.query.index;
-    if(index < querySnapshot.docs.length){
-    	
-    	// for(let i = 0; i < querySnapshot.docs.length; i++){
-    	// 	if(!querySnapshot.docs[i].data().thumbURL){
-    	// 		index = i;
-    	// 		break;
-    	// 	}
-    	// }
-    	let d = querySnapshot.docs[index];
-		success = await makeThumb(d.data().imagePath, d.id);
-		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
-    }
-    return res.status(200).json({fail: true});
-    
-});
-
-app.get('/api/makeThumbById', async (req, res) => {
-
-    let d = await db.collection("images").doc(req.query.id).get();
-    if(d){
-		let success = await makeThumb(d.data().imagePath, d.id);
-		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
-	}
-    return res.status(200).json({fail: true});
-});
+// app.get('/api/makeThumbById', async (req, res) => {
+// 
+//     let d = await db.collection("images").doc(req.query.id).get();
+//     if(d){
+// 		let success = await makeThumb(d.data().imagePath, d.id);
+// 		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
+// 	}
+//     return res.status(200).json({fail: true});
+// });
 
 async function getPublicUrl(file) {
-    file.makePublic(function(err, apiResponse) {
+    
+    file.makePublic((err, apiResponse) =>{
+    	if(err){console.log("getPublicUrl failed", err);}
 
     });
 
@@ -216,7 +209,7 @@ async function makeThumb(imgPath, imageId) {
             metadata: metadata,
             resumable: false,
             public: true
-        }, async function(err, newFile) {
+        }, async (err, newFile) =>{
             if (err) {
                 console.log("uploading thumbnail ", imageId, " failed. error: ", err);
                 return false;
@@ -232,6 +225,7 @@ async function makeThumb(imgPath, imageId) {
                 }
 
                 console.log("generateThumbnail.ThumbURL: ", pictureURL);
+                return true;
             }
         });
 
@@ -249,54 +243,14 @@ async function makeThumb(imgPath, imageId) {
     return true;
 }
 
-// [START generateThumbnailTrigger]
-exports.generateThumbnail = functions.storage.object().onFinalize(async (object) => {
-// [END generateThumbnailTrigger]
-  // [START eventAttributes]
-  const fileBucket = object.bucket; // The Storage bucket that contains the file.
-  const filePath = object.name; // File path in the bucket.
-  const contentType = object.contentType; // File content type.
-  const metageneration = object.metageneration; // Number of times metadata has been generated. New objects have a value of 1.
-  // [END eventAttributes]
+exports.makeThumb = functions.firestore
+    .document('images/{imageId}')
+    .onCreate((snap, context) => {
 
-  // [START stopConditions]
-  // Exit if this is triggered on a file that is not an image.
-  if (!contentType.startsWith('image/')) {
-    return console.log('This is not an image.');
-  }
+		makeThumb(snap.data().imagePath, snap.id);
+    });
 
-  // Get the file name.
-  const fileName = path.basename(filePath);
-  // Exit if the image is already a thumbnail.
-  if (fileName.startsWith('thumb_')) {
-    return console.log('Already a Thumbnail.');
-  }
-  // [END stopConditions]
 
-  // [START thumbnailGeneration]
-  // Download file from bucket.
-  const bucket = admin.storage().bucket(fileBucket);
-  const tempFilePath = path.join(os.tmpdir(), fileName);
-  const metadata = {
-    contentType: contentType,
-  };
-  await bucket.file(filePath).download({destination: tempFilePath});
-  console.log('Image downloaded locally to', tempFilePath);
-  // Generate a thumbnail using ImageMagick.
-  await spawn('convert', [tempFilePath, '-thumbnail', '200x200>', tempFilePath]);
-  console.log('Thumbnail created at', tempFilePath);
-  // We add a 'thumb_' prefix to thumbnails file name. That's where we'll upload the thumbnail.
-  const thumbFileName = `thumb_${fileName}`;
-  const thumbFilePath = path.join(path.dirname(filePath), thumbFileName);
-  // Uploading the thumbnail.
-  await bucket.upload(tempFilePath, {
-    destination: thumbFilePath,
-    metadata: metadata,
-  });
-  // Once the thumbnail has been uploaded delete the local file to free up disk space.
-  return fs.unlinkSync(tempFilePath);
-  // [END thumbnailGeneration]
-});
 
 // Expose the app as a function
 exports.app = functions.https.onRequest(app);
