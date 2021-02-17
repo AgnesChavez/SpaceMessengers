@@ -95,22 +95,17 @@ export function UploadImgButton(props) {
 
             let caption = uploadTasks[key].caption;
             let uploadPath = uploadTasks[key].uploadPath;
-            // let url = await uploadTasks[key].storageChild.getDownloadURL();
+
             delete uploadTasks[key];
             setNumUploads(numUploads - 1);    
 
             if(downloadURL!==null && downloadURL !== ""){
-                // console.log("downloadURL: " + downloadURL);
-                // console.log("url: " + url);
-                
-                // props.uploadSuccess({downloadURL, caption, uploadPath});
 
                 const { uid } = auth().currentUser;
 
                 let newImage = ImageData(uid, props.workshopId, downloadURL, caption, uploadPath);
         
                 addDataToDb("images" ,newImage, true, "id");
-
             }
         }
     }
@@ -147,7 +142,7 @@ export function UploadImgButton(props) {
         loadImg();
     });
 
-    // uploadImg(file, auth().currentUser.uid)}
+
     return(<>
 
         <FileUploadButton
@@ -232,44 +227,18 @@ function fileToString(file){
 }
 
 
-
-
-//props
-// file
-// task
 function FileUploader(props){
-
-    // var metadata = {contentType: 'image/jpeg'};
-
     
     const taskListener = useRef(null);
 
     const [progress, setProgress] = useState(0);
 
- // Upload completed successfully, now we can get the download URL
     async function uploadSucceded(){
 
         let downloadURL = await props.storageChild.getDownloadURL();
-        // console.log('File available at', downloadURL);
+        
         props.onComplete(props.taskId, "Succesfully uploaded file: ", downloadURL);
         
-//          file.makePublic(function(err, apiResponse) {
-//         });
-
-// 
-//         console.log("uploadSucceded task",props.task);
-//         try{
-//             let metadata = await props.task.snapshot.ref.getMetadata();
-//             // console.log("metadata",metadata)
-//             let url = await storageRef.child(metadata.fullPath).getDownloadURL();
-//             
-//             props.onComplete(props.taskId, "Succesfully uploaded file: ", url); 
-//             
-//         }catch(error) {
-//             console.error('failed getting file download url', error);
-//             props.onComplete(props.taskId, "Failed to uploaded file: " + error);
-//         }
-
     }
 
     useEffect(()=>{
