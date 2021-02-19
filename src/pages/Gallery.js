@@ -1,34 +1,32 @@
 
-import React,  { useEffect, useState, useRef} from "react";
+import React,  { useState } from "react";
 
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { useDownloadURL } from 'react-firebase-hooks/storage';
 
 import { auth, storageRef, db } from "../services/firebase";
 
 import '../css/gallery.css';
 
-import { Icon, Button, MediaBox } from 'react-materialize';
+import { Icon, Button } from 'react-materialize';
 
 import { Link } from 'react-router-dom';
 
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { userTypes, ImageData } from "../helpers/Types"
+import { userTypes } from "../helpers/Types"
 
-import { addDataToDb } from '../helpers/db';
 
-function getWidth() {
-  	return Math.max(
-    document.body.scrollWidth,
-    document.documentElement.scrollWidth,
-    document.body.offsetWidth,
-    document.documentElement.offsetWidth,
-    document.documentElement.clientWidth
-	);
-}
+// function getWidth() {
+//   	return Math.max(
+//     document.body.scrollWidth,
+//     document.documentElement.scrollWidth,
+//     document.body.offsetWidth,
+//     document.documentElement.offsetWidth,
+//     document.documentElement.clientWidth
+// 	);
+// }
 
 function deleteImg(img){
 	storageRef.child(img.imagePath).delete().then(() => {
