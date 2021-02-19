@@ -14,21 +14,68 @@ import { ImageData } from '../helpers/Types';
 
 import { FileUploadButton } from '../components/FileUploadButton';
 
+import  ImageBlobReduce  from 'image-blob-reduce';
+
+  var reducer = new ImageBlobReduce({
+    pica: ImageBlobReduce.pica({ features: [ 'js', 'wasm', 'ww' ] })
+  });
+
+
+    
+function reduceSize(file, callback){
+    reducer.toBlob(
+          file,
+          {
+            max: 200,
+            unsharpAmount: 80,
+            unsharpRadius: 0.6,
+            unsharpThreshold: 2
+          }
+        ).then((blob)=>callback(blob));    
+  }
+
 
 var uploadTasks = {};
 
 
-async function onComplete(key, message, workshopId, downloadURL=""){
+
+
+
+async function onComplete(key, message, workshopId, downloadURL=null, isThumb = false){
+    // console.log("onComplete(key: " + key + " message: " + message + " workshopId: " + workshopId + " downloadURL: " + downloadURL + " isThumb: " + isThumb);
     if(key in uploadTasks){
-        window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
-        let caption = uploadTasks[key].caption;
-        let uploadPath = uploadTasks[key].uploadPath;
-        delete uploadTasks[key];
+        if(downloadURL!==null){
+            if(isThumb){
+                uploadTasks[key].thumbURL = downloadURL;
+            }else{
+                uploadTasks[key].downloadURL = downloadURL;
+            }
+            if(uploadTasks[key].thumbURL === null || uploadTasks[key].downloadURL === null ){
+                return;
+            }
+        }else{
+            window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
+            delete uploadTasks[key];    
+            return;
+        }
+
         if(workshopId !== null && workshopId !== "" && downloadURL!==null && downloadURL !== ""){
+            let caption = uploadTasks[key].caption;
+            let uploadPath = uploadTasks[key].uploadPath;
+    
             const { uid } = auth().currentUser;
-            let newImage = ImageData(uid, workshopId, downloadURL, caption, uploadPath);
+
+            let newImage = ImageData(uid, workshopId, uploadTasks[key].thumbURL, uploadTasks[key].downloadURL, caption, uploadPath);
+            
+            // console.log("newImage:", newImage);
+
             addDataToDb("images" ,newImage, true, "id");
         }
+        window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
+        
+        delete uploadTasks[key]; 
+
+
         var event = new CustomEvent('uploadDone',{taskId: key});
         // Dispatch the event
         document.dispatchEvent(event);
@@ -40,72 +87,65 @@ function uploadImg(file, userId, workshopId){
     let fileId = fileToString(file);
     if(!(fileId in uploadTasks) || uploadTasks[fileId] ===null){
         let uploadPath = 'images/'+ userId + '/' + file.name;
-            
+        
+        let thumbUploadPath =  'images/'+ userId + "/thumb_"+ file.name; 
+
+        
+
         uploadTasks[fileId] = {
             taskId: fileId,
-            task:storageRef.child(uploadPath).put(file), 
             storageChild: storageRef.child(uploadPath), 
+            storageChildThumb: storageRef.child(thumbUploadPath), 
             uploadPath,
             file,
+            downloadURL:null,
+            thumbURL:null,
             caption: document.getElementById('TextInputModalUploadImageToBoard').value,
             workshopId
-
         };
-        setUploadTaskListener(uploadTasks[fileId]);
+        
+        uploadTasks[fileId].task = storageRef.child(uploadPath).put(file);
+        uploadTasks[fileId].listener =  setUploadTaskListener(uploadTasks[fileId], false);
+
+        reduceSize(file, (blob)=>{
+            uploadTasks[fileId].taskThumb = storageRef.child(thumbUploadPath).put(blob);
+            uploadTasks[fileId].thumbListener =  setUploadTaskListener(uploadTasks[fileId], true);
+        });
 
         closeModal('ModalUploadImageToBoard');
     }
 }
 
-function setUploadTaskListener(taskData){
-    taskData.listener = taskData.task.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+function setUploadTaskListener(taskData, isThumb){
+
+    let taskListener = (isThumb?taskData.taskThumb:taskData.task).on(firebase.storage.TaskEvent.STATE_CHANGED, 
     (snapshot) => {
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         let currentProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
-        // if(currentProgress !== progress ){setProgress(currentProgress);}
 
-        // Create a new event
-            var event = new CustomEvent('uploadProgressChange',{detail: {progress: currentProgress, taskId: taskData.taskId}});
-            // console.log("uploadProgressChange " + currentProgress);
-        // Dispatch the event
+            var event = new CustomEvent('uploadProgressChange',{detail: {progress: currentProgress, taskId: taskData.taskId, isThumb}});
             document.dispatchEvent(event);
-
-        // console.log('Upload is ' + progress + '% done');
         switch (snapshot.state) {
             case firebase.storage.TaskState.PAUSED: // or 'paused'
-                // console.log('Upload is paused');
                 break;
             case firebase.storage.TaskState.RUNNING: // or 'running'
-                // console.log('Upload is running');
                 break;
             default : break;
         }
     },
     (error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        // console.log("Error: " + error.code);
         onComplete(taskData.taskId, "File upload failed: ", null);
-    //     switch (error.code) {
-    //         case 'storage/unauthorized':
-    //             // User doesn't have permission to access the object
-    //             break;
-    //         case 'storage/canceled':
-    //             // User canceled the upload
-    //             break;
-    // 
-    //             // ...
-    // 
-    //         case 'storage/unknown':
-    //             // Unknown error occurred, inspect error.serverResponse
-    //             break;
-    //     }
     },
     async () => {
-       let downloadURL = await taskData.storageChild.getDownloadURL();
-        
-        onComplete(taskData.taskId, "Succesfully uploaded file: ", taskData.workshopId, downloadURL);
+        let downloadURL;
+        if(isThumb){
+            downloadURL = await taskData.storageChildThumb.getDownloadURL();
+        }else{
+            downloadURL = await taskData.storageChild.getDownloadURL();
+        }
+        onComplete(taskData.taskId, "Succesfully uploaded file: ", taskData.workshopId, downloadURL, isThumb);
     });
+    return taskListener;
 }
 
 
@@ -147,11 +187,13 @@ export function UploadImgButton(props) {
     function handleUploadDone(){
      setNumImage(numImage - 1);   
     }
+
     useEffect(() => {
         loadImg();
         
         document.addEventListener('uploadDone', handleUploadDone, false);
-        
+        document.addEventListener('uploadDone', handleUploadDone, false);
+
         return ()=>{
                 // cons ole.log("destroy listener");
                 document.removeEventListener('uploadDone', handleUploadDone, false);
@@ -222,14 +264,14 @@ export function UploadImgButton(props) {
         }}
         root={document.getElementById("UploadsModal")}
         >
-        <div className="uploadsContent">
-        <p>Uploads</p>
-        {Object.entries(uploadTasks).map( task=> <FileUploader 
-            key={task[0]} 
-            taskId={task[0]} 
-            file={task[1].file} 
-            />) }
-        </div>
+            <div className="uploadsContent">
+                <p>Uploads</p>
+                {Object.entries(uploadTasks).map( task=> <FileUploader 
+                    key={task[0]} 
+                    taskId={task[0]} 
+                    file={task[1].file} 
+                    />) }
+            </div>
         </Modal>
         :""}
     </>)
@@ -246,16 +288,21 @@ function fileToString(file){
 }
 
 
+
+//this is the widget that shows at the bottom of the page with the progress bar
 function FileUploader(props){
     
-    const taskListener = useRef(null);
-
     const [progress, setProgress] = useState(0);
+    const [thumbProgress, setThumbProgress] = useState(0);
 
     function handleProgress(e){
         // console.log("handleProgress ", e.detail.taskId, props.taskId);
         if(e.detail.taskId === props.taskId){
-            setProgress(e.detail.progress);
+            if(e.detail.isThumb === true){
+                setProgress(e.detail.progress);
+            }else{
+                setThumbProgress(e.detail.progress);
+            }
         }
     }
 
@@ -275,7 +322,7 @@ function FileUploader(props){
                 Uploading file: {props.file.name}
             </p>
             <div className="progress">
-                <div className="determinate" style={{width:  (progress *100) + "%"}}  ></div>
+                <div className="determinate" style={{width:  ((progress + thumbProgress) *50) + "%"}}  ></div>
             </div>
         </div>
     </>);

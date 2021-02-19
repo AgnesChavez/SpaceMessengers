@@ -243,12 +243,11 @@ async function makeThumb(imgPath, imageId) {
     return true;
 }
 
-exports.makeThumb = functions.firestore
-    .document('images/{imageId}')
-    .onCreate((snap, context) => {
-
-		makeThumb(snap.data().imagePath, snap.id);
-    });
+// exports.makeThumb = functions.firestore
+//     .document('images/{imageId}')
+//     .onCreate((snap, context) => {
+// 		makeThumb(snap.data().imagePath, snap.id);
+// });
 
 
 
