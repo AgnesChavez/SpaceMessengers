@@ -1,10 +1,6 @@
 import React, { useRef, useEffect } from "react";
 
-import firebase from "firebase";
-
 import { TextInput } from 'react-materialize';
-
-
 
 
 
