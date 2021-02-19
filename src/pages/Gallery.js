@@ -47,57 +47,6 @@ function deleteImg(img){
 
 
 
-function LoadAndShowImage(props){
-	// const [downloadUrl, loading] = useDownloadURL(storageRef.child(props.img.imagePath));	
-  	return (<>
-    	<div id={props.img.id} className="gridImg">
-    		{/* { loading && <CenteredPreloader  title={"Loading image"}/> } */}
-    		{/* {downloadUrl && !loading && */}
-			<MediaBox
-  				options={{
-  				  	inDuration: 200,
-  				  	outDuration: 200
-  				}}
-  				caption={props.img.caption}
-				>
-			  	<img
-			    	alt={props.img.caption}
-			    	src={props.img.thumbURL}
-			    	className=" materialboxed galleryImg"
-			  	/>
-			</MediaBox>
-			  	{props.deleting === true && 
-			  		<Button
-    				className="red right"
-    				node="button"
-    				small
-    				tooltip="Delete this image"
-    				waves="light"
-    				floating
-  					icon={<Icon>delete</Icon>}
-  					onClick={()=>props.deleteCallback(props.img)}
-    			/>}
-    	</div>
-    </>);
-}
-
-function ShowColumn(props){
-// console.log("Col refs:", props.imagesRefs);
-// console.log("Col index:", props.index);
-	return <div className="GalleryColumn" style={{flex: props.pctWidth+"%", maxWidth: props.pctWidth+"%" }}>
-  
-		{props.index && 
-		 props.index.map(i => (i < props.images.length)? <LoadAndShowImage
-			 					key={"img"+props.images[i].id}
-			 					img={props.images[i]}
-			 					deleting={props.deleting}
-			 					deleteCallback={props.deleteCallback}
-			 					index={i}
-			 				/>:"")}
-
-	</div>
-}
-
 export default  function Gallery(props) {
 
 	let [user, loadingUser ] = useDocumentData(db.collection('users').doc(auth().currentUser.uid));
@@ -130,13 +79,25 @@ export default  function Gallery(props) {
 
 
 function createMediaBox(imgId, src, thumbSrc){
-	console.log("createMediaBox ", imgId);
+	// console.log("createMediaBox ", imgId);
 	
 	var elem = document.getElementById(imgId);
 	if(elem){
 		elem.src = src;
-    	var box = window.M.Materialbox.init(elem, {onCloseStart: ()=> { if(thumbSrc) elem.src = thumbSrc }});
+    	var box = window.M.Materialbox.init(elem, 
+    		{onCloseStart: ()=> { if(thumbSrc) elem.src = thumbSrc },
+    		 onCloseEnd: ()=> { let instance = window.M.Materialbox.getInstance(elem);
+    		 	if(instance) instance.destroy();
+    		 }
+    		});
     	box.open();
+
+    	let captions = document.querySelector(".materialbox-caption");
+    	if(captions){
+    		captions.style.lineHeight = "unset";
+    		captions.style.height = "unset";
+    	}
+
 	}else{
 		console.log("createMediaBox failed: imageId " + imgId + " does not exist");
 	}
@@ -150,23 +111,8 @@ function createMediaBox(imgId, src, thumbSrc){
 //deleteCallback
 //user
 function ShowImg(props){
-	// const [downloadUrl, loading, error] = useDownloadURL(storageRef.child(props.img.imagePath));
-
-	// console.log(props.img.thumbURL);
-	// if(!props.img.thumbURL)return "";
 	
-
-	// const [showImageBox, setShowImageBox] = useState(false);
-
-// 
-// 	if(!props.img.thumbURL && !props.img.downloadURL){
-// 		console.log(props.img);
-// 		return "";
-// 	}
-
-
 	let thisId = (props.showUserGallery===true?"user_":"")+props.img.id;
-
 
 	return (<>
 		<li>
@@ -214,74 +160,10 @@ function RenderGallery(props){
 	const [images, imagesLoading] = useCollectionData(query); 
 	
 	let [deleting, setDeleting] = useState(false);
-	// let [indices, setIndices] = useState([]);
-	// let nextPageToken = useRef(null);
-	// let currentPageToken = useRef(null);
-	// let originalBg  = useRef(null);
-	// let [pctWidth, setPctWidth] = useState(20);
-	let needsCalculateSize = useRef(true);
 	
 
-	// if(needsCalculateSize.current === true && images && !imagesLoading){
-	// 	calculateSize();
-	// }
-
-
-
-// 	function calculateSize(){
-// 		let imgWidth = 200;
-// 		let galleryPadding=60;
-// 		let numColumns = Math.floor((getWidth()-galleryPadding)/imgWidth);
-// 		let imgsPerCol =2;
-// 		let modulo = 0;
-// 		if(images && images.length > 0){
-// 			imgsPerCol = Math.floor(images.length/numColumns);
-// 			modulo = images.length % numColumns;
-// 		}
-// 
-// 		let newIndices = [];
-// 
-// 		let startAt = 0;
-// 		for(let x = 0; x < numColumns; x++){
-// 			
-// 			let num = imgsPerCol + ((x < modulo)? 1 : 0);
-// 			let index = [];
-// 			for(let i = startAt; i < startAt + num; i++){
-// 				index.push(i);
-// 			}
-// 			newIndices.push(index);
-// 
-// 			startAt += num;
-// 		}
-// 
-// 		// console.log("newIndices", newIndices);
-// 		setIndices(newIndices)
-// 
-// 		setPctWidth(100.0 / numColumns);
-// 
-// 		needsCalculateSize.current = false;
-// 		// console.log("calculateSize. imgs: ", imagesRefs, "  indices: ", indices);
-// 
-// 	}
-
-
-// 
-// 	useEffect(()=>{
-// 		window.addEventListener("resize", calculateSize);
-// 		return (()=>{
-// 			window.removeEventListener("resize", calculateSize);
-// 		})
-// 
-// 	});
-
 	function deleteCallback(img){
-		// needsCalculateSize.current = true;
 		deleteImg(img);
-
-		// let tempImgs = imagesRefs;
-		// tempImgs.splice(index, 1);
-		// setImagesRefs(tempImgs);
-		// calculateSize();
 		
 		setDeleting(false);
 	}
@@ -331,43 +213,3 @@ function RenderGallery(props){
 		</div>
 	</>
 }
-
-// function GetOtherImages(props){
-// 	async function getImgs(){
-// 		try{
-// 			
-// 			let all = await storageRef.child("images").listAll();
-// 				// let allItems = [];
-// 				for(let i = 0; i < all.prefixes.length; i++){
-// 					// console.log(all.prefixes[i].name);
-// 					let uid = all.prefixes[i].name;
-// 					let folder = await all.prefixes[i].listAll();
-// 					if(folder.items.length > 0 ){
-// 						// console.log(folder.items);
-// 						for(let i = 0; i < folder.items.length; i++){
-// 							let url = await folder.items[i].getDownloadURL();
-// 							// console.log(url);
-//                 			let newImage = ImageData(uid, "XIWfFl9mm0GxYZb7svG6", url, "", folder.items[i].fullPath);
-//         					
-//                 			addDataToDb("images" ,newImage, true, "id");
-// 							// console.log(newImage);
-// 						}
-// 						// console.log(folder.items);
-// 						// allItems = allItems.concat(folder.items);
-// 						// console.log(allItems);
-//     	 					// allItems.push(...folder.items);
-// 					}
-// 		    	}
-// 		}catch(error) {
-//   			console.log("Loading gallery failed with error:", error);
-// 		}
-// 	}
-// 	return <Button
-//     		className="red white-text"
-//     		node="button"
-//     		waves="light"
-//   			onClick={()=>getImgs()}
-// 		>
-// 		Get All Images
-// 		</Button>
-// }
