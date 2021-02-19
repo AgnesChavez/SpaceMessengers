@@ -12,54 +12,100 @@ import { addDataToDb } from '../helpers/db';
 
 import { ImageData } from '../helpers/Types';
 
+import { FileUploadButton } from '../components/FileUploadButton';
+
+
 var uploadTasks = {};
 
 
-// export function deleteImg(imgPath){
-//     storageRef.child(imgPath).delete().then(() => {
-//   
-//     }).catch((error) => {
-//         console.log("error deleting file", error);
-//     });
-// }
-
-
-export function FileUploadButton(props){
-
-    const tooltipRef = useRef(null);
-    const divRef= useRef(null);
-    useEffect(() => {
-        // console.log("UploadImgButton constructor");
-        if(!tooltipRef.current && divRef.current){
-            let btnEl = divRef.current.querySelector('.input-field .btn');
-            if(btnEl){
-                btnEl.classList.add('btn-floating');
-                btnEl.dataset.tooltip = props.tootip;
-                btnEl.dataset.position = props.tooltipPosition;
-                tooltipRef.current = window.M.Tooltip.init(btnEl, null);
-            }
+async function onComplete(key, message, workshopId, downloadURL=""){
+    if(key in uploadTasks){
+        window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
+        let caption = uploadTasks[key].caption;
+        let uploadPath = uploadTasks[key].uploadPath;
+        delete uploadTasks[key];
+        if(workshopId !== null && workshopId !== "" && downloadURL!==null && downloadURL !== ""){
+            const { uid } = auth().currentUser;
+            let newImage = ImageData(uid, workshopId, downloadURL, caption, uploadPath);
+            addDataToDb("images" ,newImage, true, "id");
         }
-        return ()=>{
-            // console.log("UploadImgButton destructor");
-            if(tooltipRef.current){tooltipRef.current.destroy(); tooltipRef.current = null; }
+        var event = new CustomEvent('uploadDone',{taskId: key});
+        // Dispatch the event
+        document.dispatchEvent(event);
+
+    }
+}
+
+function uploadImg(file, userId, workshopId){
+    let fileId = fileToString(file);
+    if(!(fileId in uploadTasks) || uploadTasks[fileId] ===null){
+        let uploadPath = 'images/'+ userId + '/' + file.name;
+            
+        uploadTasks[fileId] = {
+            taskId: fileId,
+            task:storageRef.child(uploadPath).put(file), 
+            storageChild: storageRef.child(uploadPath), 
+            uploadPath,
+            file,
+            caption: document.getElementById('TextInputModalUploadImageToBoard').value,
+            workshopId
+
+        };
+        setUploadTaskListener(uploadTasks[fileId]);
+
+        closeModal('ModalUploadImageToBoard');
+    }
+}
+
+function setUploadTaskListener(taskData){
+    taskData.listener = taskData.task.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+    (snapshot) => {
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        let currentProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
+        // if(currentProgress !== progress ){setProgress(currentProgress);}
+
+        // Create a new event
+            var event = new CustomEvent('uploadProgressChange',{detail: {progress: currentProgress, taskId: taskData.taskId}});
+            // console.log("uploadProgressChange " + currentProgress);
+        // Dispatch the event
+            document.dispatchEvent(event);
+
+        // console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED: // or 'paused'
+                // console.log('Upload is paused');
+                break;
+            case firebase.storage.TaskState.RUNNING: // or 'running'
+                // console.log('Upload is running');
+                break;
+            default : break;
         }
+    },
+    (error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        // console.log("Error: " + error.code);
+        onComplete(taskData.taskId, "File upload failed: ", null);
+    //     switch (error.code) {
+    //         case 'storage/unauthorized':
+    //             // User doesn't have permission to access the object
+    //             break;
+    //         case 'storage/canceled':
+    //             // User canceled the upload
+    //             break;
+    // 
+    //             // ...
+    // 
+    //         case 'storage/unknown':
+    //             // Unknown error occurred, inspect error.serverResponse
+    //             break;
+    //     }
+    },
+    async () => {
+       let downloadURL = await taskData.storageChild.getDownloadURL();
+        
+        onComplete(taskData.taskId, "Succesfully uploaded file: ", taskData.workshopId, downloadURL);
     });
-
-    return(<>
-        <div ref={divRef} id={props.id}>
-            <TextInput
-                label=<i className="material-icons">file_upload</i>
-                type="file"                
-                onChange={(evt)=>{
-                    evt.stopPropagation();
-                    evt.preventDefault();
-                    if (evt.target.files && evt.target.files.length) {
-                      props.callback(evt.target.files[0]);
-                    }
-                }}
-            />
-        </div>
-    </>);
 }
 
 
@@ -67,53 +113,13 @@ export function FileUploadButton(props){
 export function UploadImgButton(props) {
     // const tooltipRef = useRef(null);
     
-    const [numUploads, setNumUploads] = useState(0);
     const [fileToUpload, setFileToUpload] = useState(null);
     const imgNeedToBeRead = useRef(false);
 
-    function uploadImg(file, userId){
-        let fileId = fileToString(file);
-        if(!(fileId in uploadTasks) || uploadTasks[fileId] ===null){
-            let uploadPath = 'images/'+ userId + '/' + file.name;
-            
-            uploadTasks[fileId] = {
-                task:storageRef.child(uploadPath).put(file), 
-                storageChild: storageRef.child(uploadPath), 
-                uploadPath,
-                file,
-                caption: document.getElementById('TextInputModalUploadImageToBoard').value
-            };
-            setNumUploads(numUploads + 1);
-            closeModal('ModalUploadImageToBoard');
-        }
-    }
-
-
-    async function onComplete(key, message, downloadURL=""){
-        if(key in uploadTasks){
-            window.M.toast({html: message + uploadTasks[key].file.name, displayLength: 2500});
-
-            let caption = uploadTasks[key].caption;
-            let uploadPath = uploadTasks[key].uploadPath;
-
-            delete uploadTasks[key];
-            setNumUploads(numUploads - 1);    
-
-            if(downloadURL!==null && downloadURL !== ""){
-
-                const { uid } = auth().currentUser;
-
-                let newImage = ImageData(uid, props.workshopId, downloadURL, caption, uploadPath);
-        
-                addDataToDb("images" ,newImage, true, "id");
-            }
-        }
-    }
-
-
-
+    const [numImage, setNumImage] = useState(0);
 
     function loadImg() {
+        // console.log("loadImg_");
         if (fileToUpload && imgNeedToBeRead.current === true) {
             // console.log("loadImg");
             var reader = new FileReader();
@@ -138,8 +144,19 @@ export function UploadImgButton(props) {
         openModal("ModalUploadImageToBoard");
     }
 
+    function handleUploadDone(){
+     setNumImage(numImage - 1);   
+    }
     useEffect(() => {
         loadImg();
+        
+        document.addEventListener('uploadDone', handleUploadDone, false);
+        
+        return ()=>{
+                // cons ole.log("destroy listener");
+                document.removeEventListener('uploadDone', handleUploadDone, false);
+            
+        }
     });
 
 
@@ -157,7 +174,11 @@ export function UploadImgButton(props) {
                 <Button 
                     node="button" 
                     waves="light" 
-                    onClick={()=>uploadImg(fileToUpload, auth().currentUser.uid)}
+                    onClick={()=>{
+
+                        uploadImg(fileToUpload, auth().currentUser.uid, props.workshopId);
+                        setNumImage(numImage + 1);
+                    }}
                 >
                 Upload
                 </Button>,
@@ -207,9 +228,7 @@ export function UploadImgButton(props) {
             key={task[0]} 
             taskId={task[0]} 
             file={task[1].file} 
-            task={task[1].task}
-            storageChild={task[1].storageChild}
-            onComplete={onComplete}/>) }
+            />) }
         </div>
         </Modal>
         :""}
@@ -233,67 +252,23 @@ function FileUploader(props){
 
     const [progress, setProgress] = useState(0);
 
-    async function uploadSucceded(){
-
-        let downloadURL = await props.storageChild.getDownloadURL();
-        
-        props.onComplete(props.taskId, "Succesfully uploaded file: ", downloadURL);
-        
+    function handleProgress(e){
+        // console.log("handleProgress ", e.detail.taskId, props.taskId);
+        if(e.detail.taskId === props.taskId){
+            setProgress(e.detail.progress);
+        }
     }
 
     useEffect(()=>{
-        if(taskListener.current === null){
-            // console.log("make listenre");
-            taskListener.current = props.task.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-                (snapshot) => {
-                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                    let currentProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
-                    if(currentProgress !== progress ){setProgress(currentProgress);}
-                    // console.log('Upload is ' + progress + '% done');
-                    switch (snapshot.state) {
-                        case firebase.storage.TaskState.PAUSED: // or 'paused'
-                            console.log('Upload is paused');
-                            break;
-                        case firebase.storage.TaskState.RUNNING: // or 'running'
-                            console.log('Upload is running');
-                            break;
-                        default : break;
-                    }
-                },
-                (error) => {
-                    // A full list of error codes is available at
-                    // https://firebase.google.com/docs/storage/web/handle-errors
-                    console.log("Error: " + error.code);
-                    props.onComplete(props.taskId, "File upload failed: ");
-                //     switch (error.code) {
-                //         case 'storage/unauthorized':
-                //             // User doesn't have permission to access the object
-                //             break;
-                //         case 'storage/canceled':
-                //             // User canceled the upload
-                //             break;
-                // 
-                //             // ...
-                // 
-                //         case 'storage/unknown':
-                //             // Unknown error occurred, inspect error.serverResponse
-                //             break;
-                //     }
-                },
-                () => {
-                   uploadSucceded();
-                });
-            }
-            return ()=>{
-                console.log("destroy listener");
-                if(taskListener.current!==null) taskListener.current();
-                    uploadSucceded();
-                    // props.onComplete(props.taskId, "Succesfully uploaded file: ");
-            }
+        document.addEventListener('uploadProgressChange', handleProgress, false);
+        
+        return ()=>{
+                // console.log("destroy listener");
+                document.removeEventListener('uploadProgressChange', handleProgress, false);
+            
         }
-    );
+    });
 
-    
     return (<>
         <div className="FileUploaderWidget">
             <p>
