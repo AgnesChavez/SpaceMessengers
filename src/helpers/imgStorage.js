@@ -14,19 +14,28 @@ import { ImageData } from '../helpers/Types';
 
 import { FileUploadButton } from '../components/FileUploadButton';
 
-import  ImageBlobReduce  from 'image-blob-reduce';
+import ImageBlobReduce  from 'image-blob-reduce';
+
 
   var reducer = new ImageBlobReduce({
-    pica: ImageBlobReduce.pica({ features: [ 'js', 'wasm', 'ww' ] })
+    pica: ImageBlobReduce.pica({ features: [ 'js', 'wasm' ] })
   });
 
-
     
-function reduceSize(file, callback){
+//tomar las medidas de la imagen desde donde se carga para ver en el modal y pasarlaas a esta funcion para que ajuste el tamaño de manera acorde2
+
+function reduceSize(file, imageSize, callback){
+    let maxSize = 300;
+    if(imageSize.height !== 0){
+        let aspect = imageSize.width/imageSize.height;
+        maxSize = Math.max(maxSize, maxSize * aspect);
+    }else{
+        console.log("imageSize.height == 0");
+    }
     reducer.toBlob(
           file,
           {
-            max: 200,
+            max: maxSize,
             unsharpAmount: 80,
             unsharpRadius: 0.6,
             unsharpThreshold: 2
@@ -83,7 +92,7 @@ async function onComplete(key, message, workshopId, downloadURL=null, isThumb = 
     }
 }
 
-function uploadImg(file, userId, workshopId){
+function uploadImg(file, userId, workshopId, imageSize){
     let fileId = fileToString(file);
     if(!(fileId in uploadTasks) || uploadTasks[fileId] ===null){
         let uploadPath = 'images/'+ userId + '/' + file.name;
@@ -107,7 +116,7 @@ function uploadImg(file, userId, workshopId){
         uploadTasks[fileId].task = storageRef.child(uploadPath).put(file);
         uploadTasks[fileId].listener =  setUploadTaskListener(uploadTasks[fileId], false);
 
-        reduceSize(file, (blob)=>{
+        reduceSize(file, imageSize,  (blob)=>{
             uploadTasks[fileId].taskThumb = storageRef.child(thumbUploadPath).put(blob);
             uploadTasks[fileId].thumbListener =  setUploadTaskListener(uploadTasks[fileId], true);
         });
@@ -149,7 +158,6 @@ function setUploadTaskListener(taskData, isThumb){
 }
 
 
-
 export function UploadImgButton(props) {
     // const tooltipRef = useRef(null);
     
@@ -157,6 +165,8 @@ export function UploadImgButton(props) {
     const imgNeedToBeRead = useRef(false);
 
     const [numImage, setNumImage] = useState(0);
+
+    const imageSize = useRef(null);
 
     function loadImg() {
         // console.log("loadImg_");
@@ -167,6 +177,15 @@ export function UploadImgButton(props) {
                 // console.log("loadImg onLoad");
                 let img = document.getElementById('ImgModalUploadImageToBoard');
                 img.setAttribute('src', e.target.result);
+                var newImg = new Image();
+
+                newImg.onload = function() {
+                  var height = newImg.height;
+                  var width = newImg.width;
+                  imageSize.current = { width, height };
+                }                
+                newImg.src = e.target.result; 
+
                 let modal = document.getElementById("ModalUploadImageToBoard");
                 let footer = modal.querySelector('.modal-footer');
                 let content = modal.querySelector('.modal-content');
@@ -192,7 +211,7 @@ export function UploadImgButton(props) {
         loadImg();
         
         document.addEventListener('uploadDone', handleUploadDone, false);
-        document.addEventListener('uploadDone', handleUploadDone, false);
+        // document.addEventListener('uploadDone', handleUploadDone, false);
 
         return ()=>{
                 // cons ole.log("destroy listener");
@@ -218,7 +237,7 @@ export function UploadImgButton(props) {
                     waves="light" 
                     onClick={()=>{
 
-                        uploadImg(fileToUpload, auth().currentUser.uid, props.workshopId);
+                        uploadImg(fileToUpload, auth().currentUser.uid, props.workshopId, imageSize.current);
                         setNumImage(numImage + 1);
                     }}
                 >
