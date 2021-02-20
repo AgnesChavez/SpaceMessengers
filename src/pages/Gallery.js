@@ -1,5 +1,5 @@
 
-import React,  { useState } from "react";
+import React,  { useState, useEffect } from "react";
 
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
@@ -83,10 +83,25 @@ function createMediaBox(imgId, src, thumbSrc){
 	var elem = document.getElementById(imgId);
 	if(elem){
 		elem.src = src;
+
+		let instance = window.M.Materialbox.getInstance(elem);
+    	if(instance ) {
+    		instance.close();
+    		return;
+    	}
+    	elem.classList.remove("galleryImg");
     	var box = window.M.Materialbox.init(elem, 
-    		{onCloseStart: ()=> { if(thumbSrc) elem.src = thumbSrc },
-    		 onCloseEnd: ()=> { let instance = window.M.Materialbox.getInstance(elem);
-    		 	if(instance) instance.destroy();
+    		{onCloseStart: ()=> { 
+    			if(thumbSrc) elem.src = thumbSrc;
+    				document.getElementById(imgId).classList.add("galleryImg");
+    			},
+    		 onCloseEnd: ()=> { 
+    		 	console.log("media box closed");
+    		 	let instance = window.M.Materialbox.getInstance(elem);
+    		 	if(instance) {
+    		 		console.log("media box instance destroyed");
+    		 		instance.destroy();
+    		 	}
     		 }
     		});
     	box.open();
@@ -183,6 +198,25 @@ function SetStateButton(props){
   			icon={<Icon>{props.icon}</Icon>}
   			onClick={props.onClick}
    		/>
+}
+
+
+function CaptionInput(props){
+
+	// let [value, setValue] = useState(null);	
+
+ //    useEffect(() => {
+	// 	if(value===null){
+	// 		setValue(props.initialValue);
+	// 	}
+	// });
+	
+
+	return <div className="input-field row">
+      		{/* <input defaultValue={props.initialValue} value={value} id={props.inputId} type="text" onChange={(e)=> setValue(e.target.value)}/> */}
+      		<input defaultValue={props.initialValue} id={props.inputId} type="text" />
+      		<label className={props.initialValue?"active":""} htmlFor={props.inputId}>Image Caption</label>
+    	</div>
 }
 
 
@@ -299,11 +333,9 @@ function RenderGallery(props){
             root={document.getElementById('modalRoot')}
         >
         <>
-            <TextInput
-                id={captionInputId}
-                label="Image Caption"
-                value={editImg !== null ? editImg.caption: ""}
-                onChange={(e)=>{}}
+            <CaptionInput
+            	initialValue={editImg !== null ? editImg.caption: ""}
+				inputId={captionInputId}
             />
         </>
     </Modal>
