@@ -9,7 +9,7 @@ import { auth, storageRef, db } from "../services/firebase";
 
 import '../css/gallery.css';
 
-import { Icon, Button } from 'react-materialize';
+import { Icon, Button, Modal, TextInput } from 'react-materialize';
 
 import { Link } from 'react-router-dom';
 
@@ -17,6 +17,7 @@ import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { userTypes } from "../helpers/Types"
 
+import { openModal, closeModal } from '../components/Modals';
 
 // function getWidth() {
 //   	return Math.max(
@@ -104,6 +105,29 @@ function createMediaBox(imgId, src, thumbSrc){
 }
 
 
+const state_deleting = "state_deleting";
+const state_editing = "state_editing";
+const state_idle = "state_idle";
+
+function EditCaption(props){
+
+	return <Button
+    	className="red right removeImageButton"
+    	node="button"
+    	small
+    	tooltip="Edit this image's caption"
+    	waves="light"
+    	floating
+  		icon={<Icon>edit</Icon>}
+  		onClick={()=> props.setImgToEdit(props.img)}
+  		/>
+    	
+
+}
+
+
+
+
 //img
 //deleting
 //deleteCallback
@@ -129,7 +153,7 @@ function ShowImg(props){
 						}
 			/>
 				
-			{ props.deleting === true && 
+			{ props.state === state_deleting && 
 				<Button
     				className="red right removeImageButton"
     				node="button"
@@ -140,9 +164,27 @@ function ShowImg(props){
   					icon={<Icon>delete</Icon>}
   					onClick={()=>props.deleteCallback(props.img)}
     		/>}
+    		{ props.state === state_editing && 
+    			<EditCaption img={props.img} setImgToEdit={props.setImgToEdit} />	
+			}
 		</li>
 	</>)    	
 }
+
+
+
+function SetStateButton(props){
+	return <Button
+   			className="grey darken-3  white-text text-darken-4 galeryStateButton"
+   			node="button"
+   			tooltip={props.tooltip}
+   			waves="light"
+   			floating
+  			icon={<Icon>{props.icon}</Icon>}
+  			onClick={props.onClick}
+   		/>
+}
+
 
 function RenderGallery(props){
 
@@ -157,38 +199,62 @@ function RenderGallery(props){
 
 	const [images, imagesLoading] = useCollectionData(query); 
 	
-	let [deleting, setDeleting] = useState(false);
-	
+	let [state, setState] = useState(state_idle);
+	let [editImg, setEditImg] = useState(null);
+
+	function setImgToEdit(img){
+		if(img === null){
+			closeModal("ModalEditCaption");
+			setEditImg(null);
+			setState(state_idle);
+		}else{
+			setEditImg(img);
+			openModal("ModalEditCaption");
+		}
+	}
 
 	function deleteCallback(img){
 		deleteImg(img);
 		
-		setDeleting(false);
+		setState(state_idle);
 	}
 	
 	
 	let idPrefix ="";
 	let title= "Master Gallery";
+	var captionInputId = "TextInputEditCaptionModal";
 	if(props.showUserGallery === true){
 		idPrefix="user";
 		title = "Your Gallery";
+		captionInputId = idPrefix+captionInputId;
 	}
+
 
 	return <>
 		<div id={ idPrefix+"gallery"} className="subGallery"> 
 			<div className="subGalleryHeader">
 				<h5>{title}</h5>
 				{((props.showUserGallery === true || props.user.type !== userTypes().student) )? 
-				
-					<Button
-    					className="grey darken-3  white-text text-darken-4 "
-    					node="button"
-    					tooltip={(deleting === false)?"Delete images":"Cancel"}
-    					waves="light"
-    					floating
-  						icon={<Icon>{(deleting === false)?"delete":"cancel"}</Icon>}
-  						onClick={()=>setDeleting(!deleting)}
-    				/>:""
+					
+					state === state_idle? <div>
+						<SetStateButton
+							tooltip="Delete images"
+							icon="delete"
+							onClick={()=> setState(state_deleting)}
+						/>
+						<SetStateButton
+							tooltip="Edit captions"
+							icon="edit"
+							onClick={()=> setState(state_editing)}
+						/>
+					</div>:
+    					<SetStateButton
+							tooltip="Cancel"
+							icon="cancel"
+							onClick={()=> setState(state_idle)}
+						/>
+    					
+    				:""
     			}
 			</div>
 			<div id= {idPrefix+"GalleryImgs"} className="galleryImgs">
@@ -198,10 +264,12 @@ function RenderGallery(props){
 				{images.map(img => <ShowImg
 					key={img.id} 
 					img={img} 
-					deleting={deleting}
+					state={state}
+					setImgToEdit={setImgToEdit}
 				 	deleteCallback={deleteCallback}
 				 	user={props.user}
 				 	showUserGallery={props.showUserGallery}
+
 				 	/>)}
 				<li></li>
 				</ul>
@@ -209,5 +277,35 @@ function RenderGallery(props){
 				<p> Empty gallery! </p>}
 			</div>
 		</div>
+		<Modal
+            actions={[      
+                <Button 
+                    node="button" 
+                    waves="light" 
+                    onClick={()=>{
+                        db.collection("images").doc(editImg.id).update({caption: document.getElementById(captionInputId).value})
+                        setImgToEdit(null);
+                    }}
+                >
+                Apply
+                </Button>,
+                <Button flat node="button" waves="red"
+                	onClick={()=>setImgToEdit(null)}
+                	>Cancel</Button>
+            ]}
+            className="black-text"
+            header="Edit caption"
+            id="ModalEditCaption"
+            root={document.getElementById('modalRoot')}
+        >
+        <>
+            <TextInput
+                id={captionInputId}
+                label="Image Caption"
+                value={editImg !== null ? editImg.caption: ""}
+                onChange={(e)=>{}}
+            />
+        </>
+    </Modal>
 	</>
 }
