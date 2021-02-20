@@ -459,34 +459,11 @@ body,
 #UploadsModal {
     background-color: black !important;
 
-}
-
-#UploadsModal .modal {
-    background-color: black !important;
-    /*background-color: transparent !important;*/
-
-}
-
-#UploadsModal .modal-footer {
-    display: none;
-}
-
-#UploadsModal .modal-content {
-    padding-top: 4px !important;
-    padding-bottom: 1rem !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-}
-
-#UploadsModal .modal-content p {
-    margin: 0px !important;
-}
-
-#UploadsModal .modal-content h4 {
-    display: none;
-}
-
-#UploadsModal .uploadsContent {
+    z-index: 9999;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 0rem 3rem;
     width: 50%;
     float: right;
 }

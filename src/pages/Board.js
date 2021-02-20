@@ -402,7 +402,7 @@ export default function Board() {
                     {( users && !loadingBoardData && boardData && boardData.name)? (<h6 className="center-align"> {boardData.name}</h6>):""
                     }
                 </div>
-                <div id="UploadsModal"></div>
+                
             </div>
             <div id="right"></div>
         </div>
