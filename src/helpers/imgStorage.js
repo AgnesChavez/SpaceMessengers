@@ -262,28 +262,7 @@ export function UploadImgButton(props) {
 
 
     {(Object.keys(uploadTasks).length > 0)?
-    <Modal
-        actions={[ ]}
-        bottomSheet
-        fixedFooter={false}
-        id="ModalUploads"
-        open={true}
-        options={{
-            dismissible: false,
-            endingTop: '10%',
-            inDuration: 250,
-            onCloseEnd: null,
-            onCloseStart: null,
-            onOpenEnd: null,
-            onOpenStart: null,
-            opacity: 0.0,
-            outDuration: 250,
-            preventScrolling: true,
-            startingTop: '4%'
-        }}
-        root={document.getElementById("UploadsModal")}
-        >
-            <div className="uploadsContent">
+            <div id="UploadsModal" className="uploadsContent">
                 <p>Uploads</p>
                 {Object.entries(uploadTasks).map( task=> <FileUploader 
                     key={task[0]} 
@@ -291,7 +270,6 @@ export function UploadImgButton(props) {
                     file={task[1].file} 
                     />) }
             </div>
-        </Modal>
         :""}
     </>)
 }
