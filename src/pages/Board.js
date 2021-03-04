@@ -182,12 +182,15 @@ export default function Board() {
     
     const onStopHandler = (msgId, position) => {
         if(msgId){
+            // console.log("onStopHandler " + msgId + "  pos: ", position);
             messagesRef.doc(msgId).update({
                 position: {
                     x: position.x,
                     y: position.y
                 }
             });
+        }else{
+            console.log("onStopHandler, messageId invalid");
         }
     }
 
