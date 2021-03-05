@@ -1,4 +1,4 @@
-import React, {  useRef, useState} from "react";
+import React, {  useRef, useState, useEffect} from "react";
 
 import { Link } from 'react-router-dom';
 import { auth } from "../services/firebase";
@@ -94,6 +94,10 @@ export default function Board() {
 
     const prevUsers = useRef(null);    
 
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    const preAnimateState = useRef(null);        
+
     const [ boardId, setBoardIdState ] = useState("default");
 
     const [ sidebarOpenLeft, setSidebarOpenLeft] = useState(true);
@@ -144,7 +148,6 @@ export default function Board() {
         addToArray('boards', boardId, 'messages',msgRef.id);
     }
     
-
     const addMessage = (e) => {
         e.preventDefault();
 
@@ -225,6 +228,7 @@ export default function Board() {
                 // setSelectedMessage(null);
             }
             toggleLeftSideNav(false);
+            disableAnimation();
         }
     }
 
@@ -248,11 +252,13 @@ export default function Board() {
                     setSidebarOpenRight(open);
                     toggled=true;
                 } 
-            }
-        toggleSideElement(side, open);
-        return toggled;
-    }
+            } 
 
+        toggleSideElement(side, open);
+        
+        return toggled;
+
+    }
 
     function getUser(uid){
         if(users && !usersLoading)
@@ -335,7 +341,33 @@ export default function Board() {
         }
     }
 
-        
+    function disableAnimation(){
+        if(isAnimating === true){
+            toggleLeftSideNav(preAnimateState.current.sidebarOpenLeft);
+            toggleRightSideNav(preAnimateState.current.sidebarOpenRight);
+            setSelected(preAnimateState.current.selected);
+            setIsAnimating(false);
+        }
+    }
+
+    function animateButtonClicked(evt){
+        if(isAnimating === false){
+            preAnimateState.current={
+                sidebarOpenLeft,
+                sidebarOpenRight,
+                selected
+            }
+
+            toggleLeftSideNav(false);
+            toggleRightSideNav(false);
+            setSelected(null);
+            setIsAnimating(true);
+        }else{
+            disableAnimation();
+        }
+    }
+
+
 
     return ( <>
         <div id="boardContainer">   
@@ -344,11 +376,28 @@ export default function Board() {
 
             <div id="left"></div>
             <div id="center">
-                { boardId !== null &&
-                currentUser && !currentUserLoading &&
-                boardData && !loadingBoardData && boardData.teamId &&
-                  <AddMessageButton currentUser={currentUser} boardData={boardData} addMessage={addMessage}/>
-                }
+                <ul className="right rightButtonsContainer">
+                    <li>
+                        { boardId !== null &&
+                        currentUser && !currentUserLoading &&
+                        boardData && !loadingBoardData && boardData.teamId &&
+                          <AddMessageButton currentUser={currentUser} boardData={boardData} addMessage={addMessage}/>
+                        }
+                    </li>
+                    <li>
+                        <Button
+                            id="AnimateButton"
+                            className="green boardButtonRight"
+                            floating
+                            icon={(isAnimating === true)?<Icon>stop</Icon>:<Icon>play_arrow</Icon>}
+                            node="button"
+                            waves="light"
+                            onClick={animateButtonClicked}
+                            tooltip="Animate messages"
+                            tooltipOptions={{position:'left'}}
+                        /> 
+                    </li>
+                </ul>
                 <ul className="left leftButtonsContainer">
                     <li>
                         <Button
@@ -401,6 +450,7 @@ export default function Board() {
                                                         getUser={getUser}
                                                         currentUser={currentUser} 
                                                         deleteMessage={deleteMessage}
+                                                        isAnimating={isAnimating}
                                                         />))}
                     {( users && !loadingBoardData && boardData && boardData.name)? (<h6 className="center-align"> {boardData.name}</h6>):""
                     }
@@ -420,7 +470,7 @@ function AddMessageButton(props){
     
     if(!isStudent || (isStudent && teamData && !loadingTeamData && teamData.members.includes(props.currentUser.id))){
     return <Button
-        className="red right boardButtonRight"
+        className="red boardButtonRight"
         floating
         icon={<Icon>add</Icon>}
         node="button"

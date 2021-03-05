@@ -230,8 +230,8 @@ header {
 
 .boardButtonRight {
     /*position: fixed;*/
-    top: 86px;
-    right: 16px;
+    /*top: 86px;*/
+    /*right: 16px;*/
 }
 
 .leftButtonsContainer {
@@ -244,6 +244,19 @@ header {
 .leftButtonsContainer li {
     margin-top: 12px;
 }
+
+
+.rightButtonsContainer {
+    position: relative;
+    top: 74px;
+    right: 16px;
+    margin-top: 0px;
+}
+
+.rightButtonsContainer li {
+    margin-top: 12px;
+}
+
 
 
 .boardButtonLeft {
@@ -502,3 +515,5 @@ body,
     min-height: 200px;
     min-width: 200px;
 }
+
+
