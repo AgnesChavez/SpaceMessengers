@@ -15,216 +15,24 @@ import { db } from "../services/firebase";
 
 import '../css/board.css';
 
+var count = 0;
 
-export function BoardMessage(props) 
-{
-
-    const [message, loadingMessage] = useDocumentData(db.collection("boardMessages").doc(props.messageId));
-
-    const myRef = useRef(null);
-    const headerRef = useRef(null);
-    
-    // const positionRef = useRef(null);
-    const [position, setPosition] = useState(null);
-    // const [animPos, setAnimPos] = useState({x:0, y:0});
-    // const animPos = useRef({x:0, y:0});
-    const wasAnimating = useRef(false);
+const mode_transitionReset =  "mode_transitionReset";
+const mode_transition = "mode_transition";
+const mode_normal = "mode_normal";
 
 
-    // useEffect(()=>{
-    //     if(!props.isAnimating){
-    //         removeTransitionListeners();
-    //     }
-    //     // console.log("useEffect " + props.messageId + "  " + ((props.isAnimating === true)?"true":"false"));
-    // });
-
-    const onStop = (e, pos) => {
-        // console.log("onStop: ", position );
-        // positionRef.current = {x: position.x, y: position.y}
-        setPosition({x: pos.x, y: pos.y});
-        props.onStopHandler(props.messageId, pos);
-        e.preventDefault();
-        e.stopPropagation();
-    };
-    function isActive(){
-        if(props.isAnimating === true ) return false;
-        if(props.selected === null )return false;
-        if(props.selected.id === props.messageId) return true;
-        return false;
-    }
-    
-    function canEdit(){
-        return ( isActive() && (props.currentUser.type !== userTypes().student || (!loadingMessage && message && message.uid === props.currentUser.id)));
-    }
-
-    const onDrag = (e, pos) => {
-        const {x, y} = pos;
-        setPosition({x, y});
-    };
-
-
-    
-
-    function removeTransitionListeners(){
-        let elem = myRef.current;
-        if(elem){
-            // elem.removeEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
-            elem.removeEventListener("transitionend", transitionEnd, false );        // Standard syntax        
-            // elem.removeEventListener("webkitTransitionEnd", resetTransitionEnd, false);  // Code for Safari 3.1 to 6.0
-            elem.removeEventListener("transitionend", resetTransitionEnd, false );        // Standard syntax
-            elem.style.transition="";
-        }
-    }
-
-
-    function setTransition(easing){
-        if(isActive() === true ){return;}
-
-
-
-        console.log("setTransition " + easing + "  " + props.messageId + "  ", props.isAnimating);
-        console.log("isActive() " + ((isActive() === true)?"true":"false"));
-        
-        console.log(props);
-        let elem = myRef.current;
-        if(elem){
-            elem.style.transition="transform 2s";
-            elem.style.transitionTimingFunction= easing;
-            let coma = elem.style.transform.indexOf(",");
-                    
-            let transform = elem.style.transform.substring(0, coma+1) + " -"+ elem.clientHeight + "px)";
-
-            // elem.addEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
-            elem.addEventListener("transitionend", transitionEnd, false );        // Standard syntax
-
-            elem.style.transform = transform;
-        }
-    }
-
-    function resetTransitionEnd(evt){
-        console.log("resetTransitionEnd", evt);
-        evt.preventDefault();
-        evt.stopPropagation();
-        let elem = myRef.current;
-        if(elem){
-            elem.style.opacity = 1.0;
-            // elem.removeEventListener("webkitTransitionEnd", resetTransitionEnd, false);  // Code for Safari 3.1 to 6.0
-            elem.removeEventListener("transitionend", resetTransitionEnd, false );        // Standard syntax
-            setTransition("linear");
-        }
-    }
-
-    function transitionEnd(evt){
-        removeTransitionListeners();
-        evt.preventDefault();
-        evt.stopPropagation();
-        let elem = myRef.current;
-        let board = document.getElementById("board");
-        if(elem && board){
-            elem.style.transition= "transform 0.1s";
-            elem.style.opacity = 0.0;
-            
-            // elem.addEventListener("webkitTransitionEnd", resetTransitionEnd, false);  // Code for Safari 3.1 to 6.0
-            elem.addEventListener("transitionend", resetTransitionEnd, false );        // Standard syntax
-// 
-            elem.style.transform = "translate("+ position.x +"px, "+ board.clientHeight+"px)";
-
-            // setTransition("linear" );
-            // elem.style.animation= "messagesAnimation 5s linear 0s infinite ";
-            // elem.style.transform = "translateX(" +message.position.x+"px)";
-
-        }
-    }
-
-    if(!loadingMessage && message){
-        let user = props.getUser(message.uid);
-        if(position === null) {
-            setPosition({x: message.position.x, y: message.position.y});
-            return null;
-        }
-
-        if(wasAnimating.current !== props.isAnimating){
-            wasAnimating.current = props.isAnimating;
-            let elem = myRef.current;
-            if(elem){
-                if(props.isAnimating === true){
-
-                    setTransition("ease-in");
-                // setAnimPos(position);
-                // if(elem){
-//                     elem.style.transition="transform 2s";
-//                     elem.style.transitionTimingFunction= "ease-in";
-//                     let coma = elem.style.transform.indexOf(",");
-// 
-//                     // let px = elem.style.transform.lastIndexOf("px");
-// 
-//                     // console.log(elem.style.transform + " _ " + elem.style.transform.substring(0, coma+1));
-//                     
-//                     let transform = elem.style.transform.substring(0, coma+1) + " -" + elem.clientHeight + "px)";
-// 
-//                     elem.addEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
-//                     elem.addEventListener("transitionend", transitionEnd, false );        // Standard syntax
-// 
-//                     elem.style.transform = transform;
-
-                    // console.log(elem.style.transform + " __ " + transform );
-                    // elem.style.transform.substring(coma+1, px)
-
-                
-                }else{
-                // if(elem){
-                    removeTransitionListeners();
-                    
-                    
-                    elem.style.transform = "translate("+message.position.x + "px, " + message.position.y+"px)";
-
-                }
-            }
-        }else{
-         
-
-            // if(props.isAnimating === true) {
-            //     let elem = myRef.current;
-            //     let board = document.getElementById("board");
-            //     let pos = animPos.current;
-            //     
-            //     if(elem && board){
-            //         if(animPos.current.y < - elem.clientHeight){
-            //             pos.y = board.clientHeight;
-            //         }
-            //     }
-            //     setAnimPos(pos);
-            // }
-        }
-    return ( 
-        <>
-            <Draggable
-                className=""
-                id={"draggable-"+props.messageId}
-                handle=".messageCard-header"
-                position={position}
-                bounds="parent" 
-                onStop={onStop}
-                onDrag={onDrag}
-                onMouseDown={(e)=>props.onMessageClick(e, message)}
-            >
-                <div ref={myRef}
-                    id={"msg-"+props.messageId}
-                    className={ "card messageCard z-depth-0 " + ((!isActive())?"transparent":"") }
-                    style={{backgroundColor: message.color, 
-                        zIndex: (isActive()?1:0)
-                        }}
-                >
-            
-                    <div className="messageCard-header messageCard-handle valign-wrapper" ref={headerRef}>
-                        <img src={user.photoURL} alt="" className="circle messageHeaderImg "/> 
-                        <span style={{color: ('color' in user)?user.color:"white"}}>{user.displayName}</span>
+function RenderMessageHeader(props){
+    return <div className="messageCard-header messageCard-handle valign-wrapper" >
+                        <img src={props.user.photoURL} alt="" className="circle messageHeaderImg "/> 
+                        <span style={{color: ('color' in props.user)?props.user.color:"white"}}>{props.user.displayName}</span>
                     </div>
-                    <div className="messageCard-content white-text">
-                  
-                        <MessageEditor id={props.messageId}  message={message} active={canEdit()}/>
+}
+function RenderBoardMessageContent(props){
 
-                        {canEdit()?
+    return  <div className="messageCard-content white-text">
+                        <MessageEditor id={props.messageId}  message={props.message} active={props.canEdit}/>
+                        {props.canEdit?
                         <Button
                             className="red small halfway-fab"
                             floating
@@ -236,12 +44,254 @@ export function BoardMessage(props)
                             waves="light"
                         />:""}
                          
-                    </div>
-                    <div className="messageCard-footer">
-                    </div>                    
-                </div>
+            </div>
+    }
+
+
+
+function AnimatedBoardMessage(props){
+
+    // const myRef = useRef(null);
+    const firstRender = useRef(true);
+    const [mode, setMode] = useState(null);
+    const [style, setStyle] = useState({opacity:1.0,
+            transitionProperty: "",
+            transform:"translate("+props.message.position.x + "px, " + props.message.position.y+"px)",
+            transitionTimingFunction: ""});
+    
+    const wasAnimating = useRef(false);
+    const numRenders = useRef(0);
+    const id = useRef(null);
+    
+    useEffect(()=>{
+        if(id.current === null){
+            id.current = count;
+            count++;
+        }
+        console.log("userEffect " + count);
+
+        addTransitionListeners();
+        
+
+        if(wasAnimating.current === false ){
+            wasAnimating.current = true;
+            setTransition("ease-in");
+        }
+
+        return ()=>{
+            removeTransitionListeners();
+            console.log("AnimatedBoardMessage destructor");
+        };
+    });
+
+
+    function addTransitionListeners(){
+        let elem = document.getElementById("msg-anim-"+props.messageId);
+        if(elem){
+            elem.addEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
+            elem.addEventListener("transitionend", transitionEnd, false );        // Standard syntax
+        }
+    }    
+
+    function removeTransitionListeners(){
+        let elem = document.getElementById("msg-anim-"+props.messageId);
+        if(elem){
+            elem.removeEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
+            elem.removeEventListener("transitionend", transitionEnd, false );        // Standard syntax        
+        }
+    }
+
+    function setTransition(_easing){
+        let elem = document.getElementById("msg-anim-"+props.messageId);
+        // console.log("setTransition ");
+        if(elem){
+            setMode(mode_transition);
+            setStyle({
+                    opacity: 1.0,
+                    transitionProperty: "transform",
+                    transitionDuration: "2s",
+                    transitionTimingFunction: _easing,
+                    transform:"translate("+ props.message.position.x +"px, -"+  elem.clientHeight+"px)",
+                    
+                });
+            console.log("setTransition ");
+
+        }
+    }
+
+    function transitionEnd(evt){
+        
+        let board = document.getElementById("board");
+        
+        if(board){
+            console.log("transitionEnd " + mode);
+            if(mode === mode_transition){
+                setMode(mode_transitionReset);
+
+                setStyle({
+                    opacity:0.0,
+                    transitionProperty: "transform",
+                    transitionDuration: "0.1s",
+                    transitionTimingFunction: "linear",
+                    transform:"translate("+ props.message.position.x +"px, "+ board.clientHeight+"px)",
+                    
+                });
+            }else if(mode === mode_transitionReset){
+                
+                setTransition("linear");
+            }
+        }
+    }
+
+    function stopTransitions(){
+        
+        setStyle({
+            opacity:1.0,
+            transitionProperty: "",
+            transform:"translate("+props.message.position.x + "px, " + props.message.position.y+"px)",
+            transitionTimingFunction: ""
+        });
+        setMode(mode_normal);
+    }
+
+    // console.log();
+        // if(firstRender.current === true){
+        //     firstRender.current = false;
+        //     setMode(mode_normal);
+        //     console.log("first render");
+        // }else{
+        //     if(wasAnimating.current === false ){
+        //         wasAnimating.current = true;
+        //         setTransition("ease-in");
+        //     }
+        // }
+        // console.log("numRenders " + id.current, numRenders.current);
+        // numRenders.current ++;
+
+        return   <div 
+                    id={"msg-anim-"+props.messageId}
+                    className={ "card messageCard z-depth-0 transparent" }
+                    style={style}
+                >
+    
+                <RenderMessageHeader user={props.user}/>             
+                <RenderBoardMessageContent
+                    messageId={props.messageId}
+                    deleteMessage={props.deleteMessage}
+                    canEdit={props.canEdit}
+                    message={props.message}
+                />
+            
+                <div className="messageCard-footer">
+                </div>        
+            </div>
+    }
+
+
+function DraggableBoardMessage(props) {
+    const [position, setPosition] = useState(null);
+
+    const onDrag = (e, pos) => {
+        const {x, y} = pos;
+        setPosition({x, y});
+    };
+
+
+    const onStop = (e, pos) => {
+        
+        setPosition({x: pos.x, y: pos.y});
+        props.onStopHandler(props.messageId, pos);
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    if(position === null) {
+        setPosition({x: props.message.position.x, y: props.message.position.y});
+        return null;
+    }
+        
+    return (
+        <>
+            <Draggable
+                id={"draggable-"+props.messageId}
+                handle=".messageCard-header"
+                position={position}
+                // bounds="parent" 
+                onStop={onStop}
+                onDrag={onDrag}
+                onMouseDown={(e)=>{console.log("onMouseDown"); props.onMessageClick(e, props.message);}}
+            >    
+                <div
+                    id={"msg-"+props.messageId}
+                    className={ "card messageCard z-depth-0 " + (props.isActive === false?"transparent":"") }
+                    style={{
+                            backgroundColor: props.message.color, 
+                            zIndex: (props.isActive?1:0),
+                            }}
+                >
+    
+                <RenderMessageHeader user={props.user}/>             
+                <RenderBoardMessageContent
+                    messageId={props.messageId}
+                    deleteMessage={props.deleteMessage}
+                    canEdit={props.canEdit}
+                    message={props.message}
+                />
+            
+                <div className="messageCard-footer">
+                </div>        
+            </div>
             </Draggable> 
         </>)
+    
+}
+
+export function BoardMessage(props) 
+
+{
+
+    const [message, loadingMessage] = useDocumentData(db.collection("boardMessages").doc(props.messageId));
+    
+    
+    function isActive(){
+        if(props.isAnimating === true ) return false;
+        if(props.selected === null )return false;
+        if(props.selected.id === props.messageId) return true;
+        return false;
+    }
+    
+    function canEdit(){
+        return ( isActive() && (props.currentUser.type !== userTypes().student || (!loadingMessage && message && message.uid === props.currentUser.id)));
+    }
+
+    if(!loadingMessage && message){
+
+        
+        let user = props.getUser(message.uid);
+        if(props.isAnimating === false){
+        return <DraggableBoardMessage
+            user ={user}
+            onStopHandler = {props.onStopHandler}
+            messageId = {props.messageId}
+            message = {message}
+            onMessageClick = {props.onMessageClick}
+            isAnimating = {props.isAnimating}
+            deleteMessage = {props.deleteMessage}
+            canEdit = {canEdit()}
+            isActive = {isActive()}
+        />}else{
+        return <AnimatedBoardMessage 
+            user ={user}
+            messageId = {props.messageId}
+            message = {message}
+            isAnimating = {props.isAnimating}
+            deleteMessage = {props.deleteMessage}
+            canEdit = {canEdit()}
+            isActive = {isActive()}
+            />
+        }
     }
     return null;
 }
+
+

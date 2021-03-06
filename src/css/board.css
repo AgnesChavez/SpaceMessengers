@@ -516,4 +516,8 @@ body,
     min-width: 200px;
 }
 
+.messageTransition{
+    transition: transform 0.1s;
+}
+
 
