@@ -21,6 +21,7 @@ const mode_transitionReset =  "mode_transitionReset";
 const mode_transition = "mode_transition";
 const mode_normal = "mode_normal";
 
+const fullSwipeDuration = 5;
 
 function RenderMessageHeader(props){
     return <div className="messageCard-header messageCard-handle valign-wrapper" >
@@ -31,19 +32,18 @@ function RenderMessageHeader(props){
 function RenderBoardMessageContent(props){
 
     return  <div className="messageCard-content white-text">
-                        <MessageEditor id={props.messageId}  message={props.message} active={props.canEdit}/>
-                        {props.canEdit?
-                        <Button
-                            className="red small halfway-fab"
-                            floating
-                            small
-                            icon={<Icon>delete</Icon>}
-                            onClick={(e)=>props.deleteMessage(props.messageId)}
-                            node="button"
-                            tooltip="Delete this message"
-                            waves="light"
-                        />:""}
-                         
+                <MessageEditor id={props.messageId}  message={props.message} active={props.canEdit}/>
+                {props.canEdit?
+                <Button
+                    className="red small halfway-fab"
+                    floating
+                    small
+                    icon={<Icon>delete</Icon>}
+                    onClick={(e)=>props.deleteMessage(props.messageId)}
+                    node="button"
+                    tooltip="Delete this message"
+                    waves="light"
+                />:""}
             </div>
     }
 
@@ -103,13 +103,19 @@ function AnimatedBoardMessage(props){
 
     function setTransition(_easing){
         let elem = document.getElementById("msg-anim-"+props.messageId);
+        let board = document.getElementById("board");
         // console.log("setTransition ");
-        if(elem){
+        if(elem && board){
+
+            let duration = fullSwipeDuration;
+            if(_easing === "ease-in"){
+                duration =(props.message.position.y / (board.clientHeight + elem.clientHeight)) * fullSwipeDuration;
+            }
             setMode(mode_transition);
             setStyle({
                     opacity: 1.0,
                     transitionProperty: "transform",
-                    transitionDuration: "2s",
+                    transitionDuration: duration+"s",
                     transitionTimingFunction: _easing,
                     transform:"translate("+ props.message.position.x +"px, -"+  elem.clientHeight+"px)",
                     
