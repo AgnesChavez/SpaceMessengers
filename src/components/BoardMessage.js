@@ -68,7 +68,7 @@ function AnimatedBoardMessage(props){
             id.current = count;
             count++;
         }
-        console.log("userEffect " + count);
+        // console.log("userEffect " + count);
 
         addTransitionListeners();
         
@@ -80,7 +80,7 @@ function AnimatedBoardMessage(props){
 
         return ()=>{
             removeTransitionListeners();
-            console.log("AnimatedBoardMessage destructor");
+            // console.log("AnimatedBoardMessage destructor");
         };
     });
 
@@ -120,7 +120,7 @@ function AnimatedBoardMessage(props){
                     transform:"translate("+ props.message.position.x +"px, -"+  elem.clientHeight+"px)",
                     
                 });
-            console.log("setTransition ");
+            // console.log("setTransition ");
 
         }
     }
@@ -130,7 +130,7 @@ function AnimatedBoardMessage(props){
         let board = document.getElementById("board");
         
         if(board){
-            console.log("transitionEnd " + mode);
+            // console.log("transitionEnd " + mode);
             if(mode === mode_transition){
                 setMode(mode_transitionReset);
 
@@ -225,7 +225,7 @@ function DraggableBoardMessage(props) {
                 // bounds="parent" 
                 onStop={onStop}
                 onDrag={onDrag}
-                onMouseDown={(e)=>{console.log("onMouseDown"); props.onMessageClick(e, props.message);}}
+                onMouseDown={(e)=>{ props.onMessageClick(e, props.message);}}
             >    
                 <div
                     id={"msg-"+props.messageId}
