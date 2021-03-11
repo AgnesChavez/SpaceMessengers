@@ -1,5 +1,5 @@
 
-import React,  { useState, useEffect } from "react";
+import React,  { useState } from "react";
 
 import { CenteredPreloader } from '../components/CenteredPreloader'
 
@@ -9,7 +9,7 @@ import { auth, storageRef, db } from "../services/firebase";
 
 import '../css/gallery.css';
 
-import { Icon, Button, Modal, TextInput } from 'react-materialize';
+import { Icon, Button, Modal } from 'react-materialize';
 
 import { Link } from 'react-router-dom';
 
