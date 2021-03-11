@@ -19,7 +19,7 @@ var count = 0;
 
 const mode_transitionReset =  "mode_transitionReset";
 const mode_transition = "mode_transition";
-const mode_normal = "mode_normal";
+// const mode_normal = "mode_normal";
 
 const fullSwipeDuration = 12;
 
@@ -52,7 +52,7 @@ function RenderBoardMessageContent(props){
 function AnimatedBoardMessage(props){
 
     // const myRef = useRef(null);
-    const firstRender = useRef(true);
+    // const firstRender = useRef(true);
     const [mode, setMode] = useState(null);
     const [style, setStyle] = useState({opacity:1.0,
             transitionProperty: "",
@@ -60,7 +60,7 @@ function AnimatedBoardMessage(props){
             transitionTimingFunction: ""});
     
     const wasAnimating = useRef(false);
-    const numRenders = useRef(0);
+    // const numRenders = useRef(0);
     const id = useRef(null);
     
     useEffect(()=>{
@@ -149,16 +149,16 @@ function AnimatedBoardMessage(props){
         }
     }
 
-    function stopTransitions(){
-        
-        setStyle({
-            opacity:1.0,
-            transitionProperty: "",
-            transform:"translate("+props.message.position.x + "px, " + props.message.position.y+"px)",
-            transitionTimingFunction: ""
-        });
-        setMode(mode_normal);
-    }
+    // function stopTransitions(){
+    //     
+    //     setStyle({
+    //         opacity:1.0,
+    //         transitionProperty: "",
+    //         transform:"translate("+props.message.position.x + "px, " + props.message.position.y+"px)",
+    //         transitionTimingFunction: ""
+    //     });
+    //     setMode(mode_normal);
+    // }
 
     // console.log();
         // if(firstRender.current === true){
