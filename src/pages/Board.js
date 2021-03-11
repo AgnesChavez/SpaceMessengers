@@ -397,6 +397,10 @@ export default function Board() {
                             tooltipOptions={{position:'left'}}
                         /> 
                     </li>
+                    <li>{currentUser && !currentUserLoading &&
+                        <ToggleBackgroundButton currentUser={currentUser}/>
+                        }
+                    </li>
                 </ul>
                 <ul className="left leftButtonsContainer">
                     <li>
@@ -482,4 +486,32 @@ function AddMessageButton(props){
 }else{
     return "";
 }
+}
+function ToggleBackgroundButton(props){
+    const [bgActive, setBgActive] = useState(document.body.classList.contains("bodyImgBackground"));
+    
+    if( props.currentUser.type === userTypes().admin ){
+    return <Button
+        className="blue boardButtonRight"
+        floating
+        icon={bgActive?<Icon>layers_clear</Icon>:<Icon>layers</Icon>}
+        node="button"
+        waves="light"
+        onClick={()=>{
+            console.log();
+            if(bgActive){
+                document.body.classList.remove("bodyImgBackground");
+                document.body.classList.add("bodyNoImgBackground");
+                setBgActive(false);
+            }else{
+                document.body.classList.remove("bodyNoImgBackground");
+                document.body.classList.add("bodyImgBackground");
+                setBgActive(true);
+            }
+            }}
+        tooltip={(bgActive?"Disable":"Enable") + " background image."}
+        tooltipOptions={{position:'left'}}
+    />
+    }
+    return "";
 }

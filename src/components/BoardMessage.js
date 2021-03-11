@@ -21,7 +21,7 @@ const mode_transitionReset =  "mode_transitionReset";
 const mode_transition = "mode_transition";
 const mode_normal = "mode_normal";
 
-const fullSwipeDuration = 5;
+const fullSwipeDuration = 12;
 
 function RenderMessageHeader(props){
     return <div className="messageCard-header messageCard-handle valign-wrapper" >
@@ -88,7 +88,7 @@ function AnimatedBoardMessage(props){
     function addTransitionListeners(){
         let elem = document.getElementById("msg-anim-"+props.messageId);
         if(elem){
-            elem.addEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
+            // elem.addEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
             elem.addEventListener("transitionend", transitionEnd, false );        // Standard syntax
         }
     }    
@@ -96,7 +96,7 @@ function AnimatedBoardMessage(props){
     function removeTransitionListeners(){
         let elem = document.getElementById("msg-anim-"+props.messageId);
         if(elem){
-            elem.removeEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
+            // elem.removeEventListener("webkitTransitionEnd", transitionEnd, false);  // Code for Safari 3.1 to 6.0
             elem.removeEventListener("transitionend", transitionEnd, false );        // Standard syntax        
         }
     }

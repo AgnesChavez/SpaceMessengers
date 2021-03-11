@@ -10,7 +10,12 @@ html, body, #root {
   height: 100%;
 }
 
-body{
+.bodyNoImgBackground{
+  background-image: none;
+  background-color: rgba(0, 0, 0, 1);
+}
+
+.bodyImgBackground{
   
   background-image: url("../imgs/steaminSpace_2000x1000.jpg");
   background-attachment: fixed;
