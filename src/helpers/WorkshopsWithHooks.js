@@ -21,24 +21,27 @@ function EmptyUserEmail(useTeam){
 
 
 
-function handleChange(event, data){
-	data[event.target.name] = event.target.value;
+function handleChange(event, data, key, setData){
+	console.log("handleChange: ", data, key, event.target.name, event.target.value );
+	let newData = data;
+	newData[key][event.target.name] = event.target.value;
+	setData(newData);
 }
 
 
 function NameEmail(props){
 	return (
 			<>
-			<TextInput label="Name" name="name" value={props.data.name} onChange={ evt => handleChange(evt, props.data)}   s={12} m={5} />
-			<TextInput label="Email" name="email" value={props.data.email} onChange={ evt => handleChange(evt, props.data)}  s={12} m={5}  email />
-			{props.useTeam && <TextInput label="Team name" name="team" value={props.data.team} onChange={ evt => handleChange(evt, props.data)}  s={12} m={2} /> }
+			<TextInput label="Name" name="name" defaultValue={props.data[props.index].name} onChange={ evt => handleChange(evt, props.data, props.index, props.setData)}   s={12} m={5} />
+			<TextInput label="Email" name="email" defaultValue={props.data[props.index].email} onChange={ evt => handleChange(evt, props.data, props.index, props.setData)}  s={12} m={5}  email />
+			{props.useTeam && <TextInput label="Team name" name="team" defaultValue={props.data[props.index].team} onChange={ evt => handleChange(evt, props.data, props.index, props.setData)}  s={12} m={2} /> }
 			</>
 		)
 }
 
 function AddMembers(props){
 	// console.log(props);
-	let j=0;
+	// let j=0;
 	return (
 		<>
 		<Row>
@@ -46,7 +49,7 @@ function AddMembers(props){
 				<h6>{props.name}</h6>
 				<Row>
 					<Col s={12}>
-						 { props.data.map(i=> <NameEmail key={j++} data={i} useTeam={props.useTeam}/>)}
+						 { props.data.map((i,index)=> <NameEmail key={index} index={index} user={i} data={props.data} setData={props.setData} useTeam={props.useTeam}/>)}
 						 
 					</Col>
 				</Row>

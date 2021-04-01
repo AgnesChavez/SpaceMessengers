@@ -19,7 +19,9 @@ import {
 
  from "../helpers/Types"
 
-import { createNewUser, createUserInDb } from "../helpers/userManagement";
+import { 
+	//createNewUser,
+	 createUserInDb } from "../helpers/userManagement";
 
 
 export async function deleteUser(userId){
@@ -143,17 +145,17 @@ export async function removeTeam(teamId){
 }
 
 
-const MAKE_DUMMY_USERS = true;
+// const MAKE_DUMMY_USERS = false;
 
 export async  function createUser( userData, type, institutionId, workshopId)
 	{
-		if(MAKE_DUMMY_USERS){
+		// if(MAKE_DUMMY_USERS){
 			let uid = await createUserInDb(null, userData, type, institutionId, workshopId);
 			return uid;
-		}else{
-			await createNewUser(userData, type, institutionId, workshopId);
-		}
-		return null;
+		// }else{
+		// 	await createNewUser(userData, type, institutionId, workshopId);
+		// }
+		// return null;
 	}
 
 
