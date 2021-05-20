@@ -2,12 +2,12 @@ import firebase from "firebase";
 import "firebase/auth";
 import "firebase/firestore";
 const config = {
-  apiKey: "***REMOVED***",
+  apiKey: "",
   authDomain: "space-messengers.firebaseapp.com",
   projectId: "space-messengers",
   storageBucket: "space-messengers.appspot.com",
-  messagingSenderId: "***REMOVED***",
-  appId: "1:***REMOVED***:web:***REMOVED***"
+  messagingSenderId: "",
+  appId: ""
 };
 
 firebase.initializeApp(config);
