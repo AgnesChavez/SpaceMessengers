@@ -354,8 +354,8 @@ export function ModalRemoveUser(props){
     		id="ModalRemoveUser"
     		root={document.getElementById('modalRoot')}
   		>			
-  			{removing?
-  				<CenteredPreloader title="Creating user"/>:
+  			{(props.currentWorkshop && props.currentWorkshop.students && removing)?
+  				<CenteredPreloader title="Remove user"/>:
   				<>
 				<p>Select user to remove:</p>
 				<SelectUser selectorId = {"ModalRemoveUserSelector"} value={""} onChange={onChange} usersArray={props.currentWorkshop.students.concat(props.currentWorkshop.instructors)} />
