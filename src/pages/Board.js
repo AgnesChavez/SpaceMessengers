@@ -322,8 +322,8 @@ export default function Board() {
                 if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
                 {
                     setBoardId(currentUser.boards[0]);
-                }else{                    
-
+                }else if(boardId !== 'default'){                    
+                    setBoardId('default');
                 }
             }
         }

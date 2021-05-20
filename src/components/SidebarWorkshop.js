@@ -171,7 +171,7 @@ export function SidebarWorkshopCollection(props){
             { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} setOtherUserId={props.setOtherUserId}/> }
 
             { currentWorkshop && (props.user.type === userTypes().admin) && <ModalCreateUser currentWorkshop={currentWorkshop}/> }
-            { currentWorkshop && (props.user.type === userTypes().admin) && <ModalRemoveUser currentWorkshop={currentWorkshop}/> }
+            { currentWorkshop && currentWorkshop.students && (props.user.type === userTypes().admin) && <ModalRemoveUser currentWorkshop={currentWorkshop}/> }
 
             { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
