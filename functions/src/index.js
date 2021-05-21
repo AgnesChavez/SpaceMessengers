@@ -20,7 +20,7 @@ var serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: "space-messengers.appspot.com"
+    // storageBucket: "space-messengers.appspot.com"
 
 });
 
@@ -118,130 +118,130 @@ app.get('/api/checkEmail', async (req, res) => {
 //     return res.status(200).json({fail: true});
 // });
 
-async function getPublicUrl(file) {
-    
-    file.makePublic((err, apiResponse) =>{
-    	if(err){console.log("getPublicUrl failed", err);}
-
-    });
-
-    const fileMetadata = await file.getMetadata();
-    // functions.logger.log("getPublicUrl: ", fileMetadata);
-    return fileMetadata[0].mediaLink;
-}
-
-
-
-async function makeThumb(imgPath, imageId) {
-	if(!imgPath || imgPath === "") return false;
-
-	console.log("makeThumb(" + imgPath+", "+imageId+")");
-	let bucket = admin.storage().bucket();
-	let file = bucket.file(imgPath); 
-
-	try{
-	let e = await file.exists();
-    if (!e[0]) {
-		console.log('No file for making thumb: ');
-		return false;
-	}
-	}catch(error){
-		console.log('error checking file exists.  errormessage: ', error.message);
-		return false;
-	}
-
-    // Get the file name.
-    const filePath = file.name; // File path in the bucket.
-    const fileName = path.basename(filePath);
-    const fileDir = path.dirname(filePath);
-    const extension = path.extname(fileName).toLowerCase();
-    
-    // const baseFileName = path.basename(fileName, extension);
-    console.log('Attempt to make thumbnail for : ', filePath);
-    // functions.logger.log("Make Thumb. fileName: "+ fileName + " filePath: " + filePath + " fileDir: " + fileDir);
-    // Exit if the image is already a thumbnail.
-    if (fileName.startsWith('thumb_')) {
-    	console.log('Already a Thumbnail.');
-        return false;
-       // return false functions.logger.log('Already a Thumbnail.');
-    }
-
-    const thumbFileName = "thumb_" + fileName;
-
-    const thumbFilePath = path.join(fileDir, thumbFileName);
-
-    console.log("thumbFilePath: " + thumbFilePath);
-
-    let d = await bucket.file(thumbFilePath).exists();
-    if (d[0] === true) {
-    console.log("There is already a thumb ", thumbFilePath);
-    return false;
-    }
-
-    const tempFilePath = path.join(os.tmpdir(), fileName.replace(/ /g, "_"));
-
-    // FORCING THUMB TO BE JPEG
-    // const tempFilePathJPEG = path.join(os.tmpdir(), "thumb_" + baseFileName.replace(/ /g, "_") + ".jpg");
-
-    try {
-        await bucket.file(filePath).download({ destination: tempFilePath });
-        console.log('Image downloaded locally to', tempFilePath);
-        // Generate a thumbnail using ImageMagick.
-        let convertResult = await spawn('convert', [tempFilePath, '-resize', 'x300>', tempFilePath], { capture: ['stdout', 'stderr'] });
-        console.log('convert stdout', JSON.stringify(convertResult));
-
-        console.log('Thumbnail created at', tempFilePath);
-        // Uploading the thumbnail.
-        // const uploadedFile = await bucket.upload(tempLocalThumbFile, {destination: thumbFilePath, metadata: metadata});
-        // const metadata = {
-        //     contentType: "image/jpeg",
-        // };
-
-        let contentType = (await file.getMetadata())[0].contentType;
-
-		const metadata = {
-            contentType: contentType,
-        };
-
-
-        bucket.upload(tempFilePath, {
-            destination: thumbFilePath,
-            metadata: metadata,
-            resumable: false,
-            public: true
-        }, async (err, newFile) =>{
-            if (err) {
-                console.log("uploading thumbnail ", imageId, " failed. error: ", err);
-                return false;
-            } else {
-
-                let pictureURL = await getPublicUrl(newFile);
-
-                const userRef = db.collection('images').doc(imageId);
-                const doc = await userRef.get();
-                if (doc.exists) {
-                    let pic = {};
-                    const updateRes = await userRef.update({thumbURL: pictureURL});
-                }
-
-                console.log("generateThumbnail.ThumbURL: ", pictureURL);
-                return true;
-            }
-        });
-
-
-    } catch (error) {
-        console.log('generateThumbnail: Error ', error.message);
-        if ('stderr' in error) {
-            console.log('generateThumbnail: stderr ', error.stderr);
-        }
-        return false;
-    }
+// async function getPublicUrl(file) {
+//     
+//     file.makePublic((err, apiResponse) =>{
+//     	if(err){console.log("getPublicUrl failed", err);}
 // 
-//     fs.unlinkSync(tempFilePathJPEG);
-//     fs.unlinkSync(tempFilePath);
-    return true;
-}
+//     });
+// 
+//     const fileMetadata = await file.getMetadata();
+//     // functions.logger.log("getPublicUrl: ", fileMetadata);
+//     return fileMetadata[0].mediaLink;
+// }
+
+
+
+// async function makeThumb(imgPath, imageId) {
+// 	if(!imgPath || imgPath === "") return false;
+// 
+// 	console.log("makeThumb(" + imgPath+", "+imageId+")");
+// 	let bucket = admin.storage().bucket();
+// 	let file = bucket.file(imgPath); 
+// 
+// 	try{
+// 	let e = await file.exists();
+//     if (!e[0]) {
+// 		console.log('No file for making thumb: ');
+// 		return false;
+// 	}
+// 	}catch(error){
+// 		console.log('error checking file exists.  errormessage: ', error.message);
+// 		return false;
+// 	}
+// 
+//     // Get the file name.
+//     const filePath = file.name; // File path in the bucket.
+//     const fileName = path.basename(filePath);
+//     const fileDir = path.dirname(filePath);
+//     const extension = path.extname(fileName).toLowerCase();
+//     
+//     // const baseFileName = path.basename(fileName, extension);
+//     console.log('Attempt to make thumbnail for : ', filePath);
+//     // functions.logger.log("Make Thumb. fileName: "+ fileName + " filePath: " + filePath + " fileDir: " + fileDir);
+//     // Exit if the image is already a thumbnail.
+//     if (fileName.startsWith('thumb_')) {
+//     	console.log('Already a Thumbnail.');
+//         return false;
+//        // return false functions.logger.log('Already a Thumbnail.');
+//     }
+// 
+//     const thumbFileName = "thumb_" + fileName;
+// 
+//     const thumbFilePath = path.join(fileDir, thumbFileName);
+// 
+//     console.log("thumbFilePath: " + thumbFilePath);
+// 
+//     let d = await bucket.file(thumbFilePath).exists();
+//     if (d[0] === true) {
+//     console.log("There is already a thumb ", thumbFilePath);
+//     return false;
+//     }
+// 
+//     const tempFilePath = path.join(os.tmpdir(), fileName.replace(/ /g, "_"));
+// 
+//     // FORCING THUMB TO BE JPEG
+//     // const tempFilePathJPEG = path.join(os.tmpdir(), "thumb_" + baseFileName.replace(/ /g, "_") + ".jpg");
+// 
+//     try {
+//         await bucket.file(filePath).download({ destination: tempFilePath });
+//         console.log('Image downloaded locally to', tempFilePath);
+//         // Generate a thumbnail using ImageMagick.
+//         let convertResult = await spawn('convert', [tempFilePath, '-resize', 'x300>', tempFilePath], { capture: ['stdout', 'stderr'] });
+//         console.log('convert stdout', JSON.stringify(convertResult));
+// 
+//         console.log('Thumbnail created at', tempFilePath);
+//         // Uploading the thumbnail.
+//         // const uploadedFile = await bucket.upload(tempLocalThumbFile, {destination: thumbFilePath, metadata: metadata});
+//         // const metadata = {
+//         //     contentType: "image/jpeg",
+//         // };
+// 
+//         let contentType = (await file.getMetadata())[0].contentType;
+// 
+// 		const metadata = {
+//             contentType: contentType,
+//         };
+// 
+// 
+//         bucket.upload(tempFilePath, {
+//             destination: thumbFilePath,
+//             metadata: metadata,
+//             resumable: false,
+//             public: true
+//         }, async (err, newFile) =>{
+//             if (err) {
+//                 console.log("uploading thumbnail ", imageId, " failed. error: ", err);
+//                 return false;
+//             } else {
+// 
+//                 let pictureURL = await getPublicUrl(newFile);
+// 
+//                 const userRef = db.collection('images').doc(imageId);
+//                 const doc = await userRef.get();
+//                 if (doc.exists) {
+//                     let pic = {};
+//                     const updateRes = await userRef.update({thumbURL: pictureURL});
+//                 }
+// 
+//                 console.log("generateThumbnail.ThumbURL: ", pictureURL);
+//                 return true;
+//             }
+//         });
+// 
+// 
+//     } catch (error) {
+//         console.log('generateThumbnail: Error ', error.message);
+//         if ('stderr' in error) {
+//             console.log('generateThumbnail: stderr ', error.stderr);
+//         }
+//         return false;
+//     }
+// // 
+// //     fs.unlinkSync(tempFilePathJPEG);
+// //     fs.unlinkSync(tempFilePath);
+//     return true;
+// }
 
 // exports.makeThumb = functions.firestore
 //     .document('images/{imageId}')
