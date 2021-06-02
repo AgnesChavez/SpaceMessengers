@@ -72,7 +72,7 @@ function LoadingData(props){
                     tooltipOptions={{position:'left'}}
                 /> 
             <Row>
-                <h6 className="center-align">Loading board data</h6>
+                <h6 className="center-align .board-headerMessage">Loading board data</h6>
             </Row>
             <Row style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
             <Col s={2} offset="s5" style={{width: "unset", margin: "auto"}}>
@@ -119,6 +119,8 @@ export default function Board() {
     const [currentUser, currentUserLoading] = useDocumentData(currentUserRef);
 
 
+
+
     async function createMessage(){
         const { uid } = auth().currentUser;
 
@@ -128,13 +130,6 @@ export default function Board() {
         let y = center.scrollTop + (center.clientHeight - 88)/2;
 
         let newMessage = BoardMessageData(uid, boardId, x, y);
-
-        // if(isImage === true && imgData !== null){
-        //     newMessage.isImage=true;
-        //     newMessage.imgURL=imgData.downloadURL;
-        //     newMessage.content=imgData.caption;
-        //     newMessage.uploadPath = imgData.uploadPath;
-        // }
 
         let msgRef = await messagesRef.add(newMessage);
 
@@ -154,17 +149,10 @@ export default function Board() {
         createMessage();
     }
 
+
+
     const deleteMessage = async (messageId) => {
         if(!messageId) return;
-
-        
-
-        // let msgData = await getQueryData(messagesRef.doc(messageId));
-        // if(msgData !== null && msgData.isImage === true && msgData.uploadPath ){
-        //     deleteImg(msgData.uploadPath);
-        // }
-        
-
 
         messagesRef.doc(messageId).delete().then(function() {
             if(messageId === selected.id){
@@ -183,6 +171,7 @@ export default function Board() {
         setBoardId(bid);
     }
     
+
     const onStopHandler = (msgId, position) => {
         if(msgId){
             // console.log("onStopHandler " + msgId + "  pos: ", position);
@@ -233,7 +222,7 @@ export default function Board() {
     }
 
     function toggleRightSideNav(open){
-        return toggleSideNav( open, 'right');
+        return toggleSideNav( open && boardId !== "default", 'right');
     }
     function toggleLeftSideNav(open){
         return toggleSideNav( open, 'left');
@@ -314,32 +303,6 @@ export default function Board() {
         });
     }
 
-    if(currentUser && !currentUserLoading){
-        if(boardId === null || boardId === 'default'){
-            if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
-                setBoardId(currentUser.currentBoard);
-            }else{
-                if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
-                {
-                    setBoardId(currentUser.boards[0]);
-                }else if(boardId !== 'default'){                    
-                    setBoardId('default');
-                }
-            }
-        }
-        if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
-              updateCurrentUser("teams", 'members', "currentTeam", null);
-        }
-        if(currentUser.currentWorkshop === null){
-            if(currentUser.type === userTypes().admin){
-                updateCurrentUser("workshops", null, "currentWorkshop","created");
-            }else if(currentUser.type === userTypes().instructor){
-                updateCurrentUser("workshops", 'instructors', "currentWorkshop","created");
-            }else if(currentUser.type === userTypes().student){
-                updateCurrentUser("workshops", 'students', "currentWorkshop","created");
-            }
-        }
-    }
 
     function disableAnimation(){
         if(isAnimating === true){
@@ -369,16 +332,56 @@ export default function Board() {
 
 
 
-    return ( <>
+    if(!boardData && !loadingBoardData){
+        console.log("no board data");
+        if(boardId !== 'default'){                    
+            setBoardId('default');
+        }
+    }else if(currentUser && !currentUserLoading){
+        if(boardId === null || boardId === 'default'){
+            if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
+                setBoardId(currentUser.currentBoard);
+            }else{
+                if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
+                {
+                    setBoardId(currentUser.boards[0]);
+                }else if(boardId !== 'default'){                    
+                    setBoardId('default');
+                }
+            }
+        }
+        if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
+              updateCurrentUser("teams", 'members', "currentTeam", null);
+        }
+        if(currentUser.currentWorkshop === null){
+            if(currentUser.type === userTypes().admin){
+                updateCurrentUser("workshops", null, "currentWorkshop","created");
+            }else if(currentUser.type === userTypes().instructor){
+                updateCurrentUser("workshops", 'instructors', "currentWorkshop","created");
+            }else if(currentUser.type === userTypes().student){
+                updateCurrentUser("workshops", 'students', "currentWorkshop","created");
+            }
+        }
+    }
+
+
+    ///dont show right sidebar when in the default board
+     if( boardId === 'default') {
+        toggleRightSideNav(false);
+     }
+
+
+    return ( 
+        <>
         <div id="boardContainer">   
             { currentUser &&  !currentUserLoading && currentUser.currentWorkshop && <Sidebar isOpen={sidebarOpenLeft} usr={currentUser} boardSelectHandle={boardSelectHandle}  ></Sidebar>}
-            <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />
+            { boardId !== 'default' && <InfoSidebar isOpen={sidebarOpenRight} boardId={boardId} selected={selected}  getUser={getUser} />}
 
             <div id="left"></div>
             <div id="center">
                 <ul className="right rightButtonsContainer">
                     <li>
-                        { boardId !== null &&
+                        { boardId !== null && boardId !== "default" && 
                         currentUser && !currentUserLoading &&
                         boardData && !loadingBoardData && boardData.teamId &&
                           <AddMessageButton currentUser={currentUser} boardData={boardData} addMessage={addMessage}/>
@@ -440,9 +443,12 @@ export default function Board() {
                     className="col s12 z-depth-2 "
                     onMouseDown={onClick}
                     >
-                    { boardId !== null && (!boardData || loadingBoardData || !currentUser ||  currentUserLoading ) && <LoadingData/>}
-                    {(boardId === null)?
-                    (<h4 className="center-align"> No board selected! <br/> Chose or create one on the left side menu under the team tab </h4>)
+                    
+
+                    { boardId !== null && (!boardData || loadingBoardData || !currentUser ||  currentUserLoading ) && <LoadingData/>} 
+
+                    {(boardId === null || (loadingBoardData===false && boardId==='default'))?
+                    (<h6 className="center-align board-headerMessage"> No board selected! <br/> Chose or create one on the left side menu under the Teams tab </h6>)
                     :
                     ( users && !loadingBoardData && boardData && boardData.messages 
                         && boardData.messages.map(msg => <BoardMessage

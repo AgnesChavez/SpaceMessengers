@@ -11,6 +11,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
+// const cors = require('cors');
 
 
 
@@ -31,6 +32,11 @@ if (process.env.NODE_ENV === 'development') {
 
 const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
+
+
+
+// app.use(cors({ origin: true }));
+
 
 
 

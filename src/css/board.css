@@ -42,7 +42,9 @@ body {
     transition: transform 0.3s !important;
 }
 
-
+.board-headerMessage{
+    margin-top:100px;
+}
 
 .sidenav-fixed {
     position: absolute !important;
