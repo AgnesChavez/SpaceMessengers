@@ -2,10 +2,15 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="pt-5">
-      <div className="container text-center">
-        <p>&copy; Agnes Chavez 2020.</p>
-      </div>
+    <footer className="page-footer black">
+        <div className="container center">
+            
+            STEMarts Lab
+            <a className="waves-effect waves-light btn-flat white-text" href="www.stemarts.com">stemarts.com</a>
+            <a className="waves-effect waves-light btn-flat white-text" href="www.spacemessengers.com">spacemessengers.com</a>
+            <a className="waves-effect waves-light btn-flat white-text" href="https://github.com/AgnesChavez/">github.com/AgnesChavez</a>
+            
+        </div>
     </footer>
   )
 }

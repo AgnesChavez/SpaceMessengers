@@ -10,6 +10,7 @@ html, body, #root {
   height: 100%;
 }
 
+
 .bodyNoImgBackground{
   background-image: none;
   background-color: rgba(0, 0, 0, 1);
@@ -43,6 +44,15 @@ header
 {
   color: white;
 }
+
+footer {
+  /*position: fixed;*/
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
 
 
 .chat-area {
@@ -240,4 +250,15 @@ header
   .chat-area .chat-bubble {
     max-width: 250px;
   }
+}
+@media screen and (min-height: 767px) {
+    #LoginButtonContainer{
+        margin-top: 100px;
+    } 
+}
+
+@media screen and (min-height: 510px) { 
+    footer{
+        position: fixed;
+    }
 }
