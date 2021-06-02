@@ -40,17 +40,7 @@ async function checkEmail(email, callback, setError){
         setError(e);
         return;
     }
-    // try{
-    //     let querySnapshot = await db.collection("users").where("email", "==", email).get();
-    //     if(querySnapshot.size > 0){
-    //         return true;
-    //     }
-    // }catch(e) {
-    //     setError(e);
-    //     console.log("Error getting documents: ", e);
-    //     return false;
-    // }
-    // return false;
+    
 }
 
 
