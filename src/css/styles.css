@@ -53,7 +53,14 @@ footer {
   text-align: center;
 }
 
+.loginButton{
 
+}
+
+.loginInfo{
+    border-width: 5px;
+    border-style: solid;
+}
 
 .chat-area {
   padding: 20px;
