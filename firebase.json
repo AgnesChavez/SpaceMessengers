@@ -37,6 +37,10 @@
         "function": "app"
       },
       {
+        "source": "/private_api/**",
+        "function": "app"
+      },
+      {
         "source": "/",
         "destination": "/index.html"
       },

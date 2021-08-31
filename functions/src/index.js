@@ -35,6 +35,34 @@ const FieldValue = admin.firestore.FieldValue;
 
 
 
+const bearer = "iufYpsD54OUvYnl0N1ZBZmnAHoknNL+/o2pwk6iGFLKCcuUedlR6OFiCY01QIYDZLcrbF/4SnpfrTWBhsBMLM8mT7AWGbA==";
+
+// Express middleware that validates a token passed in the Authorization HTTP header.
+// The token needs to be passed as a Bearer token in the Authorization HTTP header like this:
+// `Authorization: Bearer <Token>`.
+// In this case I am using a single random generated token as there is only a single computer that should be able to access this API, which already has this token.
+
+const authenticate = async (req, res, next) => {
+    if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+        res.status(403).send('Unauthorized');
+        return;
+    }
+    const idToken = req.headers.authorization.split('Bearer ')[1];
+    if (idToken == bearer) {
+        next();
+        return;
+    } else {
+        res.status(403).send('Unauthorized');
+        return;
+    }
+
+
+};
+
+
+app.use("/private_api", authenticate);
+
+
 // app.use(cors({ origin: true }));
 
 
@@ -45,6 +73,121 @@ app.get('/api/checkEmail', async (req, res) => {
     let querySnapshot = await db.collection("users").where("email", "==", req.query.email).get();
     return res.status(200).json({valid: (querySnapshot.size > 0)});
 });
+
+
+async function getDocData( collection, docID){
+try {
+        const doc = await db.collection(collection).doc(docID).get();
+        if (!doc.exists) {
+            console.log('No element in '+ collection +' with id: ', docID);
+            return { status: 404, data: { empty: true } };
+        } else {
+            return { status: 200, data: {id: doc.id, data: doc.data() }};
+        }
+    } catch (error) {
+        
+        console.log('Error getting element ', docID, " error message:", error.message);
+        return { status: 500};
+    }
+}
+
+
+async function getDoc( collection, queryID, req, res){
+try {
+        const doc = await db.collection(collection).doc(queryID).get();
+        if (!doc.exists) {
+            console.log('No element in '+ collection +' with id: ', queryID);
+            return res.status(404).json({ empty: true });
+        } else {
+            return res.status(200).json({ id: doc.id, data: doc.data() });
+        }
+    } catch (error) {
+        console.log('Error getting element ', queryID, " error message:", error.message);
+        return res.sendStatus(500);
+    }
+}
+
+
+async function getUser(userId){
+    let user = await getDocData("users",userId);
+    if(user.status === 200) return user.data.data;
+    return {};
+}
+
+async function getComments(messageID){
+
+    let query = await db.collection("comments").where("group", "==", messageID).get();
+    
+    let comments = [];
+    for(let i = 0; i < query.docs.length; i++){
+        comments.push(query.docs[i].data());
+        comments[i].author = await getUser(comments[i].uid);
+    } 
+
+    return comments;
+    // return query.docs.map( (d) => {return d.data()});
+
+}
+
+
+
+async function getMessage(messageID){
+    let msg = await getDocData( "boardMessages", messageID);
+    if(msg.status == 200) {
+        // let comments = [];
+        // for( let i = 0; i < msg.data.data.comments.length; i++){
+        //     comments.push(await getComments(msg.data.data.comments[i]));
+        // }
+        msg.data.data.author = await getUser(msg.data.data.uid);
+        msg.data.data.comments = await getComments(messageID);
+        return msg.data.data;
+    }    
+    return {};
+    
+}
+
+
+app.get('/private_api/getBoard', async (req, res) => {
+
+        
+        let board = await getDocData( "boards", req.query.boardID);
+        
+        if(board.status === 500) return res.sendStatus(500);
+        if(board.status === 404) res.status(board.status).json(board.data);
+
+        let messages = [];
+        for(let i = 0; i < board.data.data.messages.length; i++){
+
+            messages.push( await getMessage(board.data.data.messages[i]));
+            // console.log(m);
+        }
+
+        board.data.data.messages = messages;
+
+        // console.log("Messages: ", board.data.data.messages);
+
+
+        return res.status(board.status).json(board.data);
+
+        
+});
+
+app.get('/api/getUser/:userId', async (req, res) => {
+        return getDoc( "users", req.params.userId, req, res);
+});
+
+app.get('/api/getMessage', async (req, res) => {
+        return getDoc( "boardMessages", req.query.messageID, req, res);
+});
+
+
+
+
+
+// app.get('/api/getUser', async (req, res) => {
+//         return getDoc( "users", req.query.userID, req, res);
+// });
+
 
 
 // app.get('/api/listImages', async (req, res) => {
