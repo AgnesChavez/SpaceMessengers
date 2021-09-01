@@ -48,7 +48,7 @@ const authenticate = async (req, res, next) => {
         return;
     }
     const idToken = req.headers.authorization.split('Bearer ')[1];
-    if (idToken == bearer) {
+    if (idToken === bearer) {
         next();
         return;
     } else {
@@ -119,10 +119,27 @@ async function getComments(messageID){
     let query = await db.collection("comments").where("group", "==", messageID).get();
     
     let comments = [];
+    let authors_promises = [];
     for(let i = 0; i < query.docs.length; i++){
         comments.push(query.docs[i].data());
-        comments[i].author = await getUser(comments[i].uid);
+        authors_promises.push(getUser(comments[i].uid));
+        // comments[i].author = await 
     } 
+
+    let authors = await Promise.all(authors_promises);
+    if(comments.length === authors.length){
+        for(let i = 0; i < authors.length; i++ )    {
+            if(comments[i].uid === authors[i].id){
+                comments[i].author = authors[i];    
+            }else{
+                console.log("Comment: " + comments[i].id + " author wrong index");
+            }
+            
+        }
+    }else{
+        console.log("getComments(messageID): comments and authors lengths differ" );
+    }
+    
 
     return comments;
     // return query.docs.map( (d) => {return d.data()});
@@ -133,7 +150,7 @@ async function getComments(messageID){
 
 async function getMessage(messageID){
     let msg = await getDocData( "boardMessages", messageID);
-    if(msg.status == 200) {
+    if(msg.status === 200) {
         // let comments = [];
         // for( let i = 0; i < msg.data.data.comments.length; i++){
         //     comments.push(await getComments(msg.data.data.comments[i]));
@@ -147,6 +164,104 @@ async function getMessage(messageID){
 }
 
 
+
+async function getBoard(boardId){
+
+try{
+        let board = await getDocData( "boards", boardId);
+        
+        if(board.status === 200){
+        // if(board.status === 500) return res.sendStatus(500);
+        // if(board.status === 404) res.status(board.status).json(board.data);
+
+        let messages = [];
+        for(let i = 0; i < board.data.data.messages.length; i++){
+
+            messages.push(getMessage(board.data.data.messages[i]));
+            // console.log(m);
+        }
+
+            board.data.data.messages = await Promise.all(messages);
+
+            return board.data;
+        }
+
+        return {};
+        // console.log("Messages: ", board.data.data.messages);
+}catch(error){
+    console.log("getBoard : " + boardId + " failed: " + error);
+}
+
+        // return res.status(board.status).json(board.data);
+
+}
+
+async function getTeam(teamId){
+
+try{
+        let team = await getDocData("teams", teamId);
+        if(team.status !== 200){
+            return {};
+        }
+        team = team.data;
+
+        let boards = await db.collection("boards").where("teamId", "==", teamId).get();
+
+        // console.log("team boards " + boards.docs.length);
+
+        let teamBoardsPromises = [];
+        for(let i = 0; i < boards.docs.length; i++){
+            teamBoardsPromises.push(getBoard(boards.docs[i].id));
+        }
+        team.data.boards = await Promise.all(teamBoardsPromises);
+
+        return team;
+}catch(error){
+    console.log("getTeam : " + teamId + " failed: " + error);
+}
+return {};
+        // console.log("Messages: ", board.data.data.messages);
+
+
+        // return res.status(board.status).json(board.data);
+
+}
+
+app.get('/private_api/getWorkshop', async (req, res) => {
+try{
+        console.log("getWorkshop ID: " + req.query.workshopID);
+        let workshop = await getDocData("workshops", req.query.workshopID);
+        
+        if(workshop.status === 500) {
+            console.log("getWorkshop server internal error");
+            return res.sendStatus(500);
+        }
+        else if(workshop.status === 404) {
+            console.log("getWorkshop not found");
+            return res.status(workshop.status).json(workshop.data);
+        }
+    
+
+
+        // workshop = workshop.data;
+        
+        let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
+        // console.log("teams ", teams.docs.length);
+        let teamBoardsPromises = [];
+        for(let i = 0; i < teams.docs.length; i++){
+            teamBoardsPromises.push(getTeam(teams.docs[i].id));
+        }
+
+        workshop.data.data.teams = await Promise.all(teamBoardsPromises);
+
+        return res.status(200).json(workshop.data);
+}catch(error){
+    console.log("/private_api/getWorkshop failed: " + error);
+    return res.status(500);
+}
+});
+
+
 app.get('/private_api/getBoard', async (req, res) => {
 
         
@@ -158,11 +273,13 @@ app.get('/private_api/getBoard', async (req, res) => {
         let messages = [];
         for(let i = 0; i < board.data.data.messages.length; i++){
 
-            messages.push( await getMessage(board.data.data.messages[i]));
+            messages.push(getMessage(board.data.data.messages[i]));
             // console.log(m);
         }
 
-        board.data.data.messages = messages;
+        board.data.data.messages = await Promise.all(messages);
+
+        
 
         // console.log("Messages: ", board.data.data.messages);
 
