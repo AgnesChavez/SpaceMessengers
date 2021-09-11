@@ -119,26 +119,26 @@ async function getComments(messageID){
     let query = await db.collection("comments").where("group", "==", messageID).get();
     
     let comments = [];
-    let authors_promises = [];
+    // let authors_promises = [];
     for(let i = 0; i < query.docs.length; i++){
         comments.push(query.docs[i].data());
-        authors_promises.push(getUser(comments[i].uid));
+        // authors_promises.push(getUser(comments[i].uid));
         // comments[i].author = await 
     } 
 
-    let authors = await Promise.all(authors_promises);
-    if(comments.length === authors.length){
-        for(let i = 0; i < authors.length; i++ )    {
-            if(comments[i].uid === authors[i].id){
-                comments[i].author = authors[i];    
-            }else{
-                console.log("Comment: " + comments[i].id + " author wrong index");
-            }
-            
-        }
-    }else{
-        console.log("getComments(messageID): comments and authors lengths differ" );
-    }
+    // let authors = await Promise.all(authors_promises);
+    // if(comments.length === authors.length){
+        // for(let i = 0; i < authors.length; i++ )    {
+        //     // if(comments[i].uid === authors[i].id){
+        //         comments[i].authorId = comments[i].uid;
+        //     }else{
+        //         console.log("Comment: " + comments[i].id + " author wrong index");
+        //     }
+        //     
+        // }
+    // }else{
+    //     console.log("getComments(messageID): comments and authors lengths differ" );
+    // }
     
 
     return comments;
@@ -155,7 +155,7 @@ async function getMessage(messageID){
         // for( let i = 0; i < msg.data.data.comments.length; i++){
         //     comments.push(await getComments(msg.data.data.comments[i]));
         // }
-        msg.data.data.author = await getUser(msg.data.data.uid);
+        // msg.data.data.authorId = msg.data.data.uid;
         msg.data.data.comments = await getComments(messageID);
         return msg.data.data;
     }    
@@ -186,12 +186,13 @@ try{
             return board.data;
         }
 
-        return {};
+        
         // console.log("Messages: ", board.data.data.messages);
 }catch(error){
     console.log("getBoard : " + boardId + " failed: " + error);
 }
 
+return {};
         // return res.status(board.status).json(board.data);
 
 }
@@ -254,6 +255,27 @@ try{
 
         workshop.data.data.teams = await Promise.all(teamBoardsPromises);
 
+        let usersPromises = [];
+
+        workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
+            // usersPromises.push(getUser(workshop.data.data.students[i]));
+        // }
+        workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
+
+
+//         for(let i = 0; i < workshop.data.data.students.length; i++){
+//             usersPromises.push(getUser(workshop.data.data.students[i]));
+//         }
+// 
+//         for(let i = 0; i < workshop.data.data.instructors.length; i++){
+//             usersPromises.push(getUser(workshop.data.data.instructors[i]));
+//         }
+//         
+
+        workshop.data.data.users = await Promise.all(usersPromises);
+
+
+
         return res.status(200).json(workshop.data);
 }catch(error){
     console.log("/private_api/getWorkshop failed: " + error);
@@ -262,32 +284,32 @@ try{
 });
 
 
-app.get('/private_api/getBoard', async (req, res) => {
-
-        
-        let board = await getDocData( "boards", req.query.boardID);
-        
-        if(board.status === 500) return res.sendStatus(500);
-        if(board.status === 404) res.status(board.status).json(board.data);
-
-        let messages = [];
-        for(let i = 0; i < board.data.data.messages.length; i++){
-
-            messages.push(getMessage(board.data.data.messages[i]));
-            // console.log(m);
-        }
-
-        board.data.data.messages = await Promise.all(messages);
-
-        
-
-        // console.log("Messages: ", board.data.data.messages);
-
-
-        return res.status(board.status).json(board.data);
-
-        
-});
+// app.get('/private_api/getBoard', async (req, res) => {
+// 
+//         
+//         let board = await getDocData( "boards", req.query.boardID);
+//         
+//         if(board.status === 500) return res.sendStatus(500);
+//         if(board.status === 404) res.status(board.status).json(board.data);
+// 
+//         let messages = [];
+//         for(let i = 0; i < board.data.data.messages.length; i++){
+// 
+//             messages.push(getMessage(board.data.data.messages[i]));
+//             // console.log(m);
+//         }
+// 
+//         board.data.data.messages = await Promise.all(messages);
+// 
+//         
+// 
+//         // console.log("Messages: ", board.data.data.messages);
+// 
+// 
+//         return res.status(board.status).json(board.data);
+// 
+//         
+// });
 
 app.get('/api/getUser/:userId', async (req, res) => {
         return getDoc( "users", req.params.userId, req, res);
