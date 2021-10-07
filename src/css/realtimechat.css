@@ -1,0 +1,106 @@
+body{
+	background-image: none !important;
+	background-color: rgba(0, 0, 0, 1.0) !important;
+}
+header{
+	display: none !important;
+}
+.realtimeMessage{
+	line-height: unset !important;
+	margin: .5rem 0 0.5rem 0 !important;
+	/*max-width: 80%;*/
+	word-break: break-word !important;
+	background-color: rgba(100, 100, 100, 0.3);
+	border-radius: 8px;
+	
+}
+
+#waitingMessage{
+	line-height: unset !important;
+	margin: .5rem 0 0.5rem 0 !important;
+	/*max-width: 80%;*/
+	word-break: break-word !important;
+}
+
+.ownChatMessage{
+right: -20%;
+
+position: relative;
+}
+
+
+.realtimeInput
+{
+	/*width:70%  !important;*/
+	background-color: #090909 !important;
+	border: 1px solid #282828 !important;
+	color: white !important;
+	/*height:32px !important;*/
+	margin:0px !important;
+	flex-grow: 1;
+	
+	padding-left: 1rem !important;
+}
+
+.realtimeInputs{
+	flex-grow: 1;
+	display: flex;
+	flex-flow: column;	
+}
+
+#realtimeInputName{
+	border-top-left-radius: 16px !important;
+	border-bottom-left-radius: 0px !important;
+	
+}
+
+#realtimeInputText{
+	border-bottom-left-radius: 16px !important;
+	border-top-left-radius: 0px !important;
+}
+
+.realtimeSend
+{
+	border-top-right-radius: 16px;
+	border-bottom-right-radius: 16px;
+	height:100%;
+	width: 80px;
+	border-width:0px;
+	flex-grow: 0;
+}
+
+
+.realtimeContainer{
+	display: flex;
+	flex-flow: column;	
+	padding: 10px;
+	height:100%;
+}
+
+
+.realtimeInputContainer
+{
+	/*min-height:32px;*/
+	margin-top:12px;
+	margin-bottom:24px;
+	display: flex;
+	flex-flow: row;	
+}
+
+.realtimeCard-content {
+	padding-top: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 4px;
+    /*font-size: 14px !important;*/
+}
+
+.realtimeCard-header {
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.5);
+}
+
+

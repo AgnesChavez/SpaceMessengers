@@ -33,6 +33,10 @@
   ],
     "rewrites": [
       {
+        "source": "/sms",
+        "function": "app"
+      },
+      {
         "source": "/api/**",
         "function": "app"
       },
@@ -67,7 +71,12 @@
       {
         "source": "/login",
         "destination": "/index.html"
+      },
+      {
+        "source": "/realtimechat",
+        "destination": "/index.html"
       }
+      
     ]
   },
   "storage": {

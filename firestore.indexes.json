@@ -27,6 +27,34 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "realtime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isShown",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "realtime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isShown",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []
