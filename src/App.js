@@ -14,6 +14,7 @@ import { auth } from "./services/firebase";
 import Header from "./components/Header";
 import Board from "./pages/Board";
 import Gallery from "./pages/Gallery";
+import RealtimeChat from "./pages/RealtimeChat";
 
 import './css/styles.css';
 
@@ -92,6 +93,7 @@ class App extends Component {
             <Route exact path="/" component={this.state.authenticated?Board:Home} />
             <Route path="/completeRegistration" component={CompleteRegistration} />
             <Route path="/gallery" component={Gallery} />
+            <Route path="/realtimechat" component={RealtimeChat} />
 
             <PrivateRoute
               path="/board"

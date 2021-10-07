@@ -34,6 +34,21 @@ const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
 
+// const accountSid =
+
+
+// process.env.TWILIO_ACCOUNT_SID = functions.config().twilio.account_sid;
+// process.env.TWILIO_AUTH_TOKEN = functions.config().twilio.auth_token;
+
+
+// const twilio = require('twilio');
+
+// const bodyParser = require('body-parser');
+// const MessagingResponse = require('twilio').twiml.MessagingResponse;
+
+// app.use("/sms", bodyParser.urlencoded({ extended: false }));
+
+
 
 const bearer = "iufYpsD54OUvYnl0N1ZBZmnAHoknNL+/o2pwk6iGFLKCcuUedlR6OFiCY01QIYDZLcrbF/4SnpfrTWBhsBMLM8mT7AWGbA==";
 
@@ -64,6 +79,8 @@ app.use("/private_api", authenticate);
 
 
 // app.use(cors({ origin: true }));
+
+
 
 
 
@@ -319,223 +336,92 @@ app.get('/api/getMessage', async (req, res) => {
         return getDoc( "boardMessages", req.query.messageID, req, res);
 });
 
+// const MessagingResponse = require('twilio').twiml.MessagingResponse;
+
+app.get('/private_api/setRealtimeShowing', async (req, res) => {
+try{
+        
+    const docRef = db.collection('realtime').doc(req.query.id);
+
+// Update the timestamp field with the value from the server
+    const doc = await docRef.update({
+        isShown: true,
+        startShowing: FieldValue.serverTimestamp(),
+    });
+
+        return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setRealtimeShowing failed: " + error);
+    return res.sendStatus(500);
+}
+});
 
 
 
 
-// app.get('/api/getUser', async (req, res) => {
-//         return getDoc( "users", req.query.userID, req, res);
-// });
+app.get('/private_api/getRealtimeMessages', async (req, res) => {
+try{
+        console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
+        
+        let query = db.collection("realtime");
+
+        let seconds = parseInt(req.query.seconds);
+        let nanoseconds = parseInt(req.query.nanoseconds);
+
+        if(seconds > 0 || nanoseconds > 0){
+            let startFrom = new firebase.firestore.Timestamp(seconds, nanoseconds);
+            query = query.where("timestamp", ">=", startFrom);
+        }
+
+        let querySnapshot = await query.get();
+        if (querySnapshot.empty) {
+            return res.status(200).json({empty:true});
+        }  
+
+        let messages = [];
+
+        querySnapshot.forEach(doc => {
+            messages.push(doc.data());
+            // console.log(doc.id, '=>', doc.data());
+        });
 
 
+        return res.status(200).json({data:messages});
+}catch(error){
+    console.log("/private_api/getRealtimeMessages failed: " + error);
+    return res.sendStatus(500);
+}
+});
 
-// app.get('/api/listImages', async (req, res) => {
-// 
-//     let querySnapshot = await db.collection("images").get();
-//     let docs = [];
-// 
-//     querySnapshot.forEach(d=>{docs.push(d.data())})
-// 
-//     return res.status(200).json(docs);
-// });
-// 
+app.post('/sms',
+    // twilio.webhook("c2f5337db0511d7bee17a13ef48be7a6"), 
+    async (req, res) => {
 
+    // const twiml = new MessagingResponse();
 
-// app.get('/api/makeAllThumbs', async (req, res) => {
-// 
-//     let querySnapshot = await db.collection("images").get();
-//     
-// 
-//     
-//     const results = [];
-//     for(let i = 0; i < querySnapshot.docs.length; i++){
-//     	let d = querySnapshot.docs[i];
-// 
-// 		results.push(makeThumb(d.data().imagePath, d.id));
-// 
-//     	// paths.push({success, imagePath: d.data().imagePath, id: d.id});
-//     }
-// 
-//     let paths = await Promise.all(results);
-// 
-//     return res.status(200).json(paths);
-// });
+ 
+    const msg = await db.collection('realtime').add(req.body);
 
-// app.get('/api/numImages', async (req, res) => {
-// 	let querySnapshot = await db.collection("images").get();
-// 	return res.status(200).json({numImages: querySnapshot.docs.length});
-// });
+    const docRef = db.collection('realtime').doc(msg.id);
 
-// app.get('/api/noThumbs', async (req, res) => {
-// 
-//     let querySnapshot = await db.collection("images").get();
-//     
-// 
-//     let noThumbs = [];
-//     for(let i = 0; i < querySnapshot.docs.length; i++){
-//     	if(!querySnapshot.docs[i].data().thumbURL){
-//     		noThumbs.push(querySnapshot.docs[i].id);
-//     	}
-//     }
-//     return res.status(200).json(noThumbs);
-//     
-// });
+// Update the timestamp field with the value from the server
+    const doc = await docRef.update({
+        isShown: false,
+        timestamp: FieldValue.serverTimestamp(),
+        id: msg.id
+    });
 
-// app.get('/api/makeThumb', async (req, res) => {
-// 
-//     let querySnapshot = await db.collection("images").get();
-//     let success = false;
-//     let index = req.query.index;
-//     if(index < querySnapshot.docs.length){
-//     	
-//     	let d = querySnapshot.docs[index];
-// 		success = await makeThumb(d.data().imagePath, d.id);
-// 		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
-//     }
-//     return res.status(200).json({fail: true});
-//     
-// });
-
-// app.get('/api/makeThumbById', async (req, res) => {
-// 
-//     let d = await db.collection("images").doc(req.query.id).get();
-//     if(d){
-// 		let success = await makeThumb(d.data().imagePath, d.id);
-// 		return res.status(200).json({success, imagePath: d.data().imagePath, id: d.id});
-// 	}
-//     return res.status(200).json({fail: true});
-// });
-
-// async function getPublicUrl(file) {
-//     
-//     file.makePublic((err, apiResponse) =>{
-//     	if(err){console.log("getPublicUrl failed", err);}
-// 
-//     });
-// 
-//     const fileMetadata = await file.getMetadata();
-//     // functions.logger.log("getPublicUrl: ", fileMetadata);
-//     return fileMetadata[0].mediaLink;
-// }
+    // const message = twiml.message();
+    // message.body(req.body);
+  // message.media('https://farm8.staticflickr.com/7090/6941316406_80b4d6d50e_z_d.jpg');
+    // console.log(req.body);
+    res.writeHead(200, {'Content-Type': 'text/xml'});
+    res.end("<Response></Response>");
+    // res.sendStatus(200);
 
 
+});
 
-// async function makeThumb(imgPath, imageId) {
-// 	if(!imgPath || imgPath === "") return false;
-// 
-// 	console.log("makeThumb(" + imgPath+", "+imageId+")");
-// 	let bucket = admin.storage().bucket();
-// 	let file = bucket.file(imgPath); 
-// 
-// 	try{
-// 	let e = await file.exists();
-//     if (!e[0]) {
-// 		console.log('No file for making thumb: ');
-// 		return false;
-// 	}
-// 	}catch(error){
-// 		console.log('error checking file exists.  errormessage: ', error.message);
-// 		return false;
-// 	}
-// 
-//     // Get the file name.
-//     const filePath = file.name; // File path in the bucket.
-//     const fileName = path.basename(filePath);
-//     const fileDir = path.dirname(filePath);
-//     const extension = path.extname(fileName).toLowerCase();
-//     
-//     // const baseFileName = path.basename(fileName, extension);
-//     console.log('Attempt to make thumbnail for : ', filePath);
-//     // functions.logger.log("Make Thumb. fileName: "+ fileName + " filePath: " + filePath + " fileDir: " + fileDir);
-//     // Exit if the image is already a thumbnail.
-//     if (fileName.startsWith('thumb_')) {
-//     	console.log('Already a Thumbnail.');
-//         return false;
-//        // return false functions.logger.log('Already a Thumbnail.');
-//     }
-// 
-//     const thumbFileName = "thumb_" + fileName;
-// 
-//     const thumbFilePath = path.join(fileDir, thumbFileName);
-// 
-//     console.log("thumbFilePath: " + thumbFilePath);
-// 
-//     let d = await bucket.file(thumbFilePath).exists();
-//     if (d[0] === true) {
-//     console.log("There is already a thumb ", thumbFilePath);
-//     return false;
-//     }
-// 
-//     const tempFilePath = path.join(os.tmpdir(), fileName.replace(/ /g, "_"));
-// 
-//     // FORCING THUMB TO BE JPEG
-//     // const tempFilePathJPEG = path.join(os.tmpdir(), "thumb_" + baseFileName.replace(/ /g, "_") + ".jpg");
-// 
-//     try {
-//         await bucket.file(filePath).download({ destination: tempFilePath });
-//         console.log('Image downloaded locally to', tempFilePath);
-//         // Generate a thumbnail using ImageMagick.
-//         let convertResult = await spawn('convert', [tempFilePath, '-resize', 'x300>', tempFilePath], { capture: ['stdout', 'stderr'] });
-//         console.log('convert stdout', JSON.stringify(convertResult));
-// 
-//         console.log('Thumbnail created at', tempFilePath);
-//         // Uploading the thumbnail.
-//         // const uploadedFile = await bucket.upload(tempLocalThumbFile, {destination: thumbFilePath, metadata: metadata});
-//         // const metadata = {
-//         //     contentType: "image/jpeg",
-//         // };
-// 
-//         let contentType = (await file.getMetadata())[0].contentType;
-// 
-// 		const metadata = {
-//             contentType: contentType,
-//         };
-// 
-// 
-//         bucket.upload(tempFilePath, {
-//             destination: thumbFilePath,
-//             metadata: metadata,
-//             resumable: false,
-//             public: true
-//         }, async (err, newFile) =>{
-//             if (err) {
-//                 console.log("uploading thumbnail ", imageId, " failed. error: ", err);
-//                 return false;
-//             } else {
-// 
-//                 let pictureURL = await getPublicUrl(newFile);
-// 
-//                 const userRef = db.collection('images').doc(imageId);
-//                 const doc = await userRef.get();
-//                 if (doc.exists) {
-//                     let pic = {};
-//                     const updateRes = await userRef.update({thumbURL: pictureURL});
-//                 }
-// 
-//                 console.log("generateThumbnail.ThumbURL: ", pictureURL);
-//                 return true;
-//             }
-//         });
-// 
-// 
-//     } catch (error) {
-//         console.log('generateThumbnail: Error ', error.message);
-//         if ('stderr' in error) {
-//             console.log('generateThumbnail: stderr ', error.stderr);
-//         }
-//         return false;
-//     }
-// // 
-// //     fs.unlinkSync(tempFilePathJPEG);
-// //     fs.unlinkSync(tempFilePath);
-//     return true;
-// }
-
-// exports.makeThumb = functions.firestore
-//     .document('images/{imageId}')
-//     .onCreate((snap, context) => {
-// 		makeThumb(snap.data().imagePath, snap.id);
-// });
 
 
 
