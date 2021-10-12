@@ -1,14 +1,11 @@
-body{
-	background-image: none !important;
-	background-color: rgba(0, 0, 0, 1.0) !important;
-}
+
 header{
 	display: none !important;
 }
 .realtimeMessage{
 	line-height: unset !important;
 	margin: .5rem 0 0.5rem 0 !important;
-	/*max-width: 80%;*/
+	max-width: 80%;
 	word-break: break-word !important;
 	background-color: rgba(100, 100, 100, 0.3);
 	border-radius: 8px;
@@ -17,23 +14,23 @@ header{
 
 #waitingMessage{
 	line-height: unset !important;
-	margin: .5rem 0 0.5rem 0 !important;
+	margin: .5rem 0 0 0 !important;
 	/*max-width: 80%;*/
 	word-break: break-word !important;
 }
 
 .ownChatMessage{
-right: -20%;
-
-position: relative;
+	right: -20%;
+	position: relative;
+	background-color: rgba(100, 100, 100, 0.5) !important;
 }
 
 
 .realtimeInput
 {
 	/*width:70%  !important;*/
-	background-color: #090909 !important;
-	border: 1px solid #282828 !important;
+	background-color: rgba(50, 50, 50, 0.3) !important;
+	border: 1px solid rgba(80, 80, 80, 0.3) !important;
 	color: white !important;
 	/*height:32px !important;*/
 	margin:0px !important;
@@ -63,29 +60,69 @@ position: relative;
 {
 	border-top-right-radius: 16px;
 	border-bottom-right-radius: 16px;
-	height:100%;
+	/*height:100%;*/
 	width: 80px;
 	border-width:0px;
 	flex-grow: 0;
+	background-color: rgb(50,50,50);
 }
 
+.realtimeCard-waitTime{
+	margin-bottom:0px !important;
+	padding-bottom: 12px;
+}
+
+.realtimeSend:hover
+{
+	background-color: rgb(80,80,80);
+	border-color: rgb(120,120,120);
+	color:  rgb(200,200,200);
+	cursor: pointer;
+}
 
 .realtimeContainer{
 	display: flex;
 	flex-flow: column;	
-	padding: 10px;
+	padding-top: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
 	height:100%;
+	justify-content: space-between;
+}
+
+.realtimeMessagesContainer{
+	padding-left: 15px;
+    padding-right: 15px;
 }
 
 
 .realtimeInputContainer
 {
 	/*min-height:32px;*/
-	margin-top:12px;
-	margin-bottom:24px;
+	padding-top:12px;
+	padding-bottom:24px;
+	padding-left: 15px;
+    padding-right: 15px;
+
+	
+
+}
+
+.realtimeInputForm
+{
+	/*min-height:32px;*/
+	/*padding-top:12px;
+	padding-bottom:24px;
+	padding-left: 15px;
+    padding-right: 15px;*/
+
 	display: flex;
 	flex-flow: row;	
+	/*height: 100%;*/
 }
+
+
 
 .realtimeCard-content {
 	padding-top: 4px;
@@ -100,7 +137,8 @@ position: relative;
     padding-left: 6px;
     padding-right: 6px;
     padding-bottom: 4px;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.5);
+    /*border-bottom: 1px solid rgba(100, 100, 100, 0.5);*/
+    color: rgb(200, 200, 200);
 }
 
 

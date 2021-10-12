@@ -338,6 +338,31 @@ app.get('/api/getMessage', async (req, res) => {
 
 // const MessagingResponse = require('twilio').twiml.MessagingResponse;
 
+app.get('/api/getParams', async (req, res) => {
+    try{
+    
+    const querySnapshot = await db.collection('params').get();//.doc(req.query.id);
+// Update the timestamp field with the value from the server
+      if (querySnapshot.empty) {
+            return res.status(200).json({empty:true});
+        }  
+
+        let params = [];
+
+        querySnapshot.forEach(doc => {
+            params.push(doc.data());
+            // console.log(doc.id, '=>', doc.data());
+        });
+
+
+        return res.status(200).json(params);
+}catch(error){
+    console.log("/private_api/setRealtimeWasShown failed: " + error);
+    return res.sendStatus(500);
+}
+        
+});
+
 app.get('/private_api/setRealtimeShowing', async (req, res) => {
 try{
         
@@ -345,7 +370,8 @@ try{
 
 // Update the timestamp field with the value from the server
     const doc = await docRef.update({
-        isShown: true,
+        isShowing: true,
+        wasShown: false,
         startShowing: FieldValue.serverTimestamp(),
     });
 
@@ -357,21 +383,43 @@ try{
 });
 
 
+app.get('/private_api/setRealtimeWasShown', async (req, res) => {
+try{
+    
+    const docRef = db.collection('realtime').doc(req.query.id);
+// Update the timestamp field with the value from the server
+    const doc = await docRef.update({
+        wasShown: true,
+        isShowing: false
+    });
+
+        return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setRealtimeWasShown failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+
+
+
 
 
 app.get('/private_api/getRealtimeMessages', async (req, res) => {
 try{
         console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
         
-        let query = db.collection("realtime");
+        let query = db.collection("realtime");//.where("isShowing", "==" , true);
 
         let seconds = parseInt(req.query.seconds);
         let nanoseconds = parseInt(req.query.nanoseconds);
 
         if(seconds > 0 || nanoseconds > 0){
-            let startFrom = new firebase.firestore.Timestamp(seconds, nanoseconds);
-            query = query.where("timestamp", ">=", startFrom);
+            let startFrom = new admin.firestore.Timestamp(seconds, nanoseconds);
+            query = query.where("timestamp", ">", startFrom);
         }
+
+
 
         let querySnapshot = await query.get();
         if (querySnapshot.empty) {
@@ -406,7 +454,8 @@ app.post('/sms',
 
 // Update the timestamp field with the value from the server
     const doc = await docRef.update({
-        isShown: false,
+        wasShown: false,
+        isShowing: false,
         timestamp: FieldValue.serverTimestamp(),
         id: msg.id
     });
