@@ -33,6 +33,38 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "isShowing",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "realtime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isShowing",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "wasShown",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "realtime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "isShown",
           "order": "ASCENDING"
         },
