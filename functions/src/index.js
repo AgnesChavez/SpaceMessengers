@@ -453,6 +453,13 @@ app.post('/sms',
     const docRef = db.collection('realtime').doc(msg.id);
 
 // Update the timestamp field with the value from the server
+    
+    if(! req.body.hasOwnProperty('ProfileName')){
+        const doc = await docRef.update({
+            ProfileName: "SMS"
+        });
+    }
+
     const doc = await docRef.update({
         wasShown: false,
         isShowing: false,
