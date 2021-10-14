@@ -441,43 +441,38 @@ try{
 }
 });
 
-app.post('/sms',
-    // twilio.webhook("c2f5337db0511d7bee17a13ef48be7a6"), 
-    async (req, res) => {
 
-    // const twiml = new MessagingResponse();
+app.post('/sms', async (req, res) => {
+    try {
 
- 
-    const msg = await db.collection('realtime').add(req.body);
+        const msg = await db.collection('realtime').add(req.body);
 
-    const docRef = db.collection('realtime').doc(msg.id);
+        const docRef = db.collection('realtime').doc(msg.id);
 
-// Update the timestamp field with the value from the server
-    
-    if(! req.body.hasOwnProperty('ProfileName')){
+        console.log("sms", req.body);
+
+        if (!req.body.hasOwnProperty('ProfileName')) {
+            const doc = await docRef.update({
+                ProfileName: "SMS"
+            });
+        }
+
         const doc = await docRef.update({
-            ProfileName: "SMS"
+            wasShown: false,
+            isShowing: false,
+            timestamp: FieldValue.serverTimestamp(),
+            id: msg.id
         });
+
+        // res.writeHead(200, { 'Content-Type': 'text/xml' });        
+        return res.status(200).send("<Response></Response>");
+    } catch (error) {
+
+        console.log('SMS error ', error.message);
+        return res.sendStatus(500);
     }
 
-    const doc = await docRef.update({
-        wasShown: false,
-        isShowing: false,
-        timestamp: FieldValue.serverTimestamp(),
-        id: msg.id
-    });
-
-    // const message = twiml.message();
-    // message.body(req.body);
-  // message.media('https://farm8.staticflickr.com/7090/6941316406_80b4d6d50e_z_d.jpg');
-    // console.log(req.body);
-    res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.end("<Response></Response>");
-    // res.sendStatus(200);
-
-
 });
-
 
 
 
