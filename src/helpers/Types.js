@@ -104,6 +104,7 @@ export function BoardMessageData(uid, boardId, x, y) {
     color: randomColorHSL(),
     id: null,
     boardId,
+    isShowing: false,
     position: {
       x,
       y
