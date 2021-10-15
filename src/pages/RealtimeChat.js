@@ -150,7 +150,8 @@ export default function RealtimeChat(props) {
             ProfileName: usernameValue,
             timestamp: firebase.firestore.Timestamp.now(),
             wasShown: false,
-            isShowing:false
+            isShowing:false,
+            isDeleted: false
         });
 
         await db.collection("realtime").doc(docRef.id).update({
@@ -255,12 +256,18 @@ return (<>
 function deleteCallback(id){
     // console.log("deleteCallback ", id);
 
-db.collection("realtime").doc(id).delete().then(() => {
-    console.log("Message successfully deleted!");
-}).catch((error) => {
-    console.error("Error removing message: ", error);
-});
-
+// db.collection("realtime").doc(id).delete().then(() => {
+//     console.log("Message successfully deleted!");
+// }).catch((error) => {
+//     console.error("Error removing message: ", error);
+// });
+    db.collection("realtime").doc(id).update({
+        isDeleted: true
+    }).then(() => {
+        console.log("Document deleted!", id);
+    }).catch((error) => {
+        console.error("Error updating document: ", error);
+    });
 
 }
 
