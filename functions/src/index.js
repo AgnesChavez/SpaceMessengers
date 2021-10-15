@@ -384,6 +384,57 @@ try{
 }
 });
 
+app.get("/private_api/setStartShowingMessage", async (req, res)=>{
+try{
+    const docRef =  db.collection("boardMessages").doc(req.query.id);
+    const doc = await docRef.update({
+        isShowing: true
+    });
+
+    return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setStartShowingMessage failed: " + error);
+    return res.sendStatus(500);
+}
+});
+app.get("/private_api/setEndShowingMessage", async (req, res)=>{
+try{
+    const docRef =  db.collection("boardMessages").doc(req.query.id);
+    const doc = await docRef.update({
+        isShowing: false
+    });
+
+    return res.sendStatus(200);
+
+}catch(error){
+    console.log("/private_api/setEndShowingMessage failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+
+
+// app.get('/api/setIsShowing', async (req, res) => {
+// try{
+// 
+//     let boardMessages = await db.collection("boardMessages").get();
+// 
+// 
+//     let boardMessagesPromises = [];
+//     for(let i = 0; i < boardMessages.docs.length; i++){
+//         boardMessagesPromises.push(db.collection("boardMessages").doc(boardMessages.docs[i].id).set({isShowing: false}, { merge: true }));
+//     }
+// 
+//     await Promise.all(boardMessagesPromises);
+// 
+//         return res.status(200).json({ok: true});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
+// 
+
 // app.get('/api/setIsDeleted', async (req, res) => {
 // try{
 // 
