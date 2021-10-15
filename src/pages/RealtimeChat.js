@@ -67,6 +67,9 @@ export default function RealtimeChat(props) {
     
     const [isAdmin, setIsAdmin] = useState(false);
     const [isShowingAll, setIsShowingAll] = useState(false);
+    const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+
+
     useEffect (() => {
     if(auth().currentUser && !auth().currentUser.isAnonymous){
         db.collection('users').doc(auth().currentUser.uid).get().then(user=>{
@@ -129,6 +132,13 @@ export default function RealtimeChat(props) {
         }
     }
 
+    const enableDeleteCallback = ()=>{
+        if(isAdmin === true){
+            setIsDeleteEnabled(!isDeleteEnabled);
+        }
+    }
+
+
 
     const sendMessage = async (e) => {
         
@@ -180,14 +190,14 @@ export default function RealtimeChat(props) {
 
     return (<>
         <div className="realtimeContainer">
-            {isAdmin && <RenderAdminBar showAllMessagesCallback={showAllMessagesCallback} isShowingAll={isShowingAll}/>}
+            {isAdmin && <RenderAdminBar showAllMessagesCallback={showAllMessagesCallback} isShowingAll={isShowingAll}  isDeleteEnabled={isDeleteEnabled} enableDeleteCallback={enableDeleteCallback}/>}
             <div className="realtimeMessagesContainer">
                 {loadingMessages && <div>loading...</div>}
                 <ul>
                     {/* {!loadingMessages && messages && messages.slice(0).reverse().map(msg =>  */}
                     {/*     <RenderMessage key={msg.id} message={msg} />)} */}
                     {!loadingMessages && messages && messages.map(msg => 
-                        <RenderMessage key={msg.id} message={msg} myMessages={myMessages} isAdmin={isAdmin} isShowingAll={isShowingAll} />)}
+                        <RenderMessage key={msg.id} message={msg} myMessages={myMessages} isAdmin={isAdmin} isShowingAll={isShowingAll} isDeleteEnabled={isDeleteEnabled}/>)}
                 </ul>
                 <span ref={dummy}></span>
             </div>
@@ -258,6 +268,14 @@ function RenderAdminBar(props){
     return (<>
         <div className="realtimeAdminTopBar">
             <Button
+                    className="red right adminShowAllMessagesButton"
+                    node="button"
+                    small
+                    tooltip={props.isDeleteEnabled?"Disable delete":"Enable delete"}
+                    waves="light"
+                    onClick={()=>props.enableDeleteCallback()}
+            >{props.isDeleteEnabled?"Disable delete":"Enable delete"}</Button>
+            <Button
                     className="teal right adminShowAllMessagesButton"
                     node="button"
                     small
@@ -289,7 +307,7 @@ return (<>
             >  
             <div className="realtimeCard-header valign-wrapper" >
 
-            { props.isAdmin && 
+            { props.isAdmin && props.isDeleteEnabled &&
                 <Button
                     className="red right removeImageButton"
                     node="button"
