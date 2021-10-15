@@ -145,7 +145,8 @@ header{
 .adminShowAllMessagesButton{
     top: 5px;
     right: 5px;
-    position: absolute;
+    /*position: absolute;*/
+    margin-right: 10px;
 }
 
 .realtimeAdminTopBar{
