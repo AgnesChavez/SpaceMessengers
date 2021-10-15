@@ -142,25 +142,7 @@ async function getComments(messageID){
         // authors_promises.push(getUser(comments[i].uid));
         // comments[i].author = await 
     } 
-
-    // let authors = await Promise.all(authors_promises);
-    // if(comments.length === authors.length){
-        // for(let i = 0; i < authors.length; i++ )    {
-        //     // if(comments[i].uid === authors[i].id){
-        //         comments[i].authorId = comments[i].uid;
-        //     }else{
-        //         console.log("Comment: " + comments[i].id + " author wrong index");
-        //     }
-        //     
-        // }
-    // }else{
-    //     console.log("getComments(messageID): comments and authors lengths differ" );
-    // }
-    
-
     return comments;
-    // return query.docs.map( (d) => {return d.data()});
-
 }
 
 
@@ -259,11 +241,7 @@ try{
             return res.status(workshop.status).json(workshop.data);
         }
     
-
-
-        // workshop = workshop.data;
-        
-        let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
+       let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
         // console.log("teams ", teams.docs.length);
         let teamBoardsPromises = [];
         for(let i = 0; i < teams.docs.length; i++){
@@ -280,15 +258,6 @@ try{
         workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
 
 
-//         for(let i = 0; i < workshop.data.data.students.length; i++){
-//             usersPromises.push(getUser(workshop.data.data.students[i]));
-//         }
-// 
-//         for(let i = 0; i < workshop.data.data.instructors.length; i++){
-//             usersPromises.push(getUser(workshop.data.data.instructors[i]));
-//         }
-//         
-
         workshop.data.data.users = await Promise.all(usersPromises);
 
 
@@ -300,33 +269,6 @@ try{
 }
 });
 
-
-// app.get('/private_api/getBoard', async (req, res) => {
-// 
-//         
-//         let board = await getDocData( "boards", req.query.boardID);
-//         
-//         if(board.status === 500) return res.sendStatus(500);
-//         if(board.status === 404) res.status(board.status).json(board.data);
-// 
-//         let messages = [];
-//         for(let i = 0; i < board.data.data.messages.length; i++){
-// 
-//             messages.push(getMessage(board.data.data.messages[i]));
-//             // console.log(m);
-//         }
-// 
-//         board.data.data.messages = await Promise.all(messages);
-// 
-//         
-// 
-//         // console.log("Messages: ", board.data.data.messages);
-// 
-// 
-//         return res.status(board.status).json(board.data);
-// 
-//         
-// });
 
 app.get('/api/getUser/:userId', async (req, res) => {
         return getDoc( "users", req.params.userId, req, res);
@@ -401,15 +343,73 @@ try{
 });
 
 
+app.get('/private_api/setRealtimeWasDeleted', async (req, res) => {
+try{
+    
+    const docRef = db.collection('realtime').doc(req.query.id);
+// Update the timestamp field with the value from the server
+    const doc = await docRef.update({
+        wasShown: true,
+        isShowing: false
+    });
 
+    return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setRealtimeWasShown failed: " + error);
+    return res.sendStatus(500);
+}
+});
 
+app.get('/private_api/getRealtimeDeleteMessages', async (req, res) => {
+try{
+        // console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
+        
+        let query = db.collection("realtime").where("isShowing", "==" , true).where("isDeleted", "==" , true);
+
+        let querySnapshot = await query.get();
+        if (querySnapshot.empty) {
+            return res.status(200).json({empty:true});
+        }  
+
+        let messages = [];
+
+        querySnapshot.forEach(doc => {
+            messages.push(doc.id);
+        });
+
+        return res.status(200).json({data:messages});
+}catch(error){
+    console.log("/private_api/getRealtimeDeleteMessages failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+// app.get('/api/setIsDeleted', async (req, res) => {
+// try{
+// 
+//     let realtime = await db.collection("realtime").get();
+// 
+// 
+//     let realtimePromises = [];
+//     for(let i = 0; i < realtime.docs.length; i++){
+//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({isDeleted: false}, { merge: true }));
+//     }
+// 
+//     await Promise.all(realtimePromises);
+// 
+//         return res.status(200).json({ok: true});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
 
 
 app.get('/private_api/getRealtimeMessages', async (req, res) => {
 try{
-        console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
+        // console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
         
-        let query = db.collection("realtime");//.where("isShowing", "==" , true);
+        let query = db.collection("realtime").where("isDeleted", "==" , false);
 
         let seconds = parseInt(req.query.seconds);
         let nanoseconds = parseInt(req.query.nanoseconds);
@@ -460,6 +460,7 @@ app.post('/sms', async (req, res) => {
         const doc = await docRef.update({
             wasShown: false,
             isShowing: false,
+            isDeleted: false,
             timestamp: FieldValue.serverTimestamp(),
             id: msg.id
         });
@@ -471,7 +472,6 @@ app.post('/sms', async (req, res) => {
         console.log('SMS error ', error.message);
         return res.sendStatus(500);
     }
-
 });
 
 
