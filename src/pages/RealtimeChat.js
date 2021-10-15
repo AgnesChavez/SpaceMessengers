@@ -68,7 +68,7 @@ export default function RealtimeChat(props) {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isShowingAll, setIsShowingAll] = useState(false);
     const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
-
+    const [isShowingDeleted, setIsShowingDeleted] = useState(false);
 
     useEffect (() => {
     if(auth().currentUser && !auth().currentUser.isAnonymous){
@@ -94,6 +94,9 @@ export default function RealtimeChat(props) {
     if(!isShowingAll){
         query = query.where('wasShown', '==', false)
         .where('isShowing', '==', true);
+    }
+    if(isShowingAll && !isShowingDeleted){
+        query = query.where('isDeleted', '==', false);
     }
     query = query.orderBy('timestamp');//.limit(15);
    
@@ -191,14 +194,28 @@ export default function RealtimeChat(props) {
 
     return (<>
         <div className="realtimeContainer">
-            {isAdmin && <RenderAdminBar showAllMessagesCallback={showAllMessagesCallback} isShowingAll={isShowingAll}  isDeleteEnabled={isDeleteEnabled} enableDeleteCallback={enableDeleteCallback}/>}
+            {isAdmin && <RenderAdminBar 
+                        showAllMessagesCallback={showAllMessagesCallback} 
+                        isShowingAll={isShowingAll}  
+                        isDeleteEnabled={isDeleteEnabled} 
+                        enableDeleteCallback={enableDeleteCallback}
+                        isShowingDeleted={isShowingDeleted}
+                        setIsShowingDeleted={setIsShowingDeleted}
+                        />}
             <div className="realtimeMessagesContainer">
                 {loadingMessages && <div>loading...</div>}
                 <ul>
                     {/* {!loadingMessages && messages && messages.slice(0).reverse().map(msg =>  */}
                     {/*     <RenderMessage key={msg.id} message={msg} />)} */}
                     {!loadingMessages && messages && messages.map(msg => 
-                        <RenderMessage key={msg.id} message={msg} myMessages={myMessages} isAdmin={isAdmin} isShowingAll={isShowingAll} isDeleteEnabled={isDeleteEnabled}/>)}
+                        <RenderMessage key={msg.id} 
+                                        message={msg}
+                                        myMessages={myMessages}
+                                        isAdmin={isAdmin}
+                                        isShowingAll={isShowingAll} 
+                                        isDeleteEnabled={isDeleteEnabled}
+                                        isShowingDeleted={isShowingDeleted}
+                                        />)}
                 </ul>
                 <span ref={dummy}></span>
             </div>
@@ -274,6 +291,17 @@ function deleteCallback(id){
 function RenderAdminBar(props){
     return (<>
         <div className="realtimeAdminTopBar">
+            
+            
+            { props.isDeleteEnabled && <Button
+                    className="yellow black-text right adminShowAllMessagesButton"
+                    node="button"
+                    small
+                    tooltip={props.isShowingDeleted?"Hide deleted messages":"Show deleted messages"}
+                    waves="light"
+                    onClick={()=>props.setIsShowingDeleted(!props.isShowingDeleted)}
+            >{props.isShowingDeleted?"Hide deleted":"Show deleted"}</Button> }
+
             <Button
                     className="red right adminShowAllMessagesButton"
                     node="button"
