@@ -349,7 +349,7 @@ try{
 
         return res.sendStatus(200);
 }catch(error){
-    console.log("/private_api/setRealtimeWasShown failed: " + error);
+    functions.logger.log("/private_api/setRealtimeWasShown failed: " + error);
     return res.sendStatus(500);
 }
 });
@@ -358,7 +358,7 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeWasDeleted', async (req, res) => {
 try{
-    
+    functions.logger.log("setRealtimeWasDeleted");
     const docRef = db.collection('realtime').doc(req.query.id);
 // Update the timestamp field with the value from the server
     const doc = await docRef.update({
@@ -368,7 +368,7 @@ try{
 
     return res.sendStatus(200);
 }catch(error){
-    console.log("/private_api/setRealtimeWasShown failed: " + error);
+    functions.logger.log("/private_api/setRealtimeWasShown failed: " + error);
     return res.sendStatus(500);
 }
 });
@@ -377,7 +377,7 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeDeleteMessages', async (req, res) => {
 try{
-        // console.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
+        functions.logger.log("getRealtimeDeleteMessages: ");
         
         let query = db.collection("realtime").where("isShowing", "==" , true).where("isDeleted", "==" , true);
 
@@ -521,7 +521,7 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.post('/sms', async (req, res) => {
     try {
-
+        functions.logger.log("SMS");
         const msg = await db.collection('realtime').add(req.body);
 
         const docRef = db.collection('realtime').doc(msg.id);
