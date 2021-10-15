@@ -304,7 +304,7 @@ function RenderMessage( props){
     // (props.message.uid === auth().currentUser.uid)?"ownChatMessage":"";
     // console.log("props.isAdmin", props.isAdmin);
 
-    let badgeClass = "white-text realtimeMessageBadge " + (props.message.wasShown?"blue":"yellow");
+    let badgeClass = "realtimeMessageBadge " + (props.message.wasShown?"blue white-text":"yellow black-text");
 
 return (<>
 
@@ -314,7 +314,7 @@ return (<>
             >  
             <div className="realtimeCard-header valign-wrapper" >
 
-            { props.isAdmin && props.isDeleteEnabled &&
+            { props.isAdmin && props.isDeleteEnabled && !props.message.isDeleted &&
                 <Button
                     className="red right removeImageButton"
                     node="button"
@@ -327,9 +327,9 @@ return (<>
             />}
             { props.isAdmin && props.isShowingAll &&
                 <div>
-                    <Badge className={badgeClass}>{"was shown " + (props.message.wasShown?"YES": "NO")  } </Badge>
-                    {props.message.isShowing && <Badge className="green white-text realtimeMessageBadge">{"is showing now"} </Badge>}
-                    
+                    {!props.message.isDeleted && <Badge className={badgeClass}>{"was shown " + (props.message.wasShown?"YES": "NO")  } </Badge>}
+                    {props.message.isShowing && !props.message.isDeleted && <Badge className="green white-text realtimeMessageBadge">{"is showing now"} </Badge>}
+                    {props.message.isDeleted && <Badge className="red white-text realtimeMessageBadge">{"DELETED"} </Badge>}
                 </div>
             }
                 {/* <img src={props.user?props.user.photoURL:""} alt="" className="circle messageHeaderImg "/>  */}
