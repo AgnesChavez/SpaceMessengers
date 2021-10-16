@@ -158,12 +158,12 @@ export default function RealtimeChat(props) {
         // console.log(messages);
 
 
-    // }else{
-    //     if(!loadingRealtimeMessages){
-    //         messages = realtimeMessages;
-    //     }else if(!loadingBoardMessages){
-    //         messages = boardMessages;
-    //     }
+    }else{
+        if(!loadingRealtimeMessages){
+            messages = realtimeMessages;
+        }else if(!loadingBoardMessages){
+            messages = boardMessages;
+        }
     }
 
     return (<>
@@ -174,10 +174,10 @@ export default function RealtimeChat(props) {
                     {/* {!loadingMessages && messages && messages.slice(0).reverse().map(msg =>  */}
                     {/*     <RenderMessage key={msg.id} message={msg} />)} */}
                     {messages && messages.map(msg => 
-                        <RenderMessage key={msg.id} 
+                         (msg && msg.id)?  <RenderMessage key={msg.id} 
                                         message={msg}
                                         myMessages={myMessages}
-                                        />)}
+                                        />:<></>)}
                 </ul>
                 <span ref={dummy}></span>
             </div>
