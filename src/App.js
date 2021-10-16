@@ -15,7 +15,7 @@ import Header from "./components/Header";
 import Board from "./pages/Board";
 import Gallery from "./pages/Gallery";
 import RealtimeChat from "./pages/RealtimeChat";
-
+import RealtimeChatAdmin from "./pages/RealtimeChatAdmin";
 import './css/styles.css';
 
 import { checkCurrentUserDbData } from "./helpers/userManagement"
@@ -94,6 +94,7 @@ class App extends Component {
             <Route path="/completeRegistration" component={CompleteRegistration} />
             <Route path="/gallery" component={Gallery} />
             <Route path="/realtimechat" component={RealtimeChat} />
+            <Route path="/realtimechatadmin" component={RealtimeChatAdmin} />
 
             <PrivateRoute
               path="/board"
