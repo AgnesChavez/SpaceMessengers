@@ -1,12 +1,12 @@
-import React, { useRef, useState,useEffect } from "react";
-import { db, auth } from "../services/firebase";
+import React, { useRef, useState } from "react";
+import { db } from "../services/firebase";
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Icon, Button, Badge } from 'react-materialize';
+import { Icon } from 'react-materialize';
 
 import '../css/realtimechat.css';
 
@@ -34,80 +34,56 @@ function addToMyMessages(toAdd){
 
 }
 
-function removeFromMyMessages(toRemove){
-    let myMessages = getMyMessages();
-
-    myMessages = myMessages.filter(function(ele){ 
-            return ele !== toRemove; 
-    });
-
-    if(myMessages.length === 0){
-        sessionStorage.removeItem("myMessages");    
+function compareMsgs(a, b) {
+    if (a.startShowing && b.startShowing) {
+        if(a.startShowing.seconds === b.startShowing.seconds){
+            return a.startShowing.nanoseconds - b.startShowing.nanoseconds;
+        }else{
+            return a.startShowing.seconds - b.startShowing.seconds
+        }
+        // return a.startShowing.compareTo(b.startShowing);
+    // if (a.startShowing && b.startShowing) {
+    //     return -1;
+    // }
+    // if (a es mayor que b según criterio de ordenamiento) {
+    //     return 1;
+    // }
+  // a debe ser igual b
+    // return 0;
     }else{
-        sessionStorage.setItem("myMessages", myMessages);
+        if(a.startShowing){
+            return -1;
+        }else if(b.startShowing){
+            return 1;
+        }
     }
-    
+    return 0;
 }
-// 
-// async function numWaitingMessages(){
-//     let query = await db.collection("realtime")
-//     .where('wasShown', '==', false)
-//     .where('isShowing', '==', false).get();
-//     
-//     return query.size;
-// 
-// }
 
 
-
-export default function RealtimeChat(props) {
-    // console.log("auth().currentUser ", auth().currentUser);
-
+export default function RealtimeChat(props) {    
     
-    
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isShowingAll, setIsShowingAll] = useState(false);
-    const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
-    const [isShowingDeleted, setIsShowingDeleted] = useState(false);
-
-    useEffect (() => {
-    if(auth().currentUser && !auth().currentUser.isAnonymous){
-        db.collection('users').doc(auth().currentUser.uid).get().then(user=>{
-            if (user.exists) {
-                // console.log("user.data().type", user.data().type);
-                if(user.data().type === "admin"){
-                    setIsAdmin(true);
-                    // console.log("setIsAdmin(true);");
-                }
-            }
-        }).catch((error) => {
-            console.log("Error getting currentUser:", error);
-        });
-    }
-     },[]);
-
     const dummy = useRef();
 
     const color = useRef(randomColorHSL());
 
-    let query = db.collection("realtime");
-    if(!isShowingAll){
-        query = query.where('wasShown', '==', false)
-        .where('isShowing', '==', true);
-    }
-    if(isShowingAll && !isShowingDeleted){
-        query = query.where('isDeleted', '==', false);
-    }
-    query = query.orderBy('timestamp');//.limit(15);
+    let query = db.collection("realtime")
+        .where('wasShown', '==', false)
+        .where('isShowing', '==', true)
+        .orderBy('timestamp');
    
 
     let waitingQuery = db.collection("realtime")
     .where('wasShown', '==', false)
     .where('isShowing', '==', false);
 
-    const [messages, loadingMessages] = useCollectionData(query);
+    const [realtimeMessages, loadingRealtimeMessages] = useCollectionData(query);
 
-    const [waiting, loadingWaiting] = useCollectionData(waitingQuery);    
+    const [waiting, loadingWaiting] = useCollectionData(waitingQuery);  
+
+    let boardMessagesQuery = db.collection("boardMessages").where('isShowing', '==', true);
+
+    const [boardMessages, loadingBoardMessages] = useCollectionData(boardMessagesQuery);
 
     let paramsQuery = db.collection("params").doc('realtime');
     const [params, loadingParams] =  useDocumentData(paramsQuery);
@@ -117,29 +93,14 @@ export default function RealtimeChat(props) {
     
     const [waitingMessage, setWaitingMessage] = useState(null);
 
+    var messages = [];
+
     
-    // query.get().then(querySnapshot=>{
-    //     querySnapshot.forEach(doc=> {console.log(doc.id, doc.data())});
-    // });
 
 
-
-
-    useEffect (() => {
-        dummy.current.scrollIntoView({ behavior: 'smooth' });
-    },[messages],);
-
-    const showAllMessagesCallback = ()=>{
-        if(isAdmin === true){
-            setIsShowingAll(!isShowingAll);
-        }
-    }
-
-    const enableDeleteCallback = ()=>{
-        if(isAdmin === true){
-            setIsDeleteEnabled(!isDeleteEnabled);
-        }
-    }
+    // useEffect (() => {
+    //     dummy.current.scrollIntoView({ behavior: 'smooth' });
+    // },[messages],);
 
 
 
@@ -154,7 +115,8 @@ export default function RealtimeChat(props) {
             timestamp: firebase.firestore.Timestamp.now(),
             wasShown: false,
             isShowing:false,
-            isDeleted: false
+            isDeleted: false,
+            isRealTime: true
         });
 
         await db.collection("realtime").doc(docRef.id).update({
@@ -179,42 +141,42 @@ export default function RealtimeChat(props) {
     let myMessages = getMyMessages();
     
 
-    if(waitingMessage && !loadingMessages){
-        console.log(waitingMessage.id); 
-        for (var i = 0; i < messages.length; i++) {
-            if(messages[i].id === waitingMessage.id){
-                // console.log("waiting message end");
-                // console.log(messages[i].id);
+    if(waitingMessage && !loadingRealtimeMessages){
+        // console.log(waitingMessage.id); 
+        for (var i = 0; i < realtimeMessages.length; i++) {
+            if(realtimeMessages[i].id === waitingMessage.id){
                 setWaitingMessage(null);
                 break;
             }
         }
     }
 
+    if(!loadingRealtimeMessages && !loadingBoardMessages){
+        // messages = realtimeMessages;
+        messages = realtimeMessages.concat(boardMessages);
+        messages.sort(compareMsgs);
+        // console.log(messages);
+
+
+    // }else{
+    //     if(!loadingRealtimeMessages){
+    //         messages = realtimeMessages;
+    //     }else if(!loadingBoardMessages){
+    //         messages = boardMessages;
+    //     }
+    }
 
     return (<>
         <div className="realtimeContainer">
-            {isAdmin && <RenderAdminBar 
-                        showAllMessagesCallback={showAllMessagesCallback} 
-                        isShowingAll={isShowingAll}  
-                        isDeleteEnabled={isDeleteEnabled} 
-                        enableDeleteCallback={enableDeleteCallback}
-                        isShowingDeleted={isShowingDeleted}
-                        setIsShowingDeleted={setIsShowingDeleted}
-                        />}
             <div className="realtimeMessagesContainer">
-                {loadingMessages && <div>loading...</div>}
+                {(loadingRealtimeMessages || loadingBoardMessages) && <div>loading...</div>}
                 <ul>
                     {/* {!loadingMessages && messages && messages.slice(0).reverse().map(msg =>  */}
                     {/*     <RenderMessage key={msg.id} message={msg} />)} */}
-                    {!loadingMessages && messages && messages.map(msg => 
+                    {messages && messages.map(msg => 
                         <RenderMessage key={msg.id} 
                                         message={msg}
                                         myMessages={myMessages}
-                                        isAdmin={isAdmin}
-                                        isShowingAll={isShowingAll} 
-                                        isDeleteEnabled={isDeleteEnabled}
-                                        isShowingDeleted={isShowingDeleted}
                                         />)}
                 </ul>
                 <span ref={dummy}></span>
@@ -270,97 +232,17 @@ return (<>
 }
 
 
-function deleteCallback(id){
-    // console.log("deleteCallback ", id);
-
-// db.collection("realtime").doc(id).delete().then(() => {
-//     console.log("Message successfully deleted!");
-// }).catch((error) => {
-//     console.error("Error removing message: ", error);
-// });
-    db.collection("realtime").doc(id).update({
-        isDeleted: true
-    }).then(() => {
-        console.log("Document deleted!", id);
-    }).catch((error) => {
-        console.error("Error updating document: ", error);
-    });
-
-}
-
-function RenderAdminBar(props){
-    return (<>
-        <div className="realtimeAdminTopBar">
-            
-            
-            { props.isDeleteEnabled && <Button
-                    className="yellow black-text right adminShowAllMessagesButton"
-                    node="button"
-                    small
-                    tooltip={props.isShowingDeleted?"Hide deleted messages":"Show deleted messages"}
-                    waves="light"
-                    onClick={()=>props.setIsShowingDeleted(!props.isShowingDeleted)}
-            >{props.isShowingDeleted?"Hide deleted":"Show deleted"}</Button> }
-
-            <Button
-                    className="red right adminShowAllMessagesButton"
-                    node="button"
-                    small
-                    tooltip={props.isDeleteEnabled?"Disable delete":"Enable delete"}
-                    waves="light"
-                    onClick={()=>props.enableDeleteCallback()}
-            >{props.isDeleteEnabled?"Disable delete":"Enable delete"}</Button>
-            <Button
-                    className="teal right adminShowAllMessagesButton"
-                    node="button"
-                    small
-                    tooltip="Show all messages"
-                    waves="light"
-                    onClick={()=>props.showAllMessagesCallback()}
-            >{props.isShowingAll?"Only show realtime messages":"Show all Messages"}</Button>
-        </div>
-    </>);
-}
-
-
-function RenderMessage( props){
-    let style = {};
+function RenderRealtimeMessage( props){ 
     let messageClass = "z-depth-0  card realtimeMessage " ;
     if(Array.isArray(props.myMessages) && props.myMessages.includes(props.message.id)){
      messageClass += "ownChatMessage";
     }
-    // (props.message.uid === auth().currentUser.uid)?"ownChatMessage":"";
-    // console.log("props.isAdmin", props.isAdmin);
-
-    let badgeClass = "realtimeMessageBadge " + (props.message.wasShown?"blue white-text":"yellow black-text");
-
 return (<>
 
     <li id={"realtimemessage-"+props.message.id}
                 className= {messageClass}
-                style={style}
             >  
             <div className="realtimeCard-header valign-wrapper" >
-
-            { props.isAdmin && props.isDeleteEnabled && !props.message.isDeleted &&
-                <Button
-                    className="red right removeImageButton"
-                    node="button"
-                    small
-                    tooltip="Delete this message"
-                    waves="light"
-                    floating
-                    icon={<Icon>delete</Icon>}
-                    onClick={()=>deleteCallback(props.message.id)}
-            />}
-            { props.isAdmin && props.isShowingAll &&
-                <div>
-                    {!props.message.isDeleted && <Badge className={badgeClass}>{"was shown " + (props.message.wasShown?"YES": "NO")  } </Badge>}
-                    {props.message.isShowing && !props.message.isDeleted && <Badge className="green white-text realtimeMessageBadge">{"is showing now"} </Badge>}
-                    {props.message.isDeleted && <Badge className="red white-text realtimeMessageBadge">{"DELETED"} </Badge>}
-                </div>
-            }
-                {/* <img src={props.user?props.user.photoURL:""} alt="" className="circle messageHeaderImg "/>  */}
                 {props.message.ProfileName} 
             </div>
             <div className="realtimeCard-content white-text">
@@ -369,4 +251,37 @@ return (<>
     </li>    
   </>);
 }
+
+function RenderBoardMessage( props){
+return (<>
+
+    <li id={"realtimeBoardMessage-"+props.message.id}
+                className= "z-depth-0  card realtimeMessage realtimeBoardMessage"
+            >  
+            <div className="realtimeCard-header valign-wrapper" >
+                {props.message.displayName} 
+            </div>
+            <div className="realtimeCard-content white-text">
+                {props.message.content}
+            </div>
+    </li>    
+  </>);
+}
+
+
+
+function  RenderMessage( props){ 
+
+return props.message.isRealTime? <RenderRealtimeMessage {...props}/> : <RenderBoardMessage {...props} /> ;
+
+
+    // return (<>
+    //     {props.message.isRealTime && <RenderRealtimeMessage {...props}/> }
+    //     {!props.message.isRealTime && <RenderBoardMessage {...props} /> }
+    //     </>);
+}
+
+
+
+
 

@@ -8,8 +8,11 @@ header{
 	max-width: 80%;
 	word-break: break-word !important;
 	background-color: rgba(100, 100, 100, 0.3);
-	border-radius: 8px;
-	
+	border-radius: 8px;	
+}
+
+.realtimeBoardMessage{
+	background-color: rgba(150, 150, 150, 0.3) !important;
 }
 
 #waitingMessage{

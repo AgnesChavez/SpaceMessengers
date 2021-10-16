@@ -318,15 +318,18 @@ app.get('/api/getParams', async (req, res) => {
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeShowing', async (req, res) => {
 try{
-        
-    const docRef = db.collection('realtime').doc(req.query.id);
+functions.logger.log("setRealtimeShowing", req.query.id);
+    await batchUpdate('realtime', req.query.id, {isShowing: true,
+        wasShown: false,
+        startShowing: FieldValue.serverTimestamp()});        
+    // const docRef = db.collection('realtime').doc(req.query.id);
 
 // Update the timestamp field with the value from the server
-    const doc = await docRef.update({
-        isShowing: true,
-        wasShown: false,
-        startShowing: FieldValue.serverTimestamp(),
-    });
+    // const doc = await docRef.update({
+    //     isShowing: true,
+    //     wasShown: false,
+    //     startShowing: FieldValue.serverTimestamp(),
+    // });
 
         return res.sendStatus(200);
 }catch(error){
@@ -335,17 +338,36 @@ try{
 }
 });
 
+//-----------------------------------------------------------------------------------------------
+
+async function batchUpdate(collectionId, ids, propsToUpdate){
+const batch = db.batch();
+
+var idsSplit = ids.split(",");
+functions.logger.log("batchUpdate ids: ", ids);
+functions.logger.log("batchUpdate idsSplit: ", idsSplit);
+
+
+for(let i = 0; i < idsSplit.length; i++){
+    batch.update(db.collection(collectionId).doc(idsSplit[i]), propsToUpdate);
+}
+// Commit the batch
+await batch.commit();
+}
 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeWasShown', async (req, res) => {
 try{
     functions.logger.log("setRealtimeWasShown", req.query.id);
-    const docRef = db.collection('realtime').doc(req.query.id);
-// Update the timestamp field with the value from the server
-    const doc = await docRef.update({
-        wasShown: true,
-        isShowing: false
-    });
+
+    await batchUpdate('realtime', req.query.id, {wasShown: true,isShowing: false});
+
+//     const docRef = db.collection('realtime').doc(req.query.id);
+// // Update the timestamp field with the value from the server
+//     const doc = await docRef.update({
+//         wasShown: true,
+//         isShowing: false
+//     });
 
         return res.sendStatus(200);
 }catch(error){
@@ -402,11 +424,17 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.get("/private_api/setStartShowingMessage", async (req, res)=>{
 try{
-    const docRef =  db.collection("boardMessages").doc(req.query.id);
-    const doc = await docRef.update({
+
+    await batchUpdate('boardMessages', req.query.id, {
         isShowing: true,
         startShowing: FieldValue.serverTimestamp()
     });
+
+    // const docRef =  db.collection("boardMessages").doc(req.query.id);
+    // const doc = await docRef.update({
+    //     isShowing: true,
+    //     startShowing: FieldValue.serverTimestamp()
+    // });
 
     return res.sendStatus(200);
 }catch(error){
@@ -418,10 +446,11 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.get("/private_api/setEndShowingMessage", async (req, res)=>{
 try{
-    const docRef =  db.collection("boardMessages").doc(req.query.id);
-    const doc = await docRef.update({
-        isShowing: false
-    });
+    await batchUpdate('boardMessages', req.query.id, {isShowing: false});
+    // const docRef =  db.collection("boardMessages").doc(req.query.id);
+    // const doc = await docRef.update({
+        // isShowing: false
+    // });
 
     return res.sendStatus(200);
 
@@ -479,6 +508,74 @@ try{
 //     return res.sendStatus(500);
 // }
 // });
+
+
+
+// -----------------------------------------------------------------------------------------------
+// app.get('/api/setWasShown', async (req, res) => {
+// try{
+// 
+//     let realtime = await db.collection("realtime").get();
+// 
+// 
+//     let realtimePromises = [];
+//     for(let i = 0; i < realtime.docs.length; i++){
+//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({wasShown: true,isShowing: false}, { merge: true }));
+//     }
+// 
+//     await Promise.all(realtimePromises);
+// 
+//         return res.status(200).json({ok: true});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
+
+//-----------------------------------------------------------------------------------------------
+// app.get('/api/setIsRealtime', async (req, res) => {
+// try{
+// 
+//     let realtime = await db.collection("realtime").get();
+// 
+// 
+//     let realtimePromises = [];
+//     for(let i = 0; i < realtime.docs.length; i++){
+//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({isRealTime: true}, { merge: true }));
+//     }
+// 
+//     await Promise.all(realtimePromises);
+// 
+//         return res.status(200).json({ok: true});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
+
+
+// -----------------------------------------------------------------------------------------------
+// app.get('/api/setIsShowing', async (req, res) => {
+// try{
+// 
+//     let boardMessages = await db.collection("boardMessages").get();
+// 
+// 
+//     let boardMessagesPromises = [];
+//     for(let i = 0; i < boardMessages.docs.length; i++){
+//         boardMessagesPromises.push(db.collection("boardMessages").doc(boardMessages.docs[i].id).set({isShowing: false}, { merge: true }));
+//     }
+// 
+//     await Promise.all(boardMessagesPromises);
+// 
+//         return res.status(200).json({ok: true});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
+
+
 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeMessages', async (req, res) => {

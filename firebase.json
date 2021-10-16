@@ -75,6 +75,10 @@
       {
         "source": "/realtimechat",
         "destination": "/index.html"
+      },
+      {
+        "source": "/realtimechatadmin",
+        "destination": "/index.html"
       }
       
     ]
