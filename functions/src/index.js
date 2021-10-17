@@ -318,7 +318,7 @@ app.get('/api/getParams', async (req, res) => {
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeShowing', async (req, res) => {
 try{
-functions.logger.log("setRealtimeShowing", req.query.id);
+// functions.logger.log("setRealtimeShowing", req.query.id);
     await batchUpdate('realtime', req.query.id, {isShowing: true,
         wasShown: false,
         startShowing: FieldValue.serverTimestamp()});        
@@ -338,27 +338,38 @@ functions.logger.log("setRealtimeShowing", req.query.id);
 }
 });
 
-//-----------------------------------------------------------------------------------------------
+//--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-async function batchUpdate(collectionId, ids, propsToUpdate){
-const batch = db.batch();
+async function batchUpdate(collectionId, ids, propsToUpdate) {
 
-var idsSplit = ids.split(",");
-functions.logger.log("batchUpdate ids: ", ids);
-functions.logger.log("batchUpdate idsSplit: ", idsSplit);
+    const batch = db.batch();
+    try {
+        var idsSplit = ids.split(",");
+        // console.log("batchUpdate ids: ", ids);
+        // console.log("batchUpdate idsSplit: ", idsSplit);
 
+        // let promises = [];
+        for (let i = 0; i < idsSplit.length; i++) {
+            batch.update(db.collection(collectionId).doc(idsSplit[i]), propsToUpdate);
+            // promises.push(db.collection(collectionId).doc(idsSplit[i]).set(propsToUpdate, { merge: true }));
+        }
+        // await Promise.all(promises);
 
-for(let i = 0; i < idsSplit.length; i++){
-    batch.update(db.collection(collectionId).doc(idsSplit[i]), propsToUpdate);
-}
-// Commit the batch
-await batch.commit();
+        await batch.commit();
+        // batch.commit().then(values => {
+        //     console.log(values);
+        // }).catch(reason => {
+        //     console.log(reason)
+        // });
+    } catch (error) {
+        console.log("batchUpdate error: ", error, ids);
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeWasShown', async (req, res) => {
 try{
-    functions.logger.log("setRealtimeWasShown", req.query.id);
+    // functions.logger.log("setRealtimeWasShown", req.query.id);
 
     await batchUpdate('realtime', req.query.id, {wasShown: true,isShowing: false});
 
@@ -377,10 +388,42 @@ try{
 });
 
 
+app.get('/private_api/hideAllMessages', async (req, res) => {
+try{
+
+    let realtime = await db.collection("realtime").get();
+
+
+    let realtimePromises = [];
+    for(let i = 0; i < realtime.docs.length; i++){
+        realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({wasShown: true,isShowing: false}, { merge: true }));
+    }
+
+    await Promise.all(realtimePromises);
+
+
+    let boardMessages = await db.collection("boardMessages").get();
+
+    let boardMessagesPromises = [];
+    for(let i = 0; i < boardMessages.docs.length; i++){
+        boardMessagesPromises.push(db.collection("boardMessages").doc(boardMessages.docs[i].id).set({isShowing: false}, { merge: true }));
+    }
+
+    await Promise.all(boardMessagesPromises);
+
+
+        return res.status(200).json({ok: true});
+}catch(error){
+    console.log("/private_api/hideAllMessages failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeWasDeleted', async (req, res) => {
 try{
-    functions.logger.log("setRealtimeWasDeleted");
+    // functions.logger.log("setRealtimeWasDeleted");
     const docRef = db.collection('realtime').doc(req.query.id);
 // Update the timestamp field with the value from the server
     const doc = await docRef.update({
@@ -399,7 +442,7 @@ try{
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeDeleteMessages', async (req, res) => {
 try{
-        functions.logger.log("getRealtimeDeleteMessages: ");
+        // functions.logger.log("getRealtimeDeleteMessages: ");
         
         let query = db.collection("realtime").where("isShowing", "==" , true).where("isDeleted", "==" , true);
 
@@ -510,6 +553,29 @@ try{
 // });
 
 
+// //-----------------------------------------------------------------------------------------------
+// 
+// app.get('/api/getBoardsNumMessages', async (req, res) => {
+// try{
+// 
+//     let boards = await db.collection("boards").get();
+// 
+// 
+//     let boardsData = [];
+//     for(let i = 0; i < boards.docs.length; i++){
+//         let m = boards.docs[i].data().messages;
+//         if(m && m.length){
+//             boardsData.push(m.length);
+//         }
+//     }
+// 
+//         return res.status(200).json({boardsData});
+// }catch(error){
+//     console.log("/private_api/getRealtimeMessages failed: " + error);
+//     return res.sendStatus(500);
+// }
+// });
+
 
 // -----------------------------------------------------------------------------------------------
 // app.get('/api/setWasShown', async (req, res) => {
@@ -574,8 +640,8 @@ try{
 //     return res.sendStatus(500);
 // }
 // });
-
-
+// 
+// 
 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeMessages', async (req, res) => {
@@ -592,7 +658,7 @@ try{
             query = query.where("timestamp", ">", startFrom);
         }
 
-
+        // query = query.limit(1);
 
         let querySnapshot = await query.get();
         if (querySnapshot.empty) {
