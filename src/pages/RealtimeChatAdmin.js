@@ -114,9 +114,9 @@ export default function RealtimeChatAdmin(props) {
 
 
 
-    useEffect (() => {
-        dummy.current.scrollIntoView({ behavior: 'smooth' });
-    },[messages],);
+    // useEffect (() => {
+    //     dummy.current.scrollIntoView({ behavior: 'smooth' });
+    // },[messages],);
 
     const showAllMessagesCallback = ()=>{
         if(isAdmin === true){
