@@ -33,6 +33,20 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "isDeleted",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "realtime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "isShowing",
           "order": "ASCENDING"
         },
