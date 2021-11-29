@@ -6,8 +6,8 @@ function Footer() {
         <div className="container center">
             
             STEMarts Lab
-            <a className="waves-effect waves-light btn-flat white-text" href="www.stemarts.com">stemarts.com</a>
-            <a className="waves-effect waves-light btn-flat white-text" href="www.spacemessengers.com">spacemessengers.com</a>
+            <a className="waves-effect waves-light btn-flat white-text" href="https://www.stemarts.com/biosteam/projects/spacemessengers">stemarts.com</a>
+            <a className="waves-effect waves-light btn-flat white-text" href="https://www.spacemessengers.com">spacemessengers.com</a>
             <a className="waves-effect waves-light btn-flat white-text" href="https://github.com/AgnesChavez/">github.com/AgnesChavez</a>
             
         </div>

@@ -28,7 +28,7 @@ export default function HomePage(props) {
 
                                 <div className="card black loginInfo" style={{borderColor: randCol}} >
                                     <div className="card-content white-text">
-                                        <p>SPACE BOARD is a collaborative space for STEMarts Lab workshops and sci-art collaborations that allows for interactive exchange and data sharing. The platform includes a chat room, gallery and customizable boards to share messages and images in real time. Visit <a href="www.spacemessengers.com">Space Messengers</a> to see how the Space Board is being used for a youth workshop and sci-art installation.</p>
+                                        <p>SPACE BOARD is a collaborative space for STEMarts Lab workshops and sci-art collaborations that allows for interactive exchange and data sharing. The platform includes a chat room, gallery and customizable boards to share messages and images in real time. Visit <a href="https://www.spacemessengers.com">Space Messengers</a> to see how the Space Board is being used for a youth workshop and sci-art installation.</p>
                                     </div>
                                 </div>
                             </div>
