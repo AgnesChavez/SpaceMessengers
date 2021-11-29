@@ -30,3 +30,4 @@ package-lock.json
 *.log
 passwords.txt
 credenciales.txt
+src/services/firebase.js
