@@ -180,9 +180,9 @@ header {
 }
 
 .SidebarUser {
-    display: flex;
+    /*display: flex;
     align-items: center;
-    height: 28px;
+    height: 28px;*/
 }
 
 .SidebarUser img {
@@ -203,6 +203,10 @@ header {
     background-color: transparent !important;
     border: none;
     cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: left;
 }
 
 #SidebarCurrentUser {
