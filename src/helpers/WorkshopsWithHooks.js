@@ -165,7 +165,9 @@ function WorkshopButtons(props){
 
 export function Workshop (props){
 
-    		
+    
+    	// const currentWorkshopData = getCurrentWorkshopData(props.currentWorkshop);
+
     	const [name, setName ] = useState("");
         const [sending, setSending] = useState(false);
 
@@ -187,28 +189,30 @@ export function Workshop (props){
 
     	const tabsRef = useRef(null);
 
+    
 
-async function create(onCreateDone){
-
-	setSending(true);
-	let wsRef = await addDataToDb("workshops", WorkshopData(name), true, 'id');
-
-	if(wsRef === null)
-	{
-		console.log("Failed creating workshop");
-		setSending(false);
-		return ;	
-	}
-
-	await makeSchool(wsRef.id, institution1, location1, instructors1, students1, setSchool1Sending);
-	await makeSchool(wsRef.id, institution2, location2, instructors2, students2, setSchool2Sending);
-
-	setSending(false);
-	window.M.toast({html: 'Successfully created workshop!'})
+	async function create(onCreateDone){
 	
-	if(onCreateDone) onCreateDone();
+		setSending(true);
+		let wsRef = await addDataToDb("workshops", WorkshopData(name), true, 'id');
+	
+		if(wsRef === null)
+		{
+			console.log("Failed creating workshop");
+			setSending(false);
+			return ;	
+		}
+	
+		await makeSchool(wsRef.id, institution1, location1, instructors1, students1, setSchool1Sending);
+		await makeSchool(wsRef.id, institution2, location2, instructors2, students2, setSchool2Sending);
+	
+		setSending(false);
+		window.M.toast({html: 'Successfully created workshop!'})
+		
 
-}
+		if(onCreateDone) onCreateDone();
+	
+	}
 
 
 
