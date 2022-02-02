@@ -165,7 +165,7 @@ export function SidebarWorkshopCollection(props){
             // db.collection('users').doc(props.user.id).set({currentWorkshop: currentWorkshop.id}, {merge: true});
         }
     }
-
+    // console.log("currentWorkshop", currentWorkshop);
     return (
         <>
             { currentWorkshop && <SidebarWorkshop workshop={currentWorkshop} user={props.user} setOtherUserId={props.setOtherUserId}/> }
@@ -174,7 +174,8 @@ export function SidebarWorkshopCollection(props){
             { currentWorkshop && currentWorkshop.students && (props.user.type === userTypes().admin) && <ModalRemoveUser currentWorkshop={currentWorkshop}/> }
 
             { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
-            { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton/>:"" }
+            { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Create workshop"/>:"" }
+            {/* { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Edit current workshop" currentWorkshop={currentWorkshop}/>:"" } */}
 
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalRemoveTeam currentWorkshop={currentWorkshop} /> }

@@ -17,6 +17,7 @@ import { userTypes } from "../helpers/Types"
 
 import { createUserInDb, removeUser } from "../helpers/userManagement"
 
+import PapaParse from 'papaparse';
 
 
 export function openModal(id, onOpenStart=null, onCloseEnd=null){
@@ -85,6 +86,7 @@ export function ModalAddBoard(){
     </>);
 }
 
+// export function ModalCreateWorkshop(props){
 export function ModalCreateWorkshop(){
 	return (<>
         <div id="modalCreateWorkshop" className="modal">
@@ -92,6 +94,7 @@ export function ModalCreateWorkshop(){
 				<Workshop 
 					onCreateDone={()=> closeModal("modalCreateWorkshop")}
 					onCancel={()=> closeModal("modalCreateWorkshop")}
+					// currentWorkshop={props.currentWorkshop}
 				/>
 	        </div>
         </div>
@@ -112,8 +115,9 @@ export function CreateWorkshopModalButton(props){
 					})
 			}
 			>
-		Create Workshop
+		{props.buttonLabel}
 	</button>
+	
 	);
 
 }
@@ -258,7 +262,7 @@ export function ModalCreateUser(props){
 
 	async function create(){
 		setCreating(true);		
-		await createUserInDb(null, {name: name.current, email: email.current}, type.current, school.current, props.currentWorkshop.id) ;
+		await createUserInDb({name: name.current, email: email.current}, type.current, school.current, props.currentWorkshop.id) ;
 		window.M.toast({html: "Successfully created user", displayLength: 2500});
 		closeModal("ModalCreateUser");
 	}
@@ -364,6 +368,110 @@ export function ModalRemoveUser(props){
         </Modal>
         </>)
 }
+// export function ModalCreateUsersCSV(props){
+// 
+// 	const school = useRef(null);
+// 
+// 	const [creating, setCreating ] = useState(false);
+// 
+// 	function onSchoolChange(e) {
+// 		school.current = e.target.value;
+// 		console.log(e.target.value);
+// 	}
+// 
+// 	async function create(){
+// 		setCreating(true);		
+// 		// await createUserInDb({name: name.current, email: email.current}, type.current, school.current, props.currentWorkshop.id) ;
+// 		window.M.toast({html: "Successfully created user", displayLength: 2500});
+// 		closeModal("ModalCreateUser");
+// 	}
+// 
+// 	function parseCSV(file){
+// 		PapaParse.parse(file, {
+// 			header: true,
+// 			complete: function(results) {
+// 			// console.log(results);
+// 			if(results.errors.length === 0){
+// 				let students = [];
+// 				let instructors = [];
+// 				results.data.forEach(d=>{
+// 					if(d.type === userTypes().student){
+// 						students.push(d);
+// 					}else if(d.type === userTypes().instructor){
+// 						instructors.push(d);
+// 					}else{
+// 						console.log("invalid type", d);
+// 					}
+// 				});
+// 				
+// 			// 	props.setStudents(students);	
+// 			// 	props.setInstructors(instructors);
+// 			// 	setDummy(true);
+// 			}else{
+// 				console.log("CSV parse failed", results.errors);
+// 			}
+// 		}
+// 		});
+// 	}
+// 
+// 
+// 
+// 	return (<>
+// 
+// 		<Button
+// 			waves="light"
+//   		  	className="modal-trigger sidebarButton"
+//   		  	href="#ModalCreateUsersCSV"
+//   		  	node="button"
+//   		>
+//      	Create Users with CSV
+//   		</Button>
+// 		<Modal
+//     		actions={[    
+//     			<Button className="teal"  node="button" waves="light" onClick={create} >Create</Button>,
+//       			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+//     		]}
+//     		className="black-text"
+//     		header="Create users from CSV"
+//     		id="ModalCreateUsersCSV"
+//     		root={document.getElementById('modalRoot')}
+//   		>	
+//   			
+//   			{creating?
+//   				<CenteredPreloader title="Creating users"/>:
+//   			<form>
+//   				<p>Select the users school</p>
+// 				<SelectSchool currentWorkshop={props.currentWorkshop} selectorId={"ModalCreateUserSelectSchool"} onChange={onSchoolChange}/>
+// 			</form>
+// 			<Row className="SelectCSV">
+// 			<h6>Import from CSV file</h6>
+// 			
+// 			<div className="CSVInstructions">Import a CSV file with the names, emails and user types.<br/>
+// 			<Link to={"https://docs.google.com/spreadsheets/d/1_XLRJP8KGdE8KsZuoDnyFGyENwyxKK2Vj2JQP05cFJI/edit?usp=sharing"}> CSV Template </Link>
+// 			<span><br/>Copy the template and modify.<br/>Once ready choose </span><span style={{fontFamily: "monospace"}}>File > Download > Coma Separated Values (.csv, current page)</span>
+// 			<br/>Instructors don't need to be assigned to a team.
+// 			<br/>Upload a different CSV file for each school.
+// 			</div>
+// 			<TextInput
+// 				label='Select CSV file'
+//                 icon=<i className="material-icons">file_upload</i>
+//                 type="file"                
+//                 onChange={(evt)=>{
+//                     evt.stopPropagation();
+//                     evt.preventDefault();
+//                     if (evt.target.files && evt.target.files.length) {
+//                       parseCSV(evt.target.files[0]);
+//                     }
+// 	        	}}
+//     		></TextInput>
+//     	</Row>		
+// 		}
+//         </Modal>
+//         </>)
+// }
+
+
+
 export function ModalRemoveTeamButton(props){
 		
 	return <Button
