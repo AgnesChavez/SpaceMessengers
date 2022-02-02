@@ -11,7 +11,6 @@ import {
 		randomColorHSL,
 		// WorkshopData,
 		TeamData,
-		// UserData,
 		BoardData,
 		InstitutionData,
 		// BoardMessageData
@@ -147,16 +146,16 @@ export async function removeTeam(teamId){
 
 // const MAKE_DUMMY_USERS = false;
 
-export async  function createUser( userData, type, institutionId, workshopId)
-	{
+// export async  function createUser( userData, type, institutionId, workshopId)
+// 	{
 		// if(MAKE_DUMMY_USERS){
-			let uid = await createUserInDb(null, userData, type, institutionId, workshopId);
-			return uid;
+			// let uid = await createUserInDb(null, userData, type, institutionId, workshopId);
+			// return uid;
 		// }else{
 		// 	await createNewUser(userData, type, institutionId, workshopId);
 		// }
 		// return null;
-	}
+	// }
 
 
 
@@ -181,12 +180,12 @@ export async function createSchool(name, location, workshopId, instructors, stud
 	addToArray('workshops', workshopId, "institutions", instId);
 
 	for(let i = 0; i < instructors.length; i++){
-		await createUser(instructors[i], userTypes().instructor , instId, workshopId );
+		await createUserInDb(instructors[i], userTypes().instructor , instId, workshopId );
 	}
 
 
 	for(let i = 0; i < students.length; i++){
-		await createUser(students[i], userTypes().student , instId, workshopId );
+		await createUserInDb(students[i], userTypes().student , instId, workshopId );
 	}
 }
 
