@@ -31,3 +31,4 @@ package-lock.json
 passwords.txt
 credenciales.txt
 src/services/firebase.js
+/data_bkup
