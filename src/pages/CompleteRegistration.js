@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { auth } from "../services/firebase";
-// import { createUserInDb } from "../helpers/userManagement";
 
 import { getQueryData } from "../helpers/db"
 import { db } from "../services/firebase";

@@ -21,14 +21,6 @@ import { InfoSidebar } from '../components/InfoSidebar'
 
 import {  addBoardToUser } from '../helpers/factory'
 
-// import { getQueryData } from '../helpers/db'
-
-// import {  makeDefaultBoard } from '../helpers/factory' 
-// import {  createSchool } from '../helpers/factory'
-// import {  createUser } from '../helpers/factory'
-// import { createUserInDb } from '../helpers/userManagement'
-
-
 import { UploadImgButton } from '../helpers/imgStorage'
 
 import { addToArray, removeFromArray } from '../helpers/db'
