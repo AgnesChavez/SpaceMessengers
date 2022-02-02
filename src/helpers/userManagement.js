@@ -56,6 +56,14 @@ export async function sendLogInEmail(email){
 //         });
 // }
 
+async function checkUserExistsByEmail(userEmail){
+    let querySnapshot = await db.collection("users").where("email", "==", userEmail).get();
+    if (querySnapshot.docs.length > 0){
+        return querySnapshot.docs[0].id;
+    }
+    return null;
+}
+
 async function addOrCreateTeam(teamName, uid, workshopId){
     try{    
     // console.log("addOrCreateTeam", teamName, uid, workshopId);
@@ -74,16 +82,20 @@ async function addOrCreateTeam(teamName, uid, workshopId){
     }
 }
 
-export async function createUserInDb(uid, userData, type, institutionId, workshopId) {
+export async function createUserInDb(userData, type, institutionId, workshopId) {
     // console.log("createUserInDb", uid, userData, type, institutionId, workshopId);
     let _type = type;
     if(type === null) _type = userTypes().student;
 
     let userId = null;
-    if(uid){
-        await setDataInDb("users", uid, UserData(uid, userData, _type, institutionId, workshopId));
-        userId = uid;
+    if(userData.email != null){
+        userId = await checkUserExistsByEmail(userData.email);
     }else{
+        console.log("Creating user without email.")
+    }
+
+    
+    if(userId === null){
         let user= await addDataToDb("users", UserData("", userData, _type, institutionId, workshopId), true, 'id');
         if(user) userId = user.id;
     }
