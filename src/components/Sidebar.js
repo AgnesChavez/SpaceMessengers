@@ -22,13 +22,14 @@ import { userTypes } from "../helpers/Types"
 
 import { Button, Modal } from 'react-materialize';
 
-import UserProfile from "./UserProfile";
+// import UserProfile from "./UserProfileHooks";
 
 import '../css/board.css';
 
 
 import {ModalCreateWorkshop,
-        ModalAddBoard
+        ModalAddBoard,
+        ModalUserProfile
          } from './Modals'
 
       
@@ -153,17 +154,8 @@ export function Sidebar(props) {
     
     { isNotStudent && <ModalCreateWorkshop/> }
 
-
-  <Modal
-    actions={[
-      <Button flat modal="close" node="button" waves="green">Close</Button>
-    ]}
-    header="User Profile"
-    id="profileModal"
-  >
-    <UserProfile  ></UserProfile>
-  </Modal>
-
+    <ModalUserProfile/>
+ 
   {otherUserId && <ModalOtherUserProfile userId = {otherUserId}/> }
 
     </>)

@@ -17,6 +17,8 @@ import { userTypes } from "../helpers/Types"
 
 import { createUserInDb, removeUser } from "../helpers/userManagement"
 
+import UserProfile from "./UserProfileHooks";
+
 import PapaParse from 'papaparse';
 
 
@@ -119,7 +121,19 @@ export function CreateWorkshopModalButton(props){
 	</button>
 	
 	);
+}
 
+export function  ModalUserProfile(props){
+ return <Modal
+ 	actions={[]}
+    header="User Profile"
+    id="profileModal"
+  >
+    <UserProfile   
+    	onCreateDone={()=> closeModal("profileModal")}
+		onCancel={()=> closeModal("profileModal")}
+    />
+  </Modal>
 }
 
 

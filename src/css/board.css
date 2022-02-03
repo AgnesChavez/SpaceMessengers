@@ -525,5 +525,8 @@ body,
 .messageTransition{
     transition: transform 0.1s;
 }
-
+.InputProfile{
+    margin-top: unset !important; 
+    margin-bottom: unset !important;
+}
 
