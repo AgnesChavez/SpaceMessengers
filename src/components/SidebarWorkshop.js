@@ -60,12 +60,6 @@ function SidebarStudent(props)
         return (<>
             <li key={usr.id} className="SidebarUser" style={{borderRight: schoolColor+ "solid 4px"}}>
                 <RenderSidebarUser usr={usr} setOtherUserId={props.setOtherUserId}/>
-                {/* <button  onClick={()=>props.setOtherUserId(usr.id)}> */}
-                {/* <img className="circle"  alt={usr.displayName} src={usr.photoURL || ("https://i.pravatar.cc/24?u=" + usr.id)}/> */}
-                {/* <span className='name' style={('color' in usr)?{color: usr.color}:{}}> */}
-                {/*     {usr.displayName} */}
-                {/* </span> */}
-                {/* </button> */}
             </li> 
         </>);  
     }
