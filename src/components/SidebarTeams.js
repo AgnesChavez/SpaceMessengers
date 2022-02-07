@@ -193,7 +193,7 @@ function SidebarUser(props)
   if(usr && ! usrLoading){
       return (
         <>
-            <li key={usr.id} className="SidebarUser">
+            <li key={usr.id} className="SidebarUser SidebarUserFlex">
                 <RenderSidebarUser usr={usr} setOtherUserId={props.setOtherUserId}/>
                 {(props.isNotStudent && props.isRemoving) &&
                     <RemoveButton onRemove={()=>{ 
