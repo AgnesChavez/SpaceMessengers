@@ -80,8 +80,105 @@ app.use("/private_api", authenticate);
 
 // app.use(cors({ origin: true }));
 
+async function getAllCollectionItemsForUser(collectionId, usr){
 
+    let query = await db.collection(collectionId).where("uid", "==", usr).get();
+    
+    let items = [];
+    // for(let i = 0; i < query.docs.length; i++){
+    query.forEach((doc) => {
+        items.push(doc.id);
+    });
 
+    // } 
+    return items;
+}
+
+async function getAllCollectionItemsInArrayForUser(collectionId, usr, arrayName){
+
+    let query = await db.collection(collectionId).where(arrayName, "array-contains", usr).get();
+    let items = [];
+    query.forEach((doc) => {
+        items.push(doc.id);
+    });
+    // if(query.docs){
+    //     for(let i = 0; i < query.docs.length; i++){
+    //         items.push(query.docs[i].id);
+    //     } 
+    // }
+    return items;
+}
+
+async function getUserData(uid){
+    let data = {
+        uid: uid,
+        workshops : {
+            instructors: await getAllCollectionItemsInArrayForUser("workshops", uid, "instructors"),
+            students: await getAllCollectionItemsInArrayForUser("workshops", uid, "students"),
+        },
+        teams: await getAllCollectionItemsInArrayForUser("teams", uid, "members"),
+        institution: await getAllCollectionItemsInArrayForUser("institution", uid, "members"),
+        images: await getAllCollectionItemsForUser("images", uid),
+        comments: await getAllCollectionItemsForUser("comments", uid),
+        chats: await getAllCollectionItemsForUser("chats", uid),
+        boardMessages: await getAllCollectionItemsForUser("boardMessages", uid)
+    };
+    return data;
+}
+
+//-----------------------------------------------------------------------------------------------
+// app.get('/api/getAllUsers', async (req, res) => {
+// 
+//     let query = await db.collection("users").get();
+//     console.log("query.docs.length", query.docs.length);
+//     let users = {};
+// 
+//     for(let i = 0; i < query.docs.length; i++){
+//         for(let j = i+1; j < query.docs.length; j++){
+//                 if(query.docs[i].data().email === query.docs[j].data().email){
+//                     let e = query.docs[i].data().email;
+//                     if(!(e in users)){
+//                         users[e] = [[query.docs[i].data(), await getUserData(query.docs[i].id)]];
+//                         //users[e] = [query.docs[i].data()];
+//                     }
+//                     users[e].push([query.docs[j].data(), await getUserData(query.docs[j].id)]);
+//                 }
+//         }
+//     }
+//     return res.status(200).json(users);
+// });
+
+//-----------------------------------------------------------------------------------------------
+// app.get('/api/getDuplicateEmails', async (req, res) => {
+//     try{
+//     let query = await db.collection("users").get();
+//     console.log("query.docs.length", query.docs.length);
+//     let users = {};
+// 
+//     for(let i = 0; i < query.docs.length; i++){
+//         if(query.docs[i].data() !== undefined && query.docs[i].data().email !== undefined){
+//         let emails = await db.collection("users").where("email", "==", query.docs[i].data().email).get();
+//         
+//         if (emails.size > 1){
+// 
+//             let e = query.docs[i].data().email;
+// 
+//             console.log("duplicate email: ", e )
+// 
+//             if(!(e in users)){
+//                 users[e] = [query.docs[i].data()];
+//             }else{
+//                 users[e].push([query.docs[i].data()]);
+//             }
+//         }
+//         }
+//     }
+//     return res.status(200).json(users);
+//     } catch (error) {
+//         console.log( "Catch: error message:", error.message);
+//         return res.sendStatus(500);
+//     }
+// });
 
 
 //-----------------------------------------------------------------------------------------------
@@ -94,13 +191,13 @@ app.get('/api/checkEmail', async (req, res) => {
 //-----------------------------------------------------------------------------------------------
 async function getDocData( collection, docID){
 try {
-        const doc = await db.collection(collection).doc(docID).get();
-        if (!doc.exists) {
-            console.log('No element in '+ collection +' with id: ', docID);
-            return { status: 404, data: { empty: true } };
-        } else {
-            return { status: 200, data: {id: doc.id, data: doc.data() }};
-        }
+            const doc = await db.collection(collection).doc(docID).get();
+            if (!doc.exists) {
+                console.log('No element in '+ collection +' with id: ', docID);
+                return { status: 404, data: { empty: true } };
+            } else {
+                return { status: 200, data: {id: doc.id, data: doc.data() }};
+            }
     } catch (error) {
         
         console.log('Error getting element ', docID, " error message:", error.message);
@@ -235,7 +332,7 @@ return {};
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getWorkshop', async (req, res) => {
 try{
-        console.log("getWorkshop ID: " + req.query.workshopID);
+        // console.log("getWorkshop ID: " + req.query.workshopID);
         let workshop = await getDocData("workshops", req.query.workshopID);
         
         if(workshop.status === 500) {
@@ -246,9 +343,13 @@ try{
             console.log("getWorkshop not found");
             return res.status(workshop.status).json(workshop.data);
         }
-    
-       let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
-        // console.log("teams ", teams.docs.length);
+        
+
+
+
+
+       let teams = await db.collection("teams").get();// .where("workshopId", "==", req.query.workshopID).get();
+        
         let teamBoardsPromises = [];
         for(let i = 0; i < teams.docs.length; i++){
             teamBoardsPromises.push(getTeam(teams.docs[i].id));
@@ -258,10 +359,30 @@ try{
 
         let usersPromises = [];
 
-        workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
-            // usersPromises.push(getUser(workshop.data.data.students[i]));
+        // workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
+        // 
+        // workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
+
+    let query = await db.collection("users").get();
+    // console.log("query.docs.length", query.docs.length);
+    let users = {};
+
+    for(let i = 0; i < query.docs.length; i++){
+        // for(let j = i+1; j < query.docs.length; j++){
+                // if(query.docs[i].data().email === query.docs[j].data().email){
+                    // let e = query.docs[i].data().email;
+                    // if(!(e in users)){
+                        // users[e] = [[query.docs[i].data(), await getUserData(query.docs[i].id)]];
+                        //users[e] = [query.docs[i].data()];
+                    // }
+                    // users[e].push([query.docs[j].data(), await getUserData(query.docs[j].id)]);
+                // }
         // }
-        workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
+        usersPromises.push(getUser(query.docs[i].id));
+    }
+
+    // return res.status(200).json(users);
+    
 
 
         workshop.data.data.users = await Promise.all(usersPromises);
@@ -274,6 +395,48 @@ try{
     return res.status(500);
 }
 });
+
+// -----------------------------------------------------------------------------------------------
+// app.get('/private_api/getWorkshop', async (req, res) => {
+// try{
+//         console.log("getWorkshop ID: " + req.query.workshopID);
+//         let workshop = await getDocData("workshops", req.query.workshopID);
+//         
+//         if(workshop.status === 500) {
+//             console.log("getWorkshop server internal error");
+//             return res.sendStatus(500);
+//         }
+//         else if(workshop.status === 404) {
+//             console.log("getWorkshop not found");
+//             return res.status(workshop.status).json(workshop.data);
+//         }
+//     
+//        let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
+//         
+//         let teamBoardsPromises = [];
+//         for(let i = 0; i < teams.docs.length; i++){
+//             teamBoardsPromises.push(getTeam(teams.docs[i].id));
+//         }
+// 
+//         workshop.data.data.teams = await Promise.all(teamBoardsPromises);
+// 
+//         let usersPromises = [];
+// 
+//         workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
+//         
+//         workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
+// 
+// 
+//         workshop.data.data.users = await Promise.all(usersPromises);
+// 
+// 
+// 
+//         return res.status(200).json(workshop.data);
+// }catch(error){
+//     console.log("/private_api/getWorkshop failed: " + error);
+//     return res.status(500);
+// }
+// });
 
 
 //-----------------------------------------------------------------------------------------------
