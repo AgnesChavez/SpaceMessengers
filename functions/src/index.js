@@ -78,6 +78,83 @@ const authenticate = async (req, res, next) => {
 app.use("/private_api", authenticate);
 
 
+
+//----------------------------------------------------------------
+//        auto translate messages
+//----------------------------------------------------------------
+const LANGUAGES = ['en', 'es', 'pt'];
+
+const { Translate } = require('@google-cloud/translate').v2;
+const translate = new Translate();
+
+//---------------------------------------
+async function detectLanguage(text) {
+    let [detections] = await translate.detect(text);
+    detections = Array.isArray(detections) ? detections : [detections];
+    return detections;
+}
+//---------------------------------------
+async function translateText(txt, lang) {
+    let trans = await translate.translate(txt, lang);
+    if (trans.length == 0) return null;
+    return {
+        lang: lang,
+        trans: trans[0]
+    };
+}
+//---------------------------------------
+async function translateMessage(messageTxt, msgId) {
+
+    let lang = await detectLanguage(messageTxt);
+    let promises = [];
+    if (lang.length == 0) {
+        console.log("translateMessage: no language detected");
+        return;
+    }
+    let currentLang = lang[0].language.trim();
+    // console.log("currentLang:"+ currentLang);
+    for (let l = 0; l < LANGUAGES.length; l++) {
+        if (currentLang != LANGUAGES[l]) {
+            promises.push(translateText(
+                messageTxt,
+                LANGUAGES[l]
+            ));
+        }
+    }
+    let translations = await Promise.all(promises);
+
+
+    const obj = {};
+
+    for (const tr of translations) {
+        obj[tr.lang] = { txt: tr.trans, validated: false };
+    }
+    obj["original_lang"] = currentLang;
+
+    await db.collection("boardMessages").doc(msgId).set({ translations: obj }, { merge: true });
+
+}
+//---------------------------------------
+async function makeTranslations() {
+    try {
+        let boardMessages = await db.collection("boardMessages").get();
+        let boardMessagesPromises = [];
+        for (let i = 0; i < boardMessages.docs.length; i++) {
+            if (!boardMessages.docs[i].data().translations) {
+                boardMessagesPromises.push(translateMessage(boardMessages.docs[i].data().content, boardMessages.docs[i].id));
+            }
+        }
+        await Promise.all(boardMessagesPromises);
+
+    } catch (error) {
+        console.log("makeTranslations failed: " + error);
+    }
+}
+
+//----------------------------------------------------------------
+
+
+
 // app.use(cors({ origin: true }));
 
 async function getAllCollectionItemsForUser(collectionId, usr){
@@ -181,12 +258,6 @@ async function getUserData(uid){
 // });
 
 
-//-----------------------------------------------------------------------------------------------
-app.get('/api/checkEmail', async (req, res) => {
-
-    let querySnapshot = await db.collection("users").where("email", "==", req.query.email).get();
-    return res.status(200).json({valid: (querySnapshot.size > 0)});
-});
 
 //-----------------------------------------------------------------------------------------------
 async function getDocData( collection, docID){
@@ -328,116 +399,84 @@ return {};
 
 }
 
-
 //-----------------------------------------------------------------------------------------------
-app.get('/private_api/getWorkshop', async (req, res) => {
-try{
-        // console.log("getWorkshop ID: " + req.query.workshopID);
-        let workshop = await getDocData("workshops", req.query.workshopID);
-        
-        if(workshop.status === 500) {
+async function getWorkshop(workshopId) {
+    try {
+        let workshop = await getDocData("workshops", workshopId);
+
+        if (workshop.status === 500) {
             console.log("getWorkshop server internal error");
-            return res.sendStatus(500);
+            return null;
+        } else if (workshop.status === 404) {
+            return null;
         }
-        else if(workshop.status === 404) {
-            console.log("getWorkshop not found");
-            return res.status(workshop.status).json(workshop.data);
-        }
-        
 
 
+        let teams = await db.collection("teams").where("workshopId", "==", workshopId).get();
 
-
-       let teams = await db.collection("teams").get();// .where("workshopId", "==", req.query.workshopID).get();
-        
         let teamBoardsPromises = [];
-        for(let i = 0; i < teams.docs.length; i++){
+        for (let i = 0; i < teams.docs.length; i++) {
             teamBoardsPromises.push(getTeam(teams.docs[i].id));
         }
 
         workshop.data.data.teams = await Promise.all(teamBoardsPromises);
 
         let usersPromises = [];
+        if (workshop.data.data.students) {
+            for (let i = 0; i < workshop.data.data.students.length; i++) {
+                usersPromises.push(getUser(workshop.data.data.students[i]));
+            }
+        }
+        if (workshop.data.data.instructors) {
+            for (let i = 0; i < workshop.data.data.instructors.length; i++) {
+                usersPromises.push(getUser(workshop.data.data.instructors[i]));
+            }
+        }
+        workshop.data.data.users = await Promise.all(usersPromises);
+        return workshop.data;
+    } catch (error) {
+        console.log("getWorkshop " + workshopId + " failed: " + error);
+        return null;
+    }
+}
 
-        // workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
-        // 
-        // workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
+//-----------------------------------------------------------------------------------------------
+async function getAllWorkshops(){
+try{
+        
+    let workshopsQuery = await db.collection("workshops").get();
+    let workshopsPromises = [];
 
-    let query = await db.collection("users").get();
-    // console.log("query.docs.length", query.docs.length);
-    let users = {};
+    for(let i = 0; i < workshopsQuery.docs.length; i++){
 
-    for(let i = 0; i < query.docs.length; i++){
-        // for(let j = i+1; j < query.docs.length; j++){
-                // if(query.docs[i].data().email === query.docs[j].data().email){
-                    // let e = query.docs[i].data().email;
-                    // if(!(e in users)){
-                        // users[e] = [[query.docs[i].data(), await getUserData(query.docs[i].id)]];
-                        //users[e] = [query.docs[i].data()];
-                    // }
-                    // users[e].push([query.docs[j].data(), await getUserData(query.docs[j].id)]);
-                // }
-        // }
-        usersPromises.push(getUser(query.docs[i].id));
+        workshopsPromises.push(getWorkshop(workshopsQuery.docs[i].id));
     }
 
-    // return res.status(200).json(users);
-    
+    let workshopsData = await Promise.all(workshopsPromises);
 
+    // console.log(JSON.stringify(workshopsData, null, 4));
 
-        workshop.data.data.users = await Promise.all(usersPromises);
-
-
-
-        return res.status(200).json(workshop.data);
+    // let data = JSON.stringify(workshopsData, null, 4);
+    // fs.writeFileSync('workshops.json', data);
+    return workshopsData;
 }catch(error){
-    console.log("/private_api/getWorkshop failed: " + error);
-    return res.status(500);
+    console.log("getAllWorkshops failed: " + error);
+    return null;
 }
+}
+
+
+//************************************************************************
+//              PUBLIC API ENDPOINTS
+//     noauthentication required
+//************************************************************************
+
+//-----------------------------------------------------------------------------------------------
+app.get('/api/checkEmail', async (req, res) => {
+
+    let querySnapshot = await db.collection("users").where("email", "==", req.query.email).get();
+    return res.status(200).json({valid: (querySnapshot.size > 0)});
 });
-
-// -----------------------------------------------------------------------------------------------
-// app.get('/private_api/getWorkshop', async (req, res) => {
-// try{
-//         console.log("getWorkshop ID: " + req.query.workshopID);
-//         let workshop = await getDocData("workshops", req.query.workshopID);
-//         
-//         if(workshop.status === 500) {
-//             console.log("getWorkshop server internal error");
-//             return res.sendStatus(500);
-//         }
-//         else if(workshop.status === 404) {
-//             console.log("getWorkshop not found");
-//             return res.status(workshop.status).json(workshop.data);
-//         }
-//     
-//        let teams = await db.collection("teams").where("workshopId", "==", req.query.workshopID).get();
-//         
-//         let teamBoardsPromises = [];
-//         for(let i = 0; i < teams.docs.length; i++){
-//             teamBoardsPromises.push(getTeam(teams.docs[i].id));
-//         }
-// 
-//         workshop.data.data.teams = await Promise.all(teamBoardsPromises);
-// 
-//         let usersPromises = [];
-// 
-//         workshop.data.data.students.forEach( s=> usersPromises.push(getUser(s)));
-//         
-//         workshop.data.data.instructors.forEach( s=> usersPromises.push(getUser(s)));
-// 
-// 
-//         workshop.data.data.users = await Promise.all(usersPromises);
-// 
-// 
-// 
-//         return res.status(200).json(workshop.data);
-// }catch(error){
-//     console.log("/private_api/getWorkshop failed: " + error);
-//     return res.status(500);
-// }
-// });
-
 
 //-----------------------------------------------------------------------------------------------
 app.get('/api/getUser/:userId', async (req, res) => {
@@ -477,30 +516,6 @@ app.get('/api/getParams', async (req, res) => {
         
 });
 
-
-//-----------------------------------------------------------------------------------------------
-app.get('/private_api/setRealtimeShowing', async (req, res) => {
-try{
-// functions.logger.log("setRealtimeShowing", req.query.id);
-    await batchUpdate('realtime', req.query.id, {isShowing: true,
-        wasShown: false,
-        startShowing: FieldValue.serverTimestamp()});        
-    // const docRef = db.collection('realtime').doc(req.query.id);
-
-// Update the timestamp field with the value from the server
-    // const doc = await docRef.update({
-    //     isShowing: true,
-    //     wasShown: false,
-    //     startShowing: FieldValue.serverTimestamp(),
-    // });
-
-        return res.sendStatus(200);
-}catch(error){
-    console.log("/private_api/setRealtimeShowing failed: " + error);
-    return res.sendStatus(500);
-}
-});
-
 //--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 async function batchUpdate(collectionId, ids, propsToUpdate) {
@@ -529,28 +544,78 @@ async function batchUpdate(collectionId, ids, propsToUpdate) {
     }
 }
 
+
+//************************************************************************
+//              PRIVATE API ENDPOINTS
+//     these are authentiated calls
+//************************************************************************
+
 //-----------------------------------------------------------------------------------------------
-app.get('/private_api/setRealtimeWasShown', async (req, res) => {
+app.get('/private_api/getAllWorkshops', async (req, res) => {
 try{
-    // functions.logger.log("setRealtimeWasShown", req.query.id);
+        
+    let ws = await getAllWorkshops();
 
-    await batchUpdate('realtime', req.query.id, {wasShown: true,isShowing: false});
-
-//     const docRef = db.collection('realtime').doc(req.query.id);
-// // Update the timestamp field with the value from the server
-//     const doc = await docRef.update({
-//         wasShown: true,
-//         isShowing: false
-//     });
-
-        return res.sendStatus(200);
+    return res.status(200).json(ws);
 }catch(error){
-    functions.logger.log("/private_api/setRealtimeWasShown failed: " + error);
+    console.log("/private_api/getAllWorkshop failed: " + error);
+    return res.status(500);
+}
+});
+
+
+//-----------------------------------------------------------------------------------------------
+app.get('/private_api/getWorkshop', async (req, res) => {
+try{
+
+        let workshop = await getWorkshop(req.query.workshopID);
+        if(workshop){
+            return res.status(200).json(workshop.data);
+        }else{
+            return res.status(404);
+        }
+}catch(error){
+    console.log("/private_api/getWorkshop failed: " + error);
+    return res.status(500);
+}
+});
+
+
+
+
+//-----------------------------------------------------------------------------------------------
+//                  BOARDS MESSAGES 
+//-----------------------------------------------------------------------------------------------
+app.get("/private_api/setStartShowingMessage", async (req, res)=>{
+try{
+
+    await batchUpdate('boardMessages', req.query.id, {
+        isShowing: true,
+        startShowing: FieldValue.serverTimestamp()
+    });
+
+    return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setStartShowingMessage failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+//-----------------------------------------------------------------------------------------------
+app.get("/private_api/setEndShowingMessage", async (req, res)=>{
+try{
+    await batchUpdate('boardMessages', req.query.id, {isShowing: false});
+
+    return res.sendStatus(200);
+
+}catch(error){
+    console.log("/private_api/setEndShowingMessage failed: " + error);
     return res.sendStatus(500);
 }
 });
 
 
+//-----------------------------------------------------------------------------------------------
 app.get('/private_api/hideAllMessages', async (req, res) => {
 try{
 
@@ -582,7 +647,8 @@ try{
 }
 });
 
-
+//-----------------------------------------------------------------------------------------------
+//                  REALTIME MESSAGES 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/setRealtimeWasDeleted', async (req, res) => {
 try{
@@ -601,6 +667,36 @@ try{
 }
 });
 
+
+
+//-----------------------------------------------------------------------------------------------
+app.get('/private_api/setRealtimeShowing', async (req, res) => {
+try{
+// functions.logger.log("setRealtimeShowing", req.query.id);
+    await batchUpdate('realtime', req.query.id, {isShowing: true,
+        wasShown: false,
+        startShowing: FieldValue.serverTimestamp()});        
+
+        return res.sendStatus(200);
+}catch(error){
+    console.log("/private_api/setRealtimeShowing failed: " + error);
+    return res.sendStatus(500);
+}
+});
+
+
+//-----------------------------------------------------------------------------------------------
+app.get('/private_api/setRealtimeWasShown', async (req, res) => {
+try{
+
+    await batchUpdate('realtime', req.query.id, {wasShown: true,isShowing: false});
+
+        return res.sendStatus(200);
+}catch(error){
+    functions.logger.log("/private_api/setRealtimeWasShown failed: " + error);
+    return res.sendStatus(500);
+}
+});
 
 //-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeDeleteMessages', async (req, res) => {
@@ -628,188 +724,9 @@ try{
 });
 
 //-----------------------------------------------------------------------------------------------
-app.get("/private_api/setStartShowingMessage", async (req, res)=>{
-try{
-
-    await batchUpdate('boardMessages', req.query.id, {
-        isShowing: true,
-        startShowing: FieldValue.serverTimestamp()
-    });
-
-    // const docRef =  db.collection("boardMessages").doc(req.query.id);
-    // const doc = await docRef.update({
-    //     isShowing: true,
-    //     startShowing: FieldValue.serverTimestamp()
-    // });
-
-    return res.sendStatus(200);
-}catch(error){
-    console.log("/private_api/setStartShowingMessage failed: " + error);
-    return res.sendStatus(500);
-}
-});
-
-//-----------------------------------------------------------------------------------------------
-app.get("/private_api/setEndShowingMessage", async (req, res)=>{
-try{
-    await batchUpdate('boardMessages', req.query.id, {isShowing: false});
-    // const docRef =  db.collection("boardMessages").doc(req.query.id);
-    // const doc = await docRef.update({
-        // isShowing: false
-    // });
-
-    return res.sendStatus(200);
-
-}catch(error){
-    console.log("/private_api/setEndShowingMessage failed: " + error);
-    return res.sendStatus(500);
-}
-});
-//-----------------------------------------------------------------------------------------------
-
-
-// app.get('/api/setAuthorName', async (req, res) => {
-// try{
-// 
-//     let boardMessages = await db.collection("boardMessages").get();
-// 
-//     let boardMessagesPromises = [];
-//     for(let i = 0; i < boardMessages.docs.length; i++){
-//         let uid = boardMessages.docs[i].data().uid;
-//         let user = await db.collection("users").doc(uid).get();
-//         if(user.exists){
-//             boardMessagesPromises.push(db.collection("boardMessages").doc(boardMessages.docs[i].id).set({displayName: user.data().displayName}, { merge: true }));
-//         }else{
-//             console.log("user does not exist for board message ", uid, boardMessages.docs[i].id)
-//         }
-//     }
-// 
-//     await Promise.all(boardMessagesPromises);
-// 
-//     return res.status(200).json({ok: true});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-
-
-//-----------------------------------------------------------------------------------------------
-// app.get('/api/setIsDeleted', async (req, res) => {
-// try{
-// 
-//     let realtime = await db.collection("realtime").get();
-// 
-// 
-//     let realtimePromises = [];
-//     for(let i = 0; i < realtime.docs.length; i++){
-//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({isDeleted: false}, { merge: true }));
-//     }
-// 
-//     await Promise.all(realtimePromises);
-// 
-//         return res.status(200).json({ok: true});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-
-
-// //-----------------------------------------------------------------------------------------------
-// 
-// app.get('/api/getBoardsNumMessages', async (req, res) => {
-// try{
-// 
-//     let boards = await db.collection("boards").get();
-// 
-// 
-//     let boardsData = [];
-//     for(let i = 0; i < boards.docs.length; i++){
-//         let m = boards.docs[i].data().messages;
-//         if(m && m.length){
-//             boardsData.push(m.length);
-//         }
-//     }
-// 
-//         return res.status(200).json({boardsData});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-
-
-// -----------------------------------------------------------------------------------------------
-// app.get('/api/setWasShown', async (req, res) => {
-// try{
-// 
-//     let realtime = await db.collection("realtime").get();
-// 
-// 
-//     let realtimePromises = [];
-//     for(let i = 0; i < realtime.docs.length; i++){
-//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({wasShown: true,isShowing: false}, { merge: true }));
-//     }
-// 
-//     await Promise.all(realtimePromises);
-// 
-//         return res.status(200).json({ok: true});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-
-//-----------------------------------------------------------------------------------------------
-// app.get('/api/setIsRealtime', async (req, res) => {
-// try{
-// 
-//     let realtime = await db.collection("realtime").get();
-// 
-// 
-//     let realtimePromises = [];
-//     for(let i = 0; i < realtime.docs.length; i++){
-//         realtimePromises.push(db.collection("realtime").doc(realtime.docs[i].id).set({isRealTime: true}, { merge: true }));
-//     }
-// 
-//     await Promise.all(realtimePromises);
-// 
-//         return res.status(200).json({ok: true});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-
-
-// -----------------------------------------------------------------------------------------------
-// app.get('/api/setIsShowing', async (req, res) => {
-// try{
-// 
-//     let boardMessages = await db.collection("boardMessages").get();
-// 
-// 
-//     let boardMessagesPromises = [];
-//     for(let i = 0; i < boardMessages.docs.length; i++){
-//         boardMessagesPromises.push(db.collection("boardMessages").doc(boardMessages.docs[i].id).set({isShowing: false}, { merge: true }));
-//     }
-// 
-//     await Promise.all(boardMessagesPromises);
-// 
-//         return res.status(200).json({ok: true});
-// }catch(error){
-//     console.log("/private_api/getRealtimeMessages failed: " + error);
-//     return res.sendStatus(500);
-// }
-// });
-// 
-// 
-
-//-----------------------------------------------------------------------------------------------
 app.get('/private_api/getRealtimeMessages', async (req, res) => {
 try{
-        functions.logger.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
+        //functions.logger.log("getRealtimeMessages: " + req.query.seconds + ", " + req.query.nanoseconds);
         
         let query = db.collection("realtime").where("isDeleted", "==" , false);
 
@@ -843,7 +760,9 @@ try{
 }
 });
 
-
+//-----------------------------------------------------------------------------------------------
+//                  SMS/Whatsapp endpoint
+//              This enpoint is called by Twillio when ever there is a new message
 //-----------------------------------------------------------------------------------------------
 app.post('/sms', async (req, res) => {
     try {
@@ -868,8 +787,6 @@ app.post('/sms', async (req, res) => {
             id: msg.id,
             isRealTime: true
         });
-
-        // res.writeHead(200, { 'Content-Type': 'text/xml' });        
         return res.status(200).send("<Response></Response>");
     } catch (error) {
 
