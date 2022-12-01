@@ -70,8 +70,6 @@ const authenticate = async (req, res, next) => {
         res.status(403).send('Unauthorized');
         return;
     }
-
-
 };
 
 
@@ -441,6 +439,7 @@ async function getWorkshop(workshopId) {
 }
 
 //-----------------------------------------------------------------------------------------------
+// this can cause a timeout when calling through the api
 async function getAllWorkshops(){
 try{
         
@@ -464,6 +463,25 @@ try{
     return null;
 }
 }
+
+//-----------------------------------------------------------------------------------------------
+async function getAllWorkshopsIds(){
+try{
+        
+    let workshopsQuery = await db.collection("workshops").get();
+    let ids = [];
+    for(let i = 0; i < workshopsQuery.docs.length; i++){
+
+        ids.push(workshopsQuery.docs[i].id);
+    }
+
+    return ids;
+}catch(error){
+    console.log("getAllWorkshopsIds failed: " + error);
+    return null;
+}
+}
+
 
 
 //************************************************************************
@@ -551,6 +569,8 @@ async function batchUpdate(collectionId, ids, propsToUpdate) {
 //************************************************************************
 
 //-----------------------------------------------------------------------------------------------
+// this might fail because of taking too long and timing out;.
+// better to call getAllWorkshopsIds and then get each workshop individually
 app.get('/private_api/getAllWorkshops', async (req, res) => {
 try{
         
@@ -559,6 +579,19 @@ try{
     return res.status(200).json(ws);
 }catch(error){
     console.log("/private_api/getAllWorkshop failed: " + error);
+    return res.status(500);
+}
+});
+
+//-----------------------------------------------------------------------------------------------
+app.get('/private_api/getAllWorkshopsIds', async (req, res) => {
+try{
+        
+    let ws = await getAllWorkshopsIds();
+
+    return res.status(200).json(ws);
+}catch(error){
+    console.log("/private_api/getAllWorkshopsIds failed: " + error);
     return res.status(500);
 }
 });
