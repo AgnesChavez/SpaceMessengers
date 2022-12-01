@@ -96,7 +96,7 @@ async function detectLanguage(text) {
 //---------------------------------------
 async function translateText(txt, lang) {
     let trans = await translate.translate(txt, lang);
-    if (trans.length == 0) return null;
+    if (trans.length === 0) return null;
     return {
         lang: lang,
         trans: trans[0]
@@ -107,14 +107,14 @@ async function translateMessage(messageTxt, msgId) {
 
     let lang = await detectLanguage(messageTxt);
     let promises = [];
-    if (lang.length == 0) {
+    if (lang.length === 0) {
         console.log("translateMessage: no language detected");
         return;
     }
     let currentLang = lang[0].language.trim();
     // console.log("currentLang:"+ currentLang);
     for (let l = 0; l < LANGUAGES.length; l++) {
-        if (currentLang != LANGUAGES[l]) {
+        if (currentLang !== LANGUAGES[l]) {
             promises.push(translateText(
                 messageTxt,
                 LANGUAGES[l]
