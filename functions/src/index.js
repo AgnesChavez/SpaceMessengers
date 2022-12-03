@@ -768,7 +768,7 @@ try{
 
         if(seconds > 0 || nanoseconds > 0){
             let startFrom = new admin.firestore.Timestamp(seconds, nanoseconds);
-            query = query.where("timestamp", ">", startFrom);
+            query = query.where("wasShown", "==", false).where("timestamp", ">", startFrom);
         }
 
         // query = query.limit(1);
