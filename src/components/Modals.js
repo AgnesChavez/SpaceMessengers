@@ -7,7 +7,7 @@ import { downloadMessages } from '../components/downloadMessages'
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
-import { createBoard, createTeam, removeTeam, addUserToTeam } from '../helpers/factory'
+import { createBoard, createTeam, removeTeam, addUserToTeam, removeWorkshop, renameWorkshop } from '../helpers/factory'
 
 import { SelectUser, SelectSchool, SelectUserTypeButtons, SelectTeam } from './Selectors'
 
@@ -537,6 +537,135 @@ export function ModalRemoveTeam(props){
   				<>
 				<p>Select team to remove:</p>
 				<SelectTeam selectorId = {"ModalRemoveTeamSelector"} value={""} onChange={onChange} currentWorkshop={props.currentWorkshop} />
+				</>
+			}
+        </Modal>
+        </>)
+}
+
+
+export function ModalRemoveWorkshopButton(props){
+		
+	return <Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalRemoveWorkshop"
+  		  	node="button"
+  		>
+     	Remove Workshop
+  		</Button>
+}
+
+export function ModalRemoveWorkshop(props){
+
+	const selectedWorkshop = useRef(null);
+	const [removing, setRemoving] = useState(false);
+	
+	function onChange(e, selectorId){
+		if(!e.target.value)return;
+		selectedWorkshop.current = e.target.value;
+		console.log("selectedWorkshop.current: ", selectedWorkshop.current);
+	}
+
+	async function remove(){
+		let toastMsg = "";
+		if(selectedWorkshop.current){
+			setRemoving(true);
+			let success = await removeWorkshop(selectedWorkshop.current);
+			toastMsg = (success?"Successfully removed workshop":"Failed to remove workshop")
+		}else{
+			toastMsg = "No workshop was removed";
+		}
+		window.M.toast({html: toastMsg, displayLength: 2500});
+		closeModal("ModalRemoveWorkshop");
+	}
+
+	return (<>
+		<Modal
+    		actions={[    	
+    			<Button className="red"  node="button" waves="light" onClick={remove} >Remove</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Remove Workshop.Be careful, this can not be undone"
+    		id="ModalRemoveWorkshop"
+    		root={document.getElementById('modalRoot')}
+  		>			
+  			{removing?
+  				<CenteredPreloader title="Removing workshop"/>:
+  				<>
+				<p>Select workshop to remove. Be careful, this can not be undone:</p>
+				<div>
+        <form>
+            <label>Select Workshop</label>
+            <select className="browser-default"  onChange={onChange}>
+                {props.workshops && props.workshops.map(ws => <option key={ws.id} value={ws.id} > {ws.name} </option> )}
+            </select>
+        </form>
+        </div>
+				</>
+			}
+        </Modal>
+        </>)
+}
+
+
+export function ModalRenameWorkshopButton(props){
+		
+	return <Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalRenameWorkshop"
+  		  	node="button"
+  		>
+     	Rename Workshop
+  		</Button>
+}
+
+export function ModalRenameWorkshop(props){
+
+	const newName = useRef(null);
+	const [renaming, setRenaming] = useState(false);
+	
+	async function rename(){
+		let toastMsg = "";
+		if(newName.current){
+			setRenaming(true);
+			let success = await renameWorkshop(props.currentWorkshopId, newName.current);
+			toastMsg = (success?"Successfully renamed workshop":"Failed to rename workshop")
+			window.M.toast({html: toastMsg, displayLength: 2500});
+		// }else{
+			// toastMsg = "No workshop was removed";
+		}
+		
+		closeModal("ModalRenameWorkshop");
+	}
+
+	return (<>
+		<Modal
+    		actions={[    	
+    			<Button className="red"  node="button" waves="light" onClick={rename} >Rename</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Rename Workshop"
+    		id="ModalRenameWorkshop"
+    		root={document.getElementById('modalRoot')}
+  		>			
+  			{renaming?
+  				<CenteredPreloader title="Renaming workshop."/>:
+  				<>
+				<div>
+        		<form>
+            	<label>Rename Workshop {props.currentWorkshopName}</label>
+            	<TextInput
+				  	id="ModalRenameWorkshopTextInput"
+				  	label="New name:"
+				  	placeholder={props.currentWorkshopName}
+				  	onChange={(e)=> newName.current = e.target.value}
+				/>
+        		</form>
+        		</div>
 				</>
 			}
         </Modal>
