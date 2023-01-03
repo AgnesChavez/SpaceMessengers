@@ -144,6 +144,37 @@ export async function removeTeam(teamId){
 }
 
 
+export async function removeWorkshop(wsId){
+	console.log("removeWorkshop " , wsId);
+	// return true;
+	let team = await getQueryData(db.collection("workshops").doc(wsId));
+	if(team){
+		let success = removeDoc("workshops", wsId);
+		if(success){
+			let teams = await db.collection('teams').where('workshopId', '==', wsId).get();
+			teams.forEach( b => removeTeam(b.id));
+
+			return true;
+		}
+	}
+	return false;
+}
+
+export async function renameWorkshop(wsId, newName){
+	let ws = await getQueryData(db.collection("workshops").doc(wsId));
+	if(ws){
+		// let success = removeDoc("teams", teamId);
+		try{
+			await db.collection('workshops').doc(wsId).update({name: newName});
+			return true;
+		}catch(error){
+			console.log("Unable to rename Document " + wsId +" to : "+ newName );
+			return false;
+		}
+	}
+	return false;
+
+}
 // const MAKE_DUMMY_USERS = false;
 
 // export async  function createUser( userData, type, institutionId, workshopId)
