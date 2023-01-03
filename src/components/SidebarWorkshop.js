@@ -27,6 +27,8 @@ import {
     DownloadMessagesButton,
     // ModalCreateWorkshop,
         CreateWorkshopModalButton,
+        ModalRemoveWorkshopButton,
+        ModalRenameWorkshopButton,
         // ModalAddBoard,
         // openAddBoardModal,
         ModalCreateTeam,
@@ -35,6 +37,8 @@ import {
         ModalCreateUser,
         ModalRemoveUser,
         ModalRemoveTeam,
+        ModalRemoveWorkshop,
+        ModalRenameWorkshop
         // ModalRemoveTeamButton 
     } from './Modals'
 
@@ -131,11 +135,25 @@ function SelectWorkshop(props){
 
 function setCurrentWorkshop(userId, currentWorkshopId){
     db.collection('users').doc(userId).set({currentWorkshop: currentWorkshopId }, {merge: true});
+    // let wscb = db.collection('users').doc(userId).data().workshopCurrentBoard ;
+
+    // let [usr, usrLoading] = useDocumentData(db.collection('users').doc(userId));
+    // if(usr && ! usrLoading){
+    //     if(usr.workshopCurrentBoard && (typeof usr.workshopCurrentBoard === "object")){
+    //         if(usr.workshopCurrentBoard[currentWorkshopId] != null){
+                
+    //         }
+    //     }
+
+    // }
+
+
+
 }
 
 export function SidebarWorkshopCollection(props){
     const [workshops, workshopsLoading] = useCollectionData(getWorkshopQueryForUser(props.user)); 
-    
+
     // useEffect(() => initCollapsibles(".SidebarWorkshopCollection"));
 
     
@@ -169,11 +187,16 @@ export function SidebarWorkshopCollection(props){
 
             { workshops && <SelectWorkshop workshops={workshops} userId={props.user.id}/>}            
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Create workshop"/>:"" }
+            { (props.user.type === userTypes().admin)? <ModalRemoveWorkshopButton buttonLabel="Create workshop"/>:"" }
+            { (props.user.type === userTypes().admin)? <ModalRenameWorkshopButton />:"" }
             {/* { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Edit current workshop" currentWorkshop={currentWorkshop}/>:"" } */}
 
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalRemoveTeam currentWorkshop={currentWorkshop} /> }
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
+            { currentWorkshop && workshops && (props.user.type === userTypes().admin) && <ModalRemoveWorkshop currentWorkshop={currentWorkshop} workshops={workshops}/> }
+            { currentWorkshop && (props.user.type === userTypes().admin) && <ModalRenameWorkshop currentWorkshopId={currentWorkshop.id} currentWorkshopName={currentWorkshop.name}/> }
+            
 
             { currentWorkshop && (props.user.type === userTypes().admin) && <DownloadMessagesButton currentWorkshopId={currentWorkshop.id}/> }
             
