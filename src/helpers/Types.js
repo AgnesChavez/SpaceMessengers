@@ -56,6 +56,7 @@ export function UserData(uid, data, type, institutionId, workshopId) {
     color: randomColorHSL(),
     boards: [],
     currentBoard: null,
+    workshopCurrentBoard: {},
     currentTeam: null,
     currentWorkshop: workshopId,
     created: firebase.firestore.FieldValue.serverTimestamp(),
