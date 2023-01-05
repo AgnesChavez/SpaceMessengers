@@ -5,7 +5,7 @@ import firebase from "firebase";
 
 import { UserData, userTypes } from "./Types"
 
-import { getQueryData, setDataInDb, addDataToDb, removeFromArray } from "./db"
+import { getQueryData, getQueryDataDocs, setDataInDb, addDataToDb, removeFromArray } from "./db"
 
 import { createTeam, addUserToTeam, addUserToWorkshop,removeUserFromWorkshop } from './factory'
 
@@ -166,7 +166,7 @@ export async function getUserFromDb(uid) {
 
 } 
 export  function getTeamForUserWorkshop(userId, workshopId) {
-    return getQueryData(db.collection("teams").where("workshop", "==", workshopId).where("members", "array-contains",  userId));
+    return getQueryDataDocs(db.collection("teams").where("workshop", "==", workshopId).where("members", "array-contains",  userId));
 }
  
 export async function checkCurrentUserDbData(){
@@ -207,3 +207,66 @@ export async function getWorkshopStudents(workshopId) {
 
     return users;
 }
+
+
+export async function getWorkshopBoards(workshopId, user ){
+    // console.log("getWorkshopBoards() workshopId: ", workshopId);
+    let query = db.collection("teams").where("workshopId", "==", workshopId);
+
+    let isStudent = (user.type === userTypes().student);
+
+    if(isStudent){
+        // console.log("getWorkshopBoards() user isStudent");
+        query = query.where("members", "array-contains",  user.id);
+    }
+
+    let teams = await getQueryDataDocs(query);
+
+
+    let boardsData = [];
+    if(teams){
+        // console.log("teams is not null", teams);
+        let promises = [];
+        for (let i = 0; i < teams.docs.length; i++) {
+            promises.push(db.collection("boards").where("teamId", "==", teams.docs[i].id).get());
+        }
+
+        let boards = await Promise.all(promises);
+
+    
+        for (let i = 0; i < boards.length; i++) {
+            for (let j = 0; j < boards[i].docs.length; j++) {
+                boardsData.push(boards[i].docs[i].data());
+            }
+        }
+    }
+    // console.log("getWorkshopBoards", boardsData);
+
+    return boardsData;
+
+}
+
+
+export async function getCurrentBoard(user, currentUserRef){
+    // console.log("getCurrentBoard() " , user.id);
+    if(user.workshopCurrentBoard && user.currentWorkshop !== null){ 
+        if(user.workshopCurrentBoard.hasOwnProperty(user.currentWorkshop)){
+            let currentWorkshopBoardId = user.workshopCurrentBoard[user.currentWorkshop];
+            if(currentWorkshopBoardId !== null){
+                return currentWorkshopBoardId;
+            }
+        }
+        let boards = await getWorkshopBoards(user.currentWorkshop, user);
+
+
+        if(boards.length > 0 ){
+            user.workshopCurrentBoard[user.currentWorkshop] = boards[0].id;
+            currentUserRef.update({workshopCurrentBoard: user.workshopCurrentBoard});
+            return boards[0].id;
+        }
+        console.log("user.boards.length  ", user.boards.length);
+        
+    }
+    return 'default';
+}
+
