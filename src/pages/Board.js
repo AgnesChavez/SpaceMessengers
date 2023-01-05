@@ -26,6 +26,8 @@ import { UploadImgButton } from '../helpers/imgStorage'
 import { addToArray, removeFromArray } from '../helpers/db'
 
 
+import { getCurrentBoard , getWorkshopBoards } from '../helpers/userManagement'
+
 import '../css/board.css';
 
 function getInfoSidebarTabs(){
@@ -263,12 +265,19 @@ export default function Board() {
         return ({name: "", photoURL:"" });
     }
 
-    function setBoardId(bid) {
+    function setBoardId(bid, caller) {
+        // console.log("setBoardId: " , bid, "  ", caller);
         setBoardIdState(bid);
-        if(bid &&currentUser && !currentUserLoading){
-            if(currentUser.currentBoard !== bid){
-                // console.log("setBoardId");
-                currentUserRef.update({currentBoard: bid});
+        if(bid && currentUser && !currentUserLoading){
+
+            if(currentUser.currentWorkshop !== null){
+                if(currentUser.workshopCurrentBoard[currentUser.currentWorkshop] !== bid){
+                    currentUser.workshopCurrentBoard[currentUser.currentWorkshop] = bid;
+                    currentUserRef.update({workshopCurrentBoard: currentUser.workshopCurrentBoard});
+                }
+
+            //     console.log("setBoardId");
+                
             }
         }
     }
@@ -288,11 +297,16 @@ export default function Board() {
             if(querySnapshot.docs.length){
                 // console.log("currentUser.instructors");
                 currentUserRef.update({[propName]: querySnapshot.docs[0].id});
+                return querySnapshot.docs[0].id;
             }
         })
         .catch(function(error) {
             console.log("Error getting documents: ", error);
+            return null;
         });
+
+        return null;
+
     }
 
 
@@ -327,24 +341,11 @@ export default function Board() {
     if(!boardData && !loadingBoardData){
         console.log("no board data");
         if(boardId !== 'default'){                    
-            setBoardId('default');
+            setBoardId('default', "No data");
         }
     }else if(currentUser && !currentUserLoading){
-        if(boardId === null || boardId === 'default'){
-            if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
-                setBoardId(currentUser.currentBoard);
-            }else{
-                if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
-                {
-                    setBoardId(currentUser.boards[0]);
-                }else if(boardId !== 'default'){                    
-                    setBoardId('default');
-                }
-            }
-        }
-        if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
-              updateCurrentUser("teams", 'members', "currentTeam", null);
-        }
+
+
         if(currentUser.currentWorkshop === null){
             if(currentUser.type === userTypes().admin){
                 updateCurrentUser("workshops", null, "currentWorkshop","created");
@@ -353,6 +354,48 @@ export default function Board() {
             }else if(currentUser.type === userTypes().student){
                 updateCurrentUser("workshops", 'students', "currentWorkshop","created");
             }
+        }
+
+        getCurrentBoard(currentUser, currentUserRef).then(function(cur){
+            if(cur !== null && cur !== boardId){
+                setBoardId(cur);
+            }    
+        });
+        
+       
+            // if(currentUser.workshopCurrentBoard){ 
+            //     if(currentUser.workshopCurrentBoard.hasOwnProperty(currentUser.currentWorkshop)){
+            //         let currentWorkshopBoardId = currentUser.workshopCurrentBoard[currentUser.currentWorkshop];
+            //         if(currentWorkshopBoardId !== null && currentWorkshopBoardId !== boardId){
+            //             setBoardId(currentWorkshopBoardId, "currentWorkshopBoardId");
+            //         }
+
+            //     // }else{
+
+            //     }
+            // }
+        // }
+
+        // if(boardId === null || boardId === 'default'){
+        //     if(currentUser.currentBoard !== null && currentUser.currentBoard !== 'default'){
+        //         setBoardId(currentUser.currentBoard, "from currentUser.currentBoard");
+        //     }else{
+        //         if(currentUser.boards.length > 0 && currentUser.currentBoard !== 'default')
+        //         {
+        //             setBoardId(currentUser.boards[0], "First available board");
+        //             currentUser.workshopCurrentBoard[currentUser.currentWorkshop] = currentUser.boards[0];
+        //             currentUserRef.update({workshopCurrentBoard: currentUser.workshopCurrentBoard});
+
+        //         // }else if(boardId !== 'default'){                    
+
+
+        //             // setBoardId('default');
+        //         }
+        //     }
+        // }
+        
+        if(currentUser.currentTeam === null && currentUser.type === userTypes().student){
+              updateCurrentUser("teams", 'members', "currentTeam", null);
         }
     }
 
