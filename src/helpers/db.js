@@ -49,6 +49,21 @@ export async function getQueryData(query) {
     return null;
 } 
 
+export async function getQueryDataDocs(query) {
+    try{
+    let res = await query.get();
+    if(res)
+        return res;
+    }
+    catch(error) {
+        console.error("Error retrieving query data:  error: ", error);
+        return null;
+    }
+    return null;
+} 
+
+
+
 export function addToArray(collectionId, docId, arrayId, data)
 {
     db.collection(collectionId).doc(docId).update({
