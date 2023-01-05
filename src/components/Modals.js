@@ -21,6 +21,18 @@ import UserProfile from "./UserProfileHooks";
 
 import PapaParse from 'papaparse';
 
+function removeDuplicates(arry) {
+	const uniqueElements = new Set(arry);
+	arry.forEach(item => {
+        if (!uniqueElements.has(item)) {
+			uniqueElements.push(item);
+        }
+    });
+
+    return [...new Set(uniqueElements)];
+    
+}
+
 
 export function openModal(id, onOpenStart=null, onCloseEnd=null){
     // var elems = document.querySelector('#' + id);
@@ -197,7 +209,7 @@ export function ModalCreateTeam(props){
 				/>
 			</Row>
 
-			{ selectedUsers.map(u => <SelectUser  selectorId = {i++} key={i} value={u}  onChange={onChange} usersArray={props.currentWorkshop.students.concat(props.currentWorkshop.instructors)} />)}
+			{ selectedUsers.map(u => <SelectUser  selectorId = {i++} key={i} value={u}  onChange={onChange} usersArray={removeDuplicates(props.currentWorkshop.students.concat(props.currentWorkshop.instructors))} />)}
 			
 			
 			<SelectUser selectorId = {selectedUsers.length} value={""} onChange={onChange} usersArray={props.currentWorkshop.students} />
@@ -330,6 +342,8 @@ export function ModalCreateUser(props){
         </>)
 }
 
+
+
 export function ModalRemoveUser(props){
 
 	const selectedUser = useRef(null);
@@ -376,7 +390,7 @@ export function ModalRemoveUser(props){
   				<CenteredPreloader title="Remove user"/>:
   				<>
 				<p>Select user to remove:</p>
-				<SelectUser selectorId = {"ModalRemoveUserSelector"} value={""} onChange={onChange} usersArray={props.currentWorkshop.students.concat(props.currentWorkshop.instructors)} />
+				<SelectUser selectorId = {"ModalRemoveUserSelector"} value={""} onChange={onChange} usersArray={removeDuplicates(props.currentWorkshop.students.concat(props.currentWorkshop.instructors))} />
 				</>
 			}
         </Modal>
