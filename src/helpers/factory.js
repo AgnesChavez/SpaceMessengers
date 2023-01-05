@@ -1,7 +1,7 @@
 
 import { db } from "../services/firebase";
 
-import {  getQueryData, addDataToDb, addToArray, setDataInDb, removeFromArray } from './db'
+import {  getQueryData, getQueryDataDocs, addDataToDb, addToArray, setDataInDb, removeFromArray } from './db'
 
 import firebase from 'firebase/app';
 
@@ -42,16 +42,16 @@ export async function createTeam(teamName, workshopId){
 }
 
 
-export function makeDefaultBoard(){
-	setDataInDb('boards', 'default',{
-        id: "default",
-    messages: [],
-    teamId:null,
-    name: "",
-    color: randomColorHSL(),
-    created: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-}
+// export function makeDefaultBoard(){
+// 	setDataInDb('boards', 'default',{
+//         id: "default",
+//     messages: [],
+//     teamId:null,
+//     name: "",
+//     color: randomColorHSL(),
+//     created: firebase.firestore.FieldValue.serverTimestamp(),
+//         });
+// }
 
 export async function createBoard(boardName, teamId){
 	const newBoard = await addDataToDb("boards", BoardData(teamId, boardName), true, "id");
@@ -192,8 +192,8 @@ export async function renameWorkshop(wsId, newName){
 
 
 export async function createSchool(name, location, workshopId, instructors, students){
-
-	let instRef = await getQueryData(db.collection("institution").where("name", "==", name));
+	
+	let instRef = await getQueryDataDocs(db.collection("institution").where("name", "==", name));
 
 	let instId = "";
 	if(instRef){
@@ -208,6 +208,7 @@ export async function createSchool(name, location, workshopId, instructors, stud
 		}
 	}
 
+
 	addToArray('workshops', workshopId, "institutions", instId);
 
 	for(let i = 0; i < instructors.length; i++){
@@ -218,6 +219,8 @@ export async function createSchool(name, location, workshopId, instructors, stud
 	for(let i = 0; i < students.length; i++){
 		await createUserInDb(students[i], userTypes().student , instId, workshopId );
 	}
+	
+	
 }
 
 
