@@ -236,7 +236,7 @@ export async function getWorkshopBoards(workshopId, user ){
     
         for (let i = 0; i < boards.length; i++) {
             for (let j = 0; j < boards[i].docs.length; j++) {
-                boardsData.push(boards[i].docs[i].data());
+                boardsData.push(boards[i].docs[j].data());
             }
         }
     }
