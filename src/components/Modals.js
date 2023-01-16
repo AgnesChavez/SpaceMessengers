@@ -7,7 +7,7 @@ import { downloadMessages } from '../components/downloadMessages'
 
 import { Workshop } from "../helpers/WorkshopsWithHooks";
 
-import { createBoard, createTeam, removeTeam, addUserToTeam, removeWorkshop, renameWorkshop } from '../helpers/factory'
+import { createBoard, createTeam, removeTeam, addUserToTeam, removeWorkshop, renameWorkshop, setGooglePhotosLinkForWorkshop } from '../helpers/factory'
 
 import { SelectUser, SelectSchool, SelectUserTypeButtons, SelectTeam } from './Selectors'
 
@@ -648,6 +648,8 @@ export function ModalRenameWorkshop(props){
 			let success = await renameWorkshop(props.currentWorkshopId, newName.current);
 			toastMsg = (success?"Successfully renamed workshop":"Failed to rename workshop")
 			window.M.toast({html: toastMsg, displayLength: 2500});
+			newName.current = null;
+			setRenaming(false);
 		// }else{
 			// toastMsg = "No workshop was removed";
 		}
@@ -685,6 +687,77 @@ export function ModalRenameWorkshop(props){
         </Modal>
         </>)
 }
+
+
+export function ModalWoekshopsGooglePhotosLinkButton(props){
+		
+	return <Button
+			waves="light"
+  		  	className="modal-trigger sidebarButton"
+  		  	href="#ModalWorkshopGooglePhotos"
+  		  	node="button"
+  		>
+     	Set Google Photos album
+  		</Button>
+}
+
+
+export function ModalWorkshopGooglePhotos(props){
+
+	const [renaming, setRenaming] = useState(false);
+	
+	const newUrl = useRef(null);
+
+	async function setGooglePhotosLink(){
+		let toastMsg = "";
+		if(newUrl.current){
+			setRenaming(true);
+			let success = await setGooglePhotosLinkForWorkshop(props.currentWorkshop.id, newUrl.current);
+
+			toastMsg = (success?"Google Photos link Successfully set":"Failed to set Google Photos link")
+			window.M.toast({html: toastMsg, displayLength: 2500});
+			newUrl.current = null;
+			setRenaming(false);
+		// }else{
+			// toastMsg = "No workshop was removed";
+		}
+		
+		closeModal("ModalWorkshopGooglePhotos");
+	}
+
+	return (<>
+		<Modal
+    		actions={[    	
+    			<Button className="red"  node="button" waves="light" onClick={setGooglePhotosLink} >OK</Button>,
+      			<Button flat modal="close" node="button" waves="red">Cancel</Button>
+    		]}
+    		className="black-text"
+    		header="Set Google Photos album for this workshop"
+    		id="ModalWorkshopGooglePhotos"
+    		root={document.getElementById('modalRoot')}
+  		>			
+  			{renaming?
+  				<CenteredPreloader title="Renaming workshop."/>:
+  				<>
+				<div>
+        		<form>
+            	<label>Google Photos album  for {props.currentWorkshop.name}</label>
+            	<TextInput
+				  	id="ModalSetGooglePhotosTextInput"
+				  	label="URL:"
+				  	placeholder={props.currentWorkshop.googlePhotosLink}
+				  	value={(props.currentWorkshop.googlePhotosLink?props.currentWorkshop.googlePhotosLink:"")}
+				  	onChange={(e)=> newUrl.current = e.target.value}
+				/>
+        		</form>
+        		</div>
+				</>
+			}
+        </Modal>
+        </>)
+}
+
+
 
 
 export function DownloadMessagesButton(props){

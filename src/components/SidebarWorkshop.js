@@ -38,7 +38,9 @@ import {
         ModalRemoveUser,
         ModalRemoveTeam,
         ModalRemoveWorkshop,
-        ModalRenameWorkshop
+        ModalRenameWorkshop,
+        ModalWoekshopsGooglePhotosLinkButton,
+        ModalWorkshopGooglePhotos
         // ModalRemoveTeamButton 
     } from './Modals'
 
@@ -189,6 +191,8 @@ export function SidebarWorkshopCollection(props){
             { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Create workshop"/>:"" }
             { (props.user.type === userTypes().admin)? <ModalRemoveWorkshopButton buttonLabel="Create workshop"/>:"" }
             { (props.user.type === userTypes().admin)? <ModalRenameWorkshopButton />:"" }
+            { (props.user.type === userTypes().admin)? <ModalWoekshopsGooglePhotosLinkButton />:"" }
+            
             {/* { (props.user.type === userTypes().admin)? <CreateWorkshopModalButton buttonLabel="Edit current workshop" currentWorkshop={currentWorkshop}/>:"" } */}
 
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalCreateTeam currentWorkshop={currentWorkshop} /> }
@@ -196,6 +200,7 @@ export function SidebarWorkshopCollection(props){
             { currentWorkshop && (props.user.type !== userTypes().student) && <ModalAddUserToTeam currentWorkshop={currentWorkshop}/> }
             { currentWorkshop && workshops && (props.user.type === userTypes().admin) && <ModalRemoveWorkshop currentWorkshop={currentWorkshop} workshops={workshops}/> }
             { currentWorkshop && (props.user.type === userTypes().admin) && <ModalRenameWorkshop currentWorkshopId={currentWorkshop.id} currentWorkshopName={currentWorkshop.name}/> }
+            { currentWorkshop && (props.user.type === userTypes().admin) && <ModalWorkshopGooglePhotos currentWorkshop={currentWorkshop}/> }
             
 
             { currentWorkshop && (props.user.type === userTypes().admin) && <DownloadMessagesButton currentWorkshopId={currentWorkshop.id}/> }
