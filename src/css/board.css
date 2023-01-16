@@ -134,6 +134,7 @@ header {
     margin-top: unset;
     margin-bottom: unset;
     float: unset !important;
+    overflow-y: auto;
 }
 
 

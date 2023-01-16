@@ -283,6 +283,38 @@ export default function Board() {
     }
    
 
+
+
+    function GooglePhotosLinkButton(props){
+        const [workshop, workshopLoading] = useDocumentData(db.collection("workshops").doc(props.workshopId)); 
+        // console.log("GooglePhotosLinkButton ");
+        // console.log(workshop);
+        // console.log(workshopLoading);
+        // console.log("----\n");   
+
+        if (!workshop || workshopLoading || (workshop && !workshop.googlePhotosLink)){
+            return "";
+        }else{
+        return (
+            <>
+            <li>
+             <Button
+                    id="GooglePhotosButton"
+                    className="green boardButtonRight"
+                    floating
+                    icon={<Icon>photo_album</Icon>}
+                    node="button"
+                    waves="light"
+                    onClick={(evt)=> window.open(workshop.googlePhotosLink, '_blank')}
+                    tooltip="Open this workshop's Google Photos album"
+                    tooltipOptions={{position:'right'}}
+                /> 
+            </li>
+            </>);
+        }
+    }
+
+
     
     function updateCurrentUser(collection, arrayName, propName, orderBy){
         let ref = db.collection(collection);
@@ -471,6 +503,7 @@ export default function Board() {
                     <li>
                         {currentUser && currentUser.currentWorkshop && <UploadImgButton workshopId={currentUser.currentWorkshop}/> }
                     </li>
+                    {currentUser && currentUser.currentWorkshop && <GooglePhotosLinkButton workshopId={currentUser.currentWorkshop}/> }
                 </ul>
             
               
