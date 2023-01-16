@@ -8,7 +8,7 @@ import { WorkshopData, userTypes } from "../helpers/Types";
 
 import { addDataToDb } from "../helpers/db";
 
-import { createSchool } from '../helpers/factory'
+import { createSchool, setGooglePhotosLinkForWorkshop } from '../helpers/factory'
 
 
 import PapaParse from 'papaparse';
@@ -186,6 +186,7 @@ export function Workshop (props){
 		const [location1, setLocation1 ] = useState('');
         const [location2, setLocation2 ] = useState( '');
 		
+		const [gphotosLink, setGphotosLink ] = useState('');
 
     	const tabsRef = useRef(null);
 
@@ -205,7 +206,11 @@ export function Workshop (props){
 	
 		await makeSchool(wsRef.id, institution1, location1, instructors1, students1, setSchool1Sending);
 		await makeSchool(wsRef.id, institution2, location2, instructors2, students2, setSchool2Sending);
-	
+
+		if(gphotosLink && gphotosLink !== ''){
+			await setGooglePhotosLinkForWorkshop(wsRef.id, gphotosLink);
+		}
+
 		setSending(false);
 		window.M.toast({html: 'Successfully created workshop!'})
 		
@@ -268,7 +273,7 @@ export function Workshop (props){
      			<h5>Creating new workshop</h5>
      		
       			<TextInput id="workshop_name" label="Workshop name" s={12} onChange={ evt => {setName(evt.target.value)}}/>
-
+      			<TextInput id="gphotos_link" label="Google photos URL" s={12} onChange={ evt => {setGphotosLink(evt.target.value)}}/>
 
             	<ul id="CreateWorkshopTabs" className="tabs tabs-fixed-width white black-text depth-1">
             	    <li className="tab"><a className="active" href="#schoolsTab1">School 1</a></li>
