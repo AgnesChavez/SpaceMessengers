@@ -175,6 +175,25 @@ export async function renameWorkshop(wsId, newName){
 	return false;
 
 }
+
+
+export async function setGooglePhotosLinkForWorkshop(wsId, gphotosLink){
+	let ws = await getQueryData(db.collection("workshops").doc(wsId));
+	if(ws){
+		// let success = removeDoc("teams", teamId);
+		try{
+			await db.collection('workshops').doc(wsId).update({googlePhotosLink: gphotosLink});
+			return true;
+		}catch(error){
+			console.log("Unable set Google Photos Link For Workshop " + wsId +" : "+ gphotosLink );
+			return false;
+		}
+	}
+	return false;
+
+}
+
+
 // const MAKE_DUMMY_USERS = false;
 
 // export async  function createUser( userData, type, institutionId, workshopId)
