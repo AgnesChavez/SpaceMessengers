@@ -212,21 +212,28 @@ export async function setGooglePhotosLinkForWorkshop(wsId, gphotosLink){
 
 export async function createSchool(name, location, workshopId, instructors, students){
 	
+	// console.log("createSchool", name, location, workshopId, instructors, students)
+
+
 	let instRef = await getQueryDataDocs(db.collection("institution").where("name", "==", name));
 
 	let instId = "";
 	if(instRef){
 		instId = instRef.id;
-	}else{
+
+	}
+	if(instId === ""  || instId === undefined){
 		let inst = await addDataToDb("institution",InstitutionData(name, location), true, 'id');
+		// console.log("createSchool", inst);
 		if(inst){
+			
 			instId = inst.id;	
 		} else{
 			console.log("Failed creating school");
 			return;
 		}
 	}
-
+	// console.log("createSchool instId: ", instId);
 
 	addToArray('workshops', workshopId, "institutions", instId);
 
