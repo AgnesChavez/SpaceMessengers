@@ -18,7 +18,8 @@ html, body, #root {
 
 .bodyImgBackground{
   
-  background-image: url("../imgs/steaminSpace_2000x1000.jpg");
+/*  background-image: url("../imgs/steaminSpace_2000x1000.jpg");*/
+  background-image: url("../imgs/SpaceMessengersBg_00004_2000x1000.jpg");
   background-attachment: fixed;
   background-clip: border-box;
   background-color: rgba(0, 0, 0, 0);
