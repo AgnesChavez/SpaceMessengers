@@ -6,7 +6,7 @@ import 'firebase/firestore';
 
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Icon } from 'react-materialize';
+import { Icon, Button } from 'react-materialize';
 
 import '../css/realtimechat.css';
 
@@ -93,9 +93,14 @@ export default function RealtimeChat(props) {
     
     const [waitingMessage, setWaitingMessage] = useState(null);
 
+    const [replyingTo, setReplyingTo] = useState(null);
+
     var messages = [];
 
-    
+    const replyCallback = (msg)=>{
+        setReplyingTo(msg);
+    }
+
 
 
     // useEffect (() => {
@@ -116,7 +121,8 @@ export default function RealtimeChat(props) {
             wasShown: false,
             isShowing:false,
             isDeleted: false,
-            isRealTime: true
+            isRealTime: true,
+            replyingTo: (replyingTo?replyingTo.id:"")
         });
 
         await db.collection("realtime").doc(docRef.id).update({
@@ -135,6 +141,7 @@ export default function RealtimeChat(props) {
 
         setFormValue('');
         setUsernameValue('');
+        setReplyingTo(null);
         dummy.current.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -177,12 +184,14 @@ export default function RealtimeChat(props) {
                          (msg && msg.id)?  <RenderMessage key={msg.id} 
                                         message={msg}
                                         myMessages={myMessages}
+                                        replyCallback={replyCallback}
                                         />:<></>)}
                 </ul>
                 <span ref={dummy}></span>
             </div>
 
             <div className="realtimeInputContainer" style={{backgroundColor: color.current }} >
+            {replyingTo && <RenderMessageReply message={replyingTo} replyCallback={replyCallback}/>}
              {waitingMessage &&
                 <RenderWaitingMessage waitingMessage={waitingMessage} 
                                       params = {params}
@@ -232,6 +241,38 @@ return (<>
 }
 
 
+function RenderMessageReply( props){
+
+return (<>
+    {props.message &&
+    <li id={"realtimemessagereply-"+props.message.id}
+                className= "z-depth-0  card realtimeMessage "
+            >  
+
+            <div className="realtimeReplyCard-header valign-wrapper" >
+              {"Reply to: " + props.message.ProfileName}
+              </div>
+              <Button
+                    className="btn-floating  grey right replyMessageButton"
+                    node="button"
+                    small
+                    tooltip="Cancel reply"
+                    waves="light"
+                    floating
+                    icon={<Icon>cancel</Icon>}
+                    onClick={()=>props.replyCallback(null)}
+            />
+              
+            
+            <div className="realtimeReplyCard-content white-text">
+                {props.message.Body}
+            </div>
+    </li> }    
+  </>);
+}
+
+
+
 function RenderRealtimeMessage( props){ 
     let messageClass = "z-depth-0  card realtimeMessage " ;
     if(Array.isArray(props.myMessages) && props.myMessages.includes(props.message.id)){
@@ -243,8 +284,20 @@ return (<>
                 className= {messageClass}
             >  
             <div className="realtimeCard-header valign-wrapper" >
-                {props.message.ProfileName} 
-            </div>
+              {props.message.ProfileName} 
+              </div>
+              <Button
+                    className="btn-floating  grey right replyMessageButton"
+                    node="button"
+                    small
+                    tooltip="Reply this message"
+                    waves="light"
+                    floating
+                    icon={<Icon>reply</Icon>}
+                    onClick={()=>props.replyCallback(props.message)}
+            />
+              
+            
             <div className="realtimeCard-content white-text">
                 {props.message.Body}
             </div>

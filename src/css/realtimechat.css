@@ -126,7 +126,22 @@ header{
 	/*height: 100%;*/
 }
 
+.replyMessageButton {
+	top: -16px;
+/*	float: right !important;*/
+	margin-right: 16px;
+}
 
+.replyMessageButtonAdmin{
+	bottom: 5px;
+    right: 5px;
+    position: absolute;
+}
+.replyMessageButtonAdminWithDelete{
+	bottom: 5px;
+    right: 42px;
+    position: absolute;	
+}
 
 .realtimeCard-content {
 	padding-top: 4px;
@@ -136,6 +151,13 @@ header{
     min-height: 2rem;
     /*font-size: 14px !important;*/
 }
+.realtimeReplyCard-content{
+	padding-top: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    min-height: 2rem;
+}
 
 .realtimeCard-header {
     padding-top: 4px;
@@ -144,6 +166,14 @@ header{
     padding-bottom: 4px;
     /*border-bottom: 1px solid rgba(100, 100, 100, 0.5);*/
     color: rgb(200, 200, 200);
+}
+.realtimeReplyCard-header{
+	padding-top: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 0px;
+    /*border-bottom: 1px solid rgba(100, 100, 100, 0.5);*/
+    color: rgb(200, 200, 200);	
 }
 
 .adminShowAllMessagesButton{

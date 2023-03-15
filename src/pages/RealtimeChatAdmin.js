@@ -106,7 +106,7 @@ export default function RealtimeChatAdmin(props) {
     
     const [waitingMessage, setWaitingMessage] = useState(null);
 
-    
+    const [replyingTo, setReplyingTo] = useState(null);
     // query.get().then(querySnapshot=>{
     //     querySnapshot.forEach(doc=> {console.log(doc.id, doc.data())});
     // });
@@ -130,7 +130,9 @@ export default function RealtimeChatAdmin(props) {
         }
     }
 
-
+    const replyCallback = (msg)=>{
+        setReplyingTo(msg);
+    }
 
     const sendMessage = async (e) => {
         
@@ -143,7 +145,9 @@ export default function RealtimeChatAdmin(props) {
             timestamp: firebase.firestore.Timestamp.now(),
             wasShown: false,
             isShowing:false,
-            isDeleted: false
+            isDeleted: false,
+            isRealTime: true,
+            replyingTo: (replyingTo?replyingTo.id:"")
         });
 
         await db.collection("realtime").doc(docRef.id).update({
@@ -162,6 +166,7 @@ export default function RealtimeChatAdmin(props) {
 
         setFormValue('');
         setUsernameValue('');
+        setReplyingTo(null);
         dummy.current.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -204,12 +209,14 @@ export default function RealtimeChatAdmin(props) {
                                         isShowingAll={isShowingAll} 
                                         isDeleteEnabled={isDeleteEnabled}
                                         isShowingDeleted={isShowingDeleted}
+                                        replyCallback={replyCallback}
                                         />)}
                 </ul>
                 <span ref={dummy}></span>
             </div>
 
             <div className="realtimeInputContainer" style={{backgroundColor: color.current }} >
+            {replyingTo && <RenderMessageReply message={replyingTo} replyCallback={replyCallback}/>}
              {waitingMessage &&
                 <RenderWaitingMessage waitingMessage={waitingMessage} 
                                       params = {params}
@@ -313,6 +320,36 @@ function RenderAdminBar(props){
 
 
 
+function RenderMessageReply( props){
+
+return (<>
+    {props.message &&
+    <li id={"realtimemessagereply-"+props.message.id}
+                className= "z-depth-0  card realtimeMessage "
+            >  
+
+            <div className="realtimeReplyCard-header valign-wrapper" >
+              {"Reply to: " + props.message.ProfileName}
+              </div>
+              <Button
+                    className="btn-floating  grey right replyMessageButton"
+                    node="button"
+                    small
+                    tooltip="Cancel reply"
+                    waves="light"
+                    floating
+                    icon={<Icon>cancel</Icon>}
+                    onClick={()=>props.replyCallback(null)}
+            />
+              
+            
+            <div className="realtimeReplyCard-content white-text">
+                {props.message.Body}
+            </div>
+    </li> }    
+  </>);
+}
+
 
 
 
@@ -325,6 +362,13 @@ function RenderMessage( props){
 
     let badgeClass = "realtimeMessageBadge " + (props.message.wasShown?"blue white-text":"yellow black-text");
 
+
+    let classsRTMsg = "btn-floating  grey right ";
+    if(props.isAdmin && props.isDeleteEnabled && !props.message.isDeleted ){
+        classsRTMsg += "replyMessageButtonAdminWithDelete";
+    }else{
+        classsRTMsg += "replyMessageButtonAdmin ";
+    }
 return (<>
 
     <li id={"realtimemessage-"+props.message.id}
@@ -344,6 +388,7 @@ return (<>
                     icon={<Icon>delete</Icon>}
                     onClick={()=>deleteCallback(props.message.id)}
             />}
+
             { props.isAdmin && props.isShowingAll &&
                 <div>
                     {!props.message.isDeleted && <Badge className={badgeClass}>{"was shown " + (props.message.wasShown?"YES": "NO")  } </Badge>}
@@ -354,6 +399,16 @@ return (<>
                 {/* <img src={props.user?props.user.photoURL:""} alt="" className="circle messageHeaderImg "/>  */}
                 {props.message.ProfileName} 
             </div>
+                 <Button
+                    className={classsRTMsg}
+                    node="button"
+                    small
+                    tooltip="Reply this message"
+                    waves="light"
+                    floating
+                    icon={<Icon>reply</Icon>}
+                    onClick={()=>props.replyCallback(props.message)}
+            />
             <div className="realtimeCard-content white-text">
                 {props.message.Body}
             </div>
