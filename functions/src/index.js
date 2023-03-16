@@ -80,7 +80,7 @@ app.use("/private_api", authenticate);
 //----------------------------------------------------------------
 //        auto translate messages
 //----------------------------------------------------------------
-const LANGUAGES = ['en', 'es', 'pt'];
+const LANGUAGES = ['en', 'es', 'pt', 'de'];
 
 const { Translate } = require('@google-cloud/translate').v2;
 const translate = new Translate();
@@ -92,7 +92,8 @@ async function detectLanguage(text) {
     return detections;
 }
 //---------------------------------------
-async function translateText(txt, lang) {
+async function translateText(txt, lang, index, total) {
+    console.log(index, "/",total);
     let trans = await translate.translate(txt, lang);
     if (trans.length === 0) return null;
     return {
@@ -101,22 +102,26 @@ async function translateText(txt, lang) {
     };
 }
 //---------------------------------------
-async function translateMessage(messageTxt, msgId) {
+async function translateMessage(messageData, msgId, index, total) {
 
-    let lang = await detectLanguage(messageTxt);
+    let lang = await detectLanguage(messageData.content);
     let promises = [];
     if (lang.length === 0) {
         console.log("translateMessage: no language detected");
         return;
     }
+
     let currentLang = lang[0].language.trim();
     // console.log("currentLang:"+ currentLang);
+    // console.log("content: "  + messageData.content);
     for (let l = 0; l < LANGUAGES.length; l++) {
         if (currentLang !== LANGUAGES[l]) {
-            promises.push(translateText(
-                messageTxt,
-                LANGUAGES[l]
-            ));
+            if(!messageData.translations || (messageData.translations && !(LANGUAGES[l] in messageData.translations))){
+                promises.push(translateText(
+                    messageData.content,
+                    LANGUAGES[l], index, total
+                ));
+            }
         }
     }
     let translations = await Promise.all(promises);
@@ -137,10 +142,12 @@ async function makeTranslations() {
     try {
         let boardMessages = await db.collection("boardMessages").get();
         let boardMessagesPromises = [];
+        console.log("make translations");
         for (let i = 0; i < boardMessages.docs.length; i++) {
-            if (!boardMessages.docs[i].data().translations) {
-                boardMessagesPromises.push(translateMessage(boardMessages.docs[i].data().content, boardMessages.docs[i].id));
-            }
+            // if (!boardMessages.docs[i].data().translations) {
+                // console.log(i, "/" , boardMessages.docs.length);
+                boardMessagesPromises.push(translateMessage(boardMessages.docs[i].data(), boardMessages.docs[i].id, i, boardMessages.docs.length));
+            // }
         }
         await Promise.all(boardMessagesPromises);
 
@@ -148,9 +155,37 @@ async function makeTranslations() {
         console.log("makeTranslations failed: " + error);
     }
 }
+async function checkAllTranslated() {
+    try {
+        let boardMessages = await db.collection("boardMessages").get();
+        console.log("checkAllTranslated");
+        let totalMsgs =   boardMessages.docs.length;
+        for (let i = 0; i < boardMessages.docs.length; i++) {
+            let data = boardMessages.docs[i].data();
+            console.log(i, "/" ,totalMsgs);
+            if (!data.translations) {
+                console.log("    No translations:");
 
+                // boardMessagesPromises.push(translateMessage(boardMessages.docs[i].data(), boardMessages.docs[i].id, i,totalMsgs));
+            }else if(!data.translations.original_lang){
+                console.log("    No original lang: ");
+            }else{
+                for (let l = 0; l < LANGUAGES.length; l++) {
+                if (data.translations.original_lang !== LANGUAGES[l]) {
+                    if(!(LANGUAGES[l] in data.translations)){
+                            console.log("    No ", LANGUAGES[l], " translation: ");             
+                        }
+                    }
+                }
+            }
+        }
+
+    } catch (error) {
+        console.log("makeTranslations failed: " + error);
+    }
+
+}
 //----------------------------------------------------------------
-
 
 
 // app.use(cors({ origin: true }));
@@ -488,7 +523,10 @@ try{
 //              PUBLIC API ENDPOINTS
 //     noauthentication required
 //************************************************************************
-
+// app.get('/api/makeTranslations', async (req, res) => {
+//     makeTranslations();
+//     return res.status(200);
+// });
 //-----------------------------------------------------------------------------------------------
 app.get('/api/checkEmail', async (req, res) => {
 
@@ -830,5 +868,22 @@ app.post('/sms', async (req, res) => {
 
 
 
+// to  makeTranslations uncomment the two export functions below. in the terminal run `firebase functions:shell` once ready call `makeTranslations("")` and/or `checkAllTranslated("")`
+
+// exports.makeTranslations = functions.https.onCall((data, ctx) => {
+//     makeTranslations();
+// });
+
+// exports.checkAllTranslated = functions.https.onCall((data, ctx) => {
+//     checkAllTranslated();
+// });
+
 // Expose the app as a function
+// exports.app = functions.runWith({
+//       // Ensure the function has enough memory and time
+//       // to process large files
+//       timeoutSeconds: 540,
+//       memory: "1GB",
+//     }).https.onRequest(app);
 exports.app = functions.https.onRequest(app);
+
