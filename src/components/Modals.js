@@ -744,9 +744,9 @@ export function ModalWorkshopGooglePhotos(props){
             	<label>Google Photos album  for {props.currentWorkshop.name}</label>
             	<TextInput
 				  	id="ModalSetGooglePhotosTextInput"
-				  	label="URL:"
-				  	placeholder={props.currentWorkshop.googlePhotosLink}
-				  	value={(props.currentWorkshop.googlePhotosLink?props.currentWorkshop.googlePhotosLink:"")}
+				  	label="Google Photos URL:"
+				  	placeholder={props.currentWorkshop.googlePhotosLink?props.currentWorkshop.googlePhotosLink:""}
+				  	
 				  	onChange={(e)=> newUrl.current = e.target.value}
 				/>
         		</form>
