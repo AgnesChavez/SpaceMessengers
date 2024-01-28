@@ -11,9 +11,9 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// const cors = require('cors');
+const cors = require('cors');
 
-
+const multer = require('multer');
 
 var serviceAccount = require("./serviceAccountKey.json");
 
@@ -21,7 +21,7 @@ var serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    // storageBucket: "space-messengers.appspot.com"
+    storageBucket: "space_messenger_ar"
 
 });
 
@@ -72,8 +72,25 @@ const authenticate = async (req, res, next) => {
     }
 };
 
+const uploadBearer = "7SmEB9PIFcLIGEXAUEpB8Jw28TbKSJu2hIkM2CzvNMXO+W7xXgV6ATf8f70EnwioPPkfzDR1y2rGZMi+hJbrlA==";
+const authenticate_upload = async (req, res, next) => {
+    console.log("authenticate_upload")
+    if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+        res.status(403).send('Unauthorized');
+        return;
+    }
+    const idToken = req.headers.authorization.split('Bearer ')[1];
+    if (idToken === uploadBearer) {
+        next();
+        return;
+    } else {
+        res.status(403).send('Unauthorized');
+        return;
+    }
+};
 
 app.use("/private_api", authenticate);
+// app.use("/upload_api", authenticate_upload);
 
 
 
@@ -188,7 +205,7 @@ async function checkAllTranslated() {
 //----------------------------------------------------------------
 
 
-// app.use(cors({ origin: true }));
+app.use(cors());
 
 async function getAllCollectionItemsForUser(collectionId, usr){
 
@@ -866,7 +883,157 @@ app.post('/sms', async (req, res) => {
     }
 });
 
+//-----------------------------------------------------------------------------------------------
+//              Image upload endpoint 
+//              multi-part POST request.
+//              image: the actual image file (as a file buffer)
+//-----------------------------------------------------------------------------------------------
 
+const SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  // increase size limit if needed
+  limits: {fieldSize: SIZE_LIMIT},
+  // support firebase cloud functions
+  // the multipart form-data request object is pre-processed by the cloud functions
+  // currently the `multer` library doesn't natively support this behaviour
+  // as such, a custom fork is maintained to enable this by adding `startProcessing`
+  // https://github.com/emadalam/multer
+  startProcessing(req, busboy) {
+    req.rawBody ? busboy.end(req.rawBody) : req.pipe(busboy)
+  },
+});
+
+app.post('/upload_api', upload.any(), async function(req, res) {
+ try {
+
+ // if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+ //        return res.status(403).send('Unauthorized');
+ //    }
+ //    const idToken = req.headers.authorization.split('Bearer ')[1];
+ //    if (idToken === uploadBearer) {
+ //        // next();
+ //        // return;
+ //    } else {
+ //        return res.status(403).send('Unauthorized');
+ //    }
+
+        // console.log(req);
+        const {
+            fieldname,
+            originalname,
+            encoding,
+            mimetype,
+            buffer,
+        } = req.files[0];
+
+
+        const extension = path.extname(originalname);
+
+        
+        var filepath = "selfies/" + Date.now() + extension ;
+
+        console.log("filepath: ", filepath);
+//*
+        var bucket = admin.storage().bucket();
+        const file = bucket.file(filepath);
+
+        // try {
+        // Create stream to write the image's buffer
+        const stream = file.createWriteStream({
+            metadata: {
+                contentType: mimetype
+            }
+        });
+
+        var success = false;
+        var errorMessage = "";
+        // stream.on('error', function(err) {
+        //     errorMessage = err;
+        //     functions.logger.log("api/upload ERROR writting stream: ", err);
+        // });
+        
+        // stream.on('finish', async function() {
+            
+        // });
+
+        const promise = new Promise((resolve, reject) => {
+        stream.on('finish', () => {
+            console.log("stream finish");
+            try {
+    file.makePublic(function(err, apiResponse) {
+        if(err){functions.logger.log("err", err);}
+        if(apiResponse){functions.logger.log("apiResponse", apiResponse);}
+    });
+    // let url = imageBaseURL;
+    // let fileName = file.name.trim();
+    // if( fileName.startsWith("/")){
+    //     fileName = fileName.substring(1);
+    // }
+    // url += fileName;
+
+    // console.log("makePublic: ", url );
+
+    
+    // const fileMetadata = await file.getMetadata();
+    // functions.logger.log("makePublic: ", fileMetadata);
+    // return fileMetadata[0].mediaLink;
+    
+
+                success = true;
+                resolve();
+            } catch (error) {
+                success = false;
+                functions.logger.log('upload failed ', error.message);
+                errorMessage = error.message;
+                reject();
+                return;
+            }          
+
+        });
+
+        stream.on('error', function(err) {
+            errorMessage = err;
+            functions.logger.log("api/upload ERROR writting stream: ", err);
+            reject();
+        });
+        
+        stream.end(buffer);
+
+        });
+        const fileWrites = [];
+        fileWrites.push(promise);
+    
+
+        
+
+//*/
+        await Promise.all(fileWrites);
+
+        // console.log("after stream end");
+
+        if(success === false){
+            return res.status(500).json({ uploadSuccess: false, error: "Some error happened when uploading: " + errorMessage });
+        }
+        
+        console.log('Transaction success!');
+
+
+        // console.log("pictureURL: ", pictureURL);
+        // } catch (error) {
+        //     console.log('Error updating value', error.message);
+        //     res.status(500).json({ uploadSuccess: false, error: error.message });
+        //     return;
+        // }
+
+        return res.status(200).json({ uploadSuccess: true,  publicUrl: file.publicUrl(), fieldname, originalname, encoding, mimetype });
+    } catch (error) {
+        functions.logger.log('Error uploading image', error.message);
+        return res.status(500).json({ uploadSuccess: false, error: error.message });
+    }
+});
+//*/
 
 // to  makeTranslations uncomment the two export functions below. in the terminal run `firebase functions:shell` once ready call `makeTranslations("")` and/or `checkAllTranslated("")`
 
