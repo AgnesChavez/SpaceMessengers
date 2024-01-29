@@ -90,7 +90,7 @@ const authenticate_upload = async (req, res, next) => {
 };
 
 app.use("/private_api", authenticate);
-// app.use("/upload_api", authenticate_upload);
+app.use("/upload_api", authenticate_upload);
 
 
 
